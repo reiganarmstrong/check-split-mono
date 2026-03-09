@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 import { Navbar } from "@/components/landing/navbar";
+import { SiteFooter } from "@/components/landing/site-footer";
 
 export default function RootLayout({
   children,
@@ -33,7 +34,10 @@ export default function RootLayout({
       >
         <div className="flex min-h-screen flex-col bg-background font-sans">
           <Navbar />
-          {children}
+          <div className="flex-1 flex flex-col">
+            {children}
+          </div>
+          <SiteFooter />
         </div>
       </body>
     </html>
