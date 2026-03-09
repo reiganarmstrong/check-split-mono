@@ -6,7 +6,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-background min-h-[calc(100vh-3.5rem)] flex items-center pt-8 pb-16">
       {/* Background patterns */}
-      <div className="absolute inset-[-100%] z-0 bg-[linear-gradient(to_right,#80808015_1px,transparent_1px),linear-gradient(to_bottom,#80808015_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]"></div>
       <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary opacity-20 blur-[100px]"></div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
