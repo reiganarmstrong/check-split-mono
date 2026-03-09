@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ReceiptText, ScanLine } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
   return (
@@ -17,8 +17,7 @@ export default function LoginPage() {
         
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-purple-600 shadow-md mb-2">
-            <ReceiptText className="absolute h-7 w-7 text-white z-10" />
-            <ScanLine className="absolute h-10 w-10 text-white/40 p-1" />
+            <LogIn className="h-7 w-7 text-white mr-0.5" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
           <p className="text-muted-foreground text-sm">Enter your email and password to sign in.</p>

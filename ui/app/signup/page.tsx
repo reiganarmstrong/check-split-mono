@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ReceiptText, ScanLine } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 
 export default function SignupPage() {
   return (
@@ -18,8 +18,7 @@ export default function SignupPage() {
         
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-purple-600 shadow-md mb-2">
-            <ReceiptText className="absolute h-7 w-7 text-white z-10" />
-            <ScanLine className="absolute h-10 w-10 text-white/40 p-1" />
+            <UserPlus className="h-7 w-7 text-white mt-0.5 ml-0.5" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
           <p className="text-muted-foreground text-sm">Enter your details below to get started.</p>
