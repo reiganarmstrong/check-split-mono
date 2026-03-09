@@ -23,7 +23,7 @@ export function Navbar() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button size="sm" className="shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">Get Started</Button>
+              <Button size="sm" className="shadow-sm hover:shadow-md active:shadow-md transition-all duration-300 hover:-translate-y-0.5 active:-translate-y-0.5">Get Started</Button>
             </Link>
           </nav>
         </div>

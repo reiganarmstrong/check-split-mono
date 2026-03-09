@@ -69,7 +69,7 @@ export default function SignupPage() {
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" type="button" className="h-11 shadow-sm bg-background/50 backdrop-blur-sm hover:bg-[#4285F4]/10 hover:text-[#4285F4] hover:border-[#4285F4]/50 transition-colors">
+            <Button variant="outline" type="button" className="h-11 shadow-sm bg-background/50 backdrop-blur-sm hover:bg-[#4285F4]/10 active:bg-[#4285F4]/10 hover:text-[#4285F4] hover:border-[#4285F4]/50 transition-colors">
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -90,7 +90,7 @@ export default function SignupPage() {
               </svg>
               Google
             </Button>
-            <Button variant="outline" type="button" className="h-11 shadow-sm bg-background/50 backdrop-blur-sm hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black hover:border-black dark:hover:border-white transition-colors">
+            <Button variant="outline" type="button" className="h-11 shadow-sm bg-background/50 backdrop-blur-sm hover:bg-black active:bg-black hover:text-white active:text-white dark:hover:bg-white dark:active:bg-white dark:hover:text-black dark:active:text-black hover:border-black active:border-black dark:hover:border-white dark:active:border-white transition-colors">
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.04 2.26-.74 3.58-.8 1.58-.09 2.94.51 3.76 1.65-3.37 1.88-2.82 6.03.35 7.34-.78 1.91-1.8 3.02-2.77 3.98zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
               </svg>

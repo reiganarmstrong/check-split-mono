@@ -36,7 +36,7 @@ export function Hero() {
               </Button>
             </Link>
             <Link href="#features" className="w-full sm:w-auto">
-              <Button variant="outline" size="lg" className="h-14 px-8 text-lg w-full rounded-full border-2 hover:bg-accent transition-all duration-300 shadow-sm hover:shadow-md">
+              <Button variant="outline" size="lg" className="h-14 px-8 text-lg w-full rounded-full border-2 hover:bg-accent active:bg-accent transition-all duration-300 shadow-sm hover:shadow-md">
                 See How It Works
               </Button>
             </Link>
