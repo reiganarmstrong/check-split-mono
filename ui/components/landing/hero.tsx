@@ -6,7 +6,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden bg-background min-h-[calc(100vh-3.5rem)] flex items-center pt-8 pb-16">
       {/* Background patterns */}
-      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[32px_32px]"></div>
       <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary opacity-20 blur-[100px]"></div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
@@ -30,13 +30,21 @@ export function Hero() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full sm:w-auto">
             <Link href="/signup" className="w-full sm:w-auto">
-              <Button size="lg" className="h-14 px-8 text-lg w-full rounded-full shadow-md hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300 group">
+
+              <Button size="lg" className="h-14 px-8 text-lg w-full rounded-full shadow-md hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300 group hidden sm:flex">
                 Start Splitting for Free
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
+              <Button size="lg" className="h-14 px-8 text-lg w-full rounded-full shadow-md hover:shadow-xl hover:shadow-primary/20 flex sm:hidden">
+                Start Splitting for Free
+                <ArrowRight className="" />
+              </Button>
             </Link>
             <Link href="#features" className="w-full sm:w-auto">
-              <Button variant="outline" size="lg" className="h-14 px-8 text-lg w-full rounded-full border-2 hover:bg-accent active:bg-accent transition-all duration-300 shadow-sm hover:shadow-md">
+              <Button variant="outline" size="lg" className="h-14 px-8 text-lg w-full rounded-full border-2 hover:bg-accent transition-all duration-300 shadow-sm hover:shadow-md hidden sm:flex">
+                See How It Works
+              </Button>
+              <Button variant="outline" size="lg" className="h-14 px-8 text-lg w-full rounded-full border-2 hover:bg-accent shadow-sm hover:shadow-md flex sm:hidden">
                 See How It Works
               </Button>
             </Link>
