@@ -8,4 +8,5 @@ fi
 
 # fetch the token from Bitwarden
 echo "Fetching Cloudflare token from Bitwarden..."
-export CLOUDFLARE_API_TOKEN=$(bw get item "Cloudflare Terraform Token" | jq -r '.fields[] | select(.name == "API_KEY") | .value')
+# leading space to prevent saving in shell history
+ CLOUDFLARE_API_TOKEN=$(bw get item "Cloudflare Terraform Token" | jq -r '.fields[] | select(.name == "API_KEY") | .value') terraform "$@"
