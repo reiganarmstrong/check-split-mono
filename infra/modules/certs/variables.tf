@@ -1,9 +1,17 @@
-variable "domain_name" {
-    type = string
-    description = "Root domain name."
+variable "subdomain" {
+  type = string
 }
 
 variable "cloudflare_zone_id" {
-  type = string
+  type        = string
   description = "Cloudflare domain zone id."
+}
+
+variable "root_domain" {
+  type = string
+}
+
+variable "environment" {
+  type        = string
+  description = "The environment name"
 }
