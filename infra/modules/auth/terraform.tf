@@ -4,6 +4,8 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 6.0"
     }
+
+    # CLOUDFLARE_API_TOKEN environment variable used for authentication
     cloudflare = {
       source  = "cloudflare/cloudflare"
       version = ">= 5.0"
@@ -16,6 +18,5 @@ provider "aws" {
   profile = "default"
 }
 
-provider "cloudflare" {
-  # CLOUDFLARE_API_TOKEN environment variable used for authentication
-}
+
+
