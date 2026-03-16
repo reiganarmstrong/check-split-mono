@@ -1,11 +1,3 @@
-module "certs" {
-  source             = "../certs"
-  root_domain        = var.root_domain
-  subdomain          = var.subdomain
-  cloudflare_zone_id = var.cloudflare_zone_id
-  environment        = var.environment
-}
-
 locals {
   environment_domain_prefix = var.environment == "prod" ? "" : "${var.environment}."
   auth_domain               = "auth.${local.environment_domain_prefix}${var.subdomain}"
@@ -45,7 +37,7 @@ resource "aws_cognito_user_pool" "checksplit_user_pool" {
 resource "aws_cognito_user_pool_domain" "checksplit_custom_domain" {
   domain          = local.auth_domain
   user_pool_id    = aws_cognito_user_pool.checksplit_user_pool.id
-  certificate_arn = module.certs.validated_cert_arn
+  certificate_arn = var.validated_cert_arn
 }
 
 # create cloudflare dns records for the custom cognito domain cloudfront distribution
