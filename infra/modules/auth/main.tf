@@ -62,7 +62,7 @@ resource "cloudflare_dns_record" "auth_cognito" {
 }
 
 
-resource "aws_cognito_user_pool_client" "userpool_client" {
+resource "aws_cognito_user_pool_client" "checksplit_user_pool_client" {
   name         = "client"
   user_pool_id = aws_cognito_user_pool.checksplit_user_pool.id
 
