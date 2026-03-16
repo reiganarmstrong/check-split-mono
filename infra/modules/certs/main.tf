@@ -17,13 +17,16 @@ resource "aws_acm_certificate" "cert" {
 resource "cloudflare_dns_record" "validation" {
   # iterate over all mandated records
   for_each = {
-    # remove wildcard prefix from domain_name as the key to prevent duplicate record error in cloudflare
-    # we cannot use resource_record_name because it is not known until apply time
-    for dvo in aws_acm_certificate.cert.domain_validation_options : trimprefix(dvo.domain_name, "*.") => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
+    # group the records with possible say name and values, only take the first one
+    for k, v in {
+      # remove wildcard prefix from domain_name as the key to prevent duplicate record error in cloudflare
+      # we cannot use resource_record_name because it is not known until apply time
+      for dvo in aws_acm_certificate.cert.domain_validation_options : trimprefix(dvo.domain_name, "*.") => {
+        name   = dvo.resource_record_name
+        record = dvo.resource_record_value
+        type   = dvo.resource_record_type
+      }...
+    } : k => v[0]
   }
 
   zone_id = var.cloudflare_zone_id
