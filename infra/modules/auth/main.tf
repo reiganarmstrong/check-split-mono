@@ -61,7 +61,6 @@ resource "aws_cognito_user_pool_client" "checksplit_user_pool_client" {
   # allow users to sign in with username and password with refresh tokens
   explicit_auth_flows = [
     "ALLOW_USER_SRP_AUTH",
-    "ALLOW_REFRESH_TOKEN_AUTH"
   ]
 
   # enable refresh token rotation
