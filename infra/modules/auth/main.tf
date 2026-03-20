@@ -34,6 +34,8 @@ resource "aws_cognito_user_pool" "checksplit_user_pool" {
 
 }
 
+# assign the user pool a custom domain used by federated login providers
+# this will show the checksplit domain rather than cognito when logging in with google or apple
 resource "aws_cognito_user_pool_domain" "checksplit_custom_domain" {
   domain          = local.auth_domain
   user_pool_id    = aws_cognito_user_pool.checksplit_user_pool.id
