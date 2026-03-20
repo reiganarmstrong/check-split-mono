@@ -1,5 +1,5 @@
-module "certs" {
-  source             = "../../modules/certs"
+module "certificates" {
+  source             = "../../modules/certificates"
   environment        = var.environment
   root_domain        = var.root_domain
   subdomain          = var.subdomain
@@ -8,7 +8,7 @@ module "certs" {
 
 module "cognito-auth" {
   source             = "../../modules/cognito-auth"
-  validated_cert_arn = module.certs.validated_cert_arn
+  validated_cert_arn = module.certificates.validated_cert_arn
   environment        = var.environment
   root_domain        = var.root_domain
   subdomain          = var.subdomain
