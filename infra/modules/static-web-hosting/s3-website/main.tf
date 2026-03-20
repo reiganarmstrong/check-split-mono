@@ -1,5 +1,8 @@
 resource "aws_s3_bucket" "checksplit_bucket" {
   bucket = var.bucket_name
+  tags = {
+    Environment = var.environment
+  }
 }
 
 # block all public access, will use OAC via cloudfront to access the bucket
