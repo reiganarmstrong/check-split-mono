@@ -3,7 +3,7 @@ locals {
 }
 
 # request the ACM Certificate
-resource "aws_acm_certificate" "cert" {
+resource "aws_acm_certificate" "this" {
   domain_name               = var.root_domain
   subject_alternative_names = ["${local.environment_domain_prefix}${var.subdomain}", "*.${local.environment_domain_prefix}${var.subdomain}"]
   validation_method         = "DNS"
@@ -14,14 +14,14 @@ resource "aws_acm_certificate" "cert" {
 }
 
 # create ACM mandated dns records in cloudflare to prove ownership
-resource "cloudflare_dns_record" "validation" {
+resource "cloudflare_dns_record" "this" {
   # iterate over all mandated records
   for_each = {
     # group the records with possible say name and values, only take the first one
     for k, v in {
       # remove wildcard prefix from domain_name as the key to prevent duplicate record error in cloudflare
       # we cannot use resource_record_name because it is not known until apply time
-      for dvo in aws_acm_certificate.cert.domain_validation_options : trimprefix(dvo.domain_name, "*.") => {
+      for dvo in aws_acm_certificate.this.domain_validation_options : trimprefix(dvo.domain_name, "*.") => {
         name   = dvo.resource_record_name
         record = dvo.resource_record_value
         type   = dvo.resource_record_type
@@ -40,7 +40,7 @@ resource "cloudflare_dns_record" "validation" {
 }
 
 # trigger the validation process
-resource "aws_acm_certificate_validation" "cert_validation" {
-  certificate_arn         = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [for record in cloudflare_dns_record.validation : record.name]
+resource "aws_acm_certificate_validation" "this" {
+  certificate_arn         = aws_acm_certificate.this.arn
+  validation_record_fqdns = [for record in cloudflare_dns_record.this : record.name]
 }

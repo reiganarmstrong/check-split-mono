@@ -1,4 +1,4 @@
-resource "aws_cognito_user_pool" "user_pool" {
+resource "aws_cognito_user_pool" "this" {
   name = var.cognito_user_pool_resource_name
 
   # sets the email as the username and allows cognito to handle verification of email
@@ -31,29 +31,29 @@ resource "aws_cognito_user_pool" "user_pool" {
 
 # assign the user pool a custom domain used by federated login providers
 # this will show the checksplit domain rather than cognito when logging in with google or apple
-resource "aws_cognito_user_pool_domain" "custom_domain" {
+resource "aws_cognito_user_pool_domain" "this" {
   domain          = var.auth_domain
-  user_pool_id    = aws_cognito_user_pool.user_pool.id
+  user_pool_id    = aws_cognito_user_pool.this.id
   certificate_arn = var.validated_cert_arn
 }
 
 # create cloudflare dns records for the custom cognito domain cloudfront distribution
 # this reroutes the traffic to the auth url to cognito
-resource "cloudflare_dns_record" "auth_cognito" {
+resource "cloudflare_dns_record" "this" {
   zone_id = var.cloudflare_zone_id
   name    = var.auth_domain
   # ttl of 1 means automatic in cloudflare
   ttl     = 1
   type    = "CNAME"
   comment = "Domain verification record"
-  content = aws_cognito_user_pool_domain.custom_domain.cloudfront_distribution
+  content = aws_cognito_user_pool_domain.this.cloudfront_distribution
   proxied = false
 }
 
 
-resource "aws_cognito_user_pool_client" "user_pool_client" {
+resource "aws_cognito_user_pool_client" "this" {
   name         = "client"
-  user_pool_id = aws_cognito_user_pool.user_pool.id
+  user_pool_id = aws_cognito_user_pool.this.id
 
   # allow users to sign in with username and password with refresh tokens
   explicit_auth_flows = [
