@@ -20,3 +20,11 @@ variable "validated_cert_arn" {
   description = "The arn of the acm certificate indicating ownership of the domain"
   type        = string
 }
+
+variable "auth_domain" {
+  type = string
+}
+
+variable "cognito_user_pool_resource_name" {
+  type = string
+}

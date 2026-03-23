@@ -1,10 +1,5 @@
-locals {
-  environment_domain_prefix = var.environment == "prod" ? "" : "${var.environment}."
-  auth_domain               = "auth.${local.environment_domain_prefix}${var.subdomain}"
-}
-
-resource "aws_cognito_user_pool" "checksplit_user_pool" {
-  name = "checksplit_user_pool_${var.environment}"
+resource "aws_cognito_user_pool" "user_pool" {
+  name = var.cognito_user_pool_resource_name
 
   # sets the email as the username and allows cognito to handle verification of email
   username_attributes      = ["email"]
@@ -36,9 +31,9 @@ resource "aws_cognito_user_pool" "checksplit_user_pool" {
 
 # assign the user pool a custom domain used by federated login providers
 # this will show the checksplit domain rather than cognito when logging in with google or apple
-resource "aws_cognito_user_pool_domain" "checksplit_custom_domain" {
-  domain          = local.auth_domain
-  user_pool_id    = aws_cognito_user_pool.checksplit_user_pool.id
+resource "aws_cognito_user_pool_domain" "custom_domain" {
+  domain          = var.auth_domain
+  user_pool_id    = aws_cognito_user_pool.user_pool.id
   certificate_arn = var.validated_cert_arn
 }
 
@@ -46,19 +41,19 @@ resource "aws_cognito_user_pool_domain" "checksplit_custom_domain" {
 # this reroutes the traffic to the auth url to cognito
 resource "cloudflare_dns_record" "auth_cognito" {
   zone_id = var.cloudflare_zone_id
-  name    = local.auth_domain
+  name    = var.auth_domain
   # ttl of 1 means automatic in cloudflare
   ttl     = 1
   type    = "CNAME"
   comment = "Domain verification record"
-  content = aws_cognito_user_pool_domain.checksplit_custom_domain.cloudfront_distribution
+  content = aws_cognito_user_pool_domain.custom_domain.cloudfront_distribution
   proxied = false
 }
 
 
-resource "aws_cognito_user_pool_client" "checksplit_user_pool_client" {
+resource "aws_cognito_user_pool_client" "user_pool_client" {
   name         = "client"
-  user_pool_id = aws_cognito_user_pool.checksplit_user_pool.id
+  user_pool_id = aws_cognito_user_pool.user_pool.id
 
   # allow users to sign in with username and password with refresh tokens
   explicit_auth_flows = [
