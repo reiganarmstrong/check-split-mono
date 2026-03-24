@@ -12,3 +12,9 @@ terraform {
     }
   }
 }
+
+provider "aws" {
+  # needed for cloudfront acm certificate
+  region  = "us-east-1"
+  profile = "default"
+}
