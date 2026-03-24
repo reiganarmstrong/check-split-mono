@@ -14,7 +14,7 @@ module "certificates" {
 }
 
 module "static-website-hosting" {
-  source                   = "../../modules/static-web-hosting"
+  source                   = "../../modules/static-website-hosting"
   environment              = var.environment
   bucket_name              = var.bucket_name
   cloudflare_zone_id       = var.cloudflare_zone_id
