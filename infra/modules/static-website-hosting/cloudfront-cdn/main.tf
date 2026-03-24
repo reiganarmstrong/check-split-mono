@@ -1,3 +1,7 @@
+locals {
+  dummy_ip = "127.0.0.1"
+}
+
 # create the oac for cloudfront as identification for points of presence for s3
 resource "aws_cloudfront_origin_access_control" "this" {
   name                              = "oac-${var.s3_bucket_id}"
@@ -97,6 +101,7 @@ resource "aws_s3_bucket_policy" "this" {
 }
 
 # record to point cloudflare to cloudfront
+# IMPORTANT: Uncomment after cognito user pool creation
 resource "cloudflare_dns_record" "this" {
   zone_id = var.cloudflare_zone_id
   # is assumed to not be zone apex
@@ -106,3 +111,17 @@ resource "cloudflare_dns_record" "this" {
   content = aws_cloudfront_distribution.this.domain_name
   proxied = false
 }
+
+# dummy record needed by cognito to not error on creation 
+# cognito needs an explicit A record for a custom domain indicating there is a resource
+#     behind the domain, a cname record is not enough
+# IMPORTANT: Comment after cognito user pool initial creation
+# resource "cloudflare_dns_record" "this" {
+#   zone_id = var.cloudflare_zone_id
+#   # is assumed to not be zone apex
+#   name    = var.cloudfront_custom_domain
+#   ttl     = 1
+#   type    = "A"
+#   content = local.dummy_ip
+#   proxied = false
+# }
