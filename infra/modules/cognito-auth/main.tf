@@ -1,0 +1,82 @@
+resource "aws_cognito_user_pool" "this" {
+  name = var.cognito_user_pool_resource_name
+
+  # sets the email as the username and allows cognito to handle verification of email
+  username_attributes      = ["email"]
+  auto_verified_attributes = ["email"]
+
+  # TODO: Custom email configuration for prod env
+
+  # sets the password policy to secure defaults
+  password_policy {
+    minimum_length    = 8
+    require_lowercase = true
+    require_uppercase = true
+    require_numbers   = true
+    require_symbols   = true
+  }
+
+  # sets the account recovery options to verified email only
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
+
+  # explicit MFA configuration for readability
+  mfa_configuration = "OFF"
+
+}
+
+# assign the user pool a custom domain used by federated login providers
+# this will show the checksplit domain rather than cognito when logging in with google or apple
+resource "aws_cognito_user_pool_domain" "this" {
+  domain          = var.auth_domain
+  user_pool_id    = aws_cognito_user_pool.this.id
+  certificate_arn = var.validated_cert_arn
+}
+
+# create cloudflare dns records for the custom cognito domain cloudfront distribution
+# this reroutes the traffic to the auth url to cognito
+resource "cloudflare_dns_record" "this" {
+  zone_id = var.cloudflare_zone_id
+  name    = var.auth_domain
+  # ttl of 1 means automatic in cloudflare
+  ttl     = 1
+  type    = "CNAME"
+  comment = "Domain verification record"
+  content = aws_cognito_user_pool_domain.this.cloudfront_distribution
+  proxied = false
+}
+
+
+resource "aws_cognito_user_pool_client" "this" {
+  name         = "client"
+  user_pool_id = aws_cognito_user_pool.this.id
+
+  # allow users to sign in with username and password with refresh tokens
+  explicit_auth_flows = [
+    "ALLOW_USER_SRP_AUTH",
+  ]
+
+  # enable refresh token rotation
+  refresh_token_rotation {
+    feature = "ENABLED"
+    # prevents flaky network requests from causing refresh token rotation to fail
+    retry_grace_period_seconds = 60
+  }
+
+  # prevent guessing of registered emails
+  prevent_user_existence_errors = "ENABLED"
+
+  # TODO: Configure google and apple federated providers
+  # allowed_oauth_flows_user_pool_client = true
+  # allowed_oauth_flows                  = ["code"]
+  # supported_identity_providers         = ["COGNITO", "Google", "SignInWithApple"]
+
+  # allowed_oauth_scopes = ["email", "openid", "profile"]
+
+  # callback_urls = ["${local.environment_domain_prefix}${var.subdomain}"]
+  # logout_urls   = ["${local.environment_domain_prefix}${var.subdomain}"]
+}
