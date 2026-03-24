@@ -15,3 +15,8 @@ variable "root_domain" {
 variable "subdomain" {
   type = string
 }
+
+variable "bucket_name" {
+  type = string
+
+}
