@@ -1,4 +1,4 @@
-variable "subdomain" {
+variable "app_subdomain" {
   type = string
 }
 

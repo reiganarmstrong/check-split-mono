@@ -1,11 +1,7 @@
-locals {
-  environment_domain_prefix = var.environment == "prod" ? "" : "${var.environment}."
-}
-
 # request the ACM Certificate
 resource "aws_acm_certificate" "this" {
   domain_name               = var.root_domain
-  subject_alternative_names = ["${local.environment_domain_prefix}${var.subdomain}", "*.${local.environment_domain_prefix}${var.subdomain}"]
+  subject_alternative_names = ["${var.app_subdomain}", "*.${var.app_subdomain}"]
   validation_method         = "DNS"
 
   lifecycle {
