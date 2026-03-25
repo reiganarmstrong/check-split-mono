@@ -1,0 +1,43 @@
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/environments/dev**"
+      - "infra/modules/**"
+
+permissions:
+  pull-requests: write
+  # needed since we are now defining permissions
+  contents: read
+
+jobs:
+  terraform-plan-dev:
+    defaults:
+      run:
+        working-directory: ./infra/environments/dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          # only include the necessary files
+          sparse-checkout: |
+            infra/environments/dev
+            infra/modules
+            .github/scripts
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.14.7"
+      - name: Terraform Init
+        run: terraform init
+      - name: Terraform Plan
+        # output plan into a txt file for bash script to read
+        run: terraform plan -no-color > plan.txt
+      - name: Terraform Plan Status
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: ./pr-plan-comment.sh
