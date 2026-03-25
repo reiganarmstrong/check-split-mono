@@ -2,7 +2,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "infra/environments/dev**"
+      - "infra/environments/dev/**"
       - "infra/modules/**"
 jobs:
   terraform-deploy-dev:
