@@ -16,6 +16,8 @@ jobs:
       run:
         working-directory: ./infra/environments/dev
     runs-on: ubuntu-latest
+    environment:
+      name: dev
 
     steps:
       - name: Checkout the code
