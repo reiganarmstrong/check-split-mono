@@ -1,0 +1,38 @@
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ui/**"
+jobs:
+  ui-deploy-dev:
+    defaults:
+      run:
+        working-directory: ./ui
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          # only include the necessary files
+          sparse-checkout: |
+            ui
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ^10.32.1
+
+      - name: Install correct node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install pnpm dependencies
+        run: pnpm install
+
+      - name: Build static files
+        run: pnpm run build
