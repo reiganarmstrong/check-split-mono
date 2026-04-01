@@ -4,35 +4,21 @@
 set -e
 
 # check for required environment variables
-if [ -z "$GITHUB_REPOSITORY" ] || [ -z "$PR_NUMBER" ] || [ -z "$GITHUB_TOKEN" ]; then
-  echo "Error: Missing GITHUB_REPOSITORY, PR_NUMBER, or GITHUB_TOKEN."
+if [ -z "$GITHUB_REPOSITORY" ] || [ -z "$PR_NUMBER" ] || [ -z "$GITHUB_TOKEN" ] || [ -z "$PLAN_STATUS" ]; then
+  echo "Error: Missing GITHUB_REPOSITORY, PR_NUMBER, GITHUB_TOKEN, or PLAN_STATUS."
   exit 1
 fi
 
-# read the terraform plan output from a file
-if [ ! -f "plan.txt" ]; then
-  echo "Error: plan.txt not found."
-  exit 1
-fi
-PLAN_OUTPUT=$(cat plan.txt)
-
-# hidden marker for finding the comment later
 MARKER="<!--terraform-plan-comment-->"
-COMMENT_BODY=$(cat <<EOF
-$MARKER
-#### Terraform Plan 📖
 
-<details><summary>Click to expand the full plan</summary>
-
-\`\`\`terraform
-$PLAN_OUTPUT
-\`\`\`
-
-</details>
-
-*Last updated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")*
-EOF
-)
+if [ "$PLAN_STATUS" = "success" ]; then
+  COMMENT_BODY="$MARKER
+**Terraform Plan Succeeded**"
+else
+  COMMENT_BODY="$MARKER
+**Terraform Plan Failed**
+Please check the workflow logs for details."
+fi
 
 # search for an existing comment with our marker
 echo "Searching for existing Terraform plan comment on PR #$PR_NUMBER..."

@@ -35,11 +35,15 @@ jobs:
       - name: Terraform Init
         run: terraform init
       - name: Terraform Plan
-        # output plan into a txt file for bash script to read
-        run: terraform plan -no-color > plan.txt
-      - name: Terraform Plan Status
-        working-directory: .github/scripts
+        id: tf-plan
+        run: terraform plan -no-color
+        continue-on-error: true
+      - name: Comment on PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: ./pr-plan-comment.sh
+          PLAN_STATUS: ${{ steps.tf-plan.outcome }}
+        run: bash $GITHUB_WORKSPACE/.github/scripts/pr-plan-comment.sh
+      - name: Fail workflow
+        if: steps.tf-plan.outcome == 'failure'
+        run: exit 1
