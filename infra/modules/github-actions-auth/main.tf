@@ -71,7 +71,3 @@ resource "aws_iam_role_policy_attachment" "github_actions_role_s3_read_write_pol
   policy_arn = aws_iam_policy.s3_read_write_policy.arn
 }
 
-# output the ARN to use in GitHub workflow
-output "github_actions_role_arn" {
-  value = aws_iam_role.github_actions_role.arn
-}
