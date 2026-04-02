@@ -44,6 +44,6 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PLAN_STATUS: ${{ steps.tf-plan.outcome }}
         run: bash $GITHUB_WORKSPACE/.github/scripts/pr-plan-comment.sh
-      - name: Fail workflow
+      - name: Fail job
         if: steps.tf-plan.outcome == 'failure'
         run: exit 1
