@@ -28,6 +28,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
+      - name: Create tfvars file
+        run: echo "${{ secrets.TFVARS }}" > terraform.tfvars
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v4
         with:
