@@ -20,9 +20,9 @@ resource "aws_iam_role" "github_actions_role" {
           StringEquals = {
             "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
           }
-          # ensures that the token is meant for this repo and branch
+          # ensures that the token is meant for this repo and environment
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:${var.github_repo_path}:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" : "repo:${var.github_repo_path}:environment:${var.github_repo_environment}"
           }
         }
       }
@@ -30,7 +30,7 @@ resource "aws_iam_role" "github_actions_role" {
   })
 }
 
-# Output the ARN so you can use it in your GitHub workflow
+# Output the ARN to use in GitHub workflow
 output "github_actions_role_arn" {
   value = aws_iam_role.github_actions_role.arn
 }

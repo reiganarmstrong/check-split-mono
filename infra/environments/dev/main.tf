@@ -36,4 +36,10 @@ module "cognito-auth" {
 }
 
 
-
+module "github-actions-auth" {
+  source                  = "../../modules/github-actions-auth"
+  environment             = var.environment
+  repo_name               = var.repo_name
+  github_repo_path        = var.github_repo_path
+  github_repo_environment = var.github_repo_environment
+}
