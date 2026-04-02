@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "s3_read_write_policy_definition" {
 
 # create the policy resource from the definition above
 resource "aws_iam_policy" "s3_read_write_policy" {
-  name   = "${var.s3_bucket_arn}-read-write-policy"
+  name   = "${var.s3_bucket_name}-read-write-policy"
   policy = data.aws_iam_policy_document.s3_read_write_policy_definition.json
 }
 
