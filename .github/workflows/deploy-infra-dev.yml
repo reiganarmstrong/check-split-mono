@@ -29,7 +29,10 @@ jobs:
           aws-region: us-east-1
 
       - name: Create tfvars file
-        run: echo "${{ secrets.TFVARS }}" > terraform.tfvars
+        # load into env variable then make to file to prevent bash from stripping out newlines needed by terraform
+        env:
+          TFVARS_CONTENT: ${{ secrets.TFVARS }}
+        run: echo "$TFVARS_CONTENT" > terraform.tfvars
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v4
