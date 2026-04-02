@@ -14,3 +14,7 @@ variable "github_repo_path" {
 variable "github_repo_environment" {
   type = string
 }
+
+variable "s3_bucket_arn" {
+  type = string
+}

@@ -42,4 +42,5 @@ module "github-actions-auth" {
   repo_name               = var.repo_name
   github_repo_path        = var.github_repo_path
   github_repo_environment = var.github_repo_environment
+  s3_bucket_arn           = module.static-website-hosting.s3_bucket_arn
 }
