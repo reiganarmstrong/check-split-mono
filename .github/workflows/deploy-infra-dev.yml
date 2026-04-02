@@ -21,11 +21,22 @@ jobs:
           sparse-checkout: |
             infra/environments/dev
             infra/modules
+
+      - name: AWS Auth
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.14.7"
+
       - name: Terraform Init
         run: terraform init
+
       - name: Terraform Apply
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: terraform apply -auto-approve
