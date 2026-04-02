@@ -6,6 +6,8 @@ on:
       - "infra/modules/**"
 
 permissions:
+  # AWS OIDC
+  id-token: write
   pull-requests: write
   # needed since we are now defining permissions
   contents: read
