@@ -1,5 +1,7 @@
 terraform {
-  backend "s3" {}
+  backend "s3" {
+    # define parameters in backend.hcl
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
