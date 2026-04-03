@@ -43,24 +43,33 @@ jobs:
           TFVARS_CONTENT: ${{ secrets.TFVARS }}
         run: echo "$TFVARS_CONTENT" > terraform.tfvars
 
+      - name: Create backend.hcl file
+        env:
+          BACKEND_CONTENT: ${{ secrets.TF_S3_BACKEND }}
+        run: echo "$BACKEND_CONTENT" > backend.hcl
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.14.7"
+
       - name: Terraform Init
-        run: terraform init -input=false > /dev/null 2>&1
+        run: terraform init -input=false -backend-config=backend.hcl > /dev/null 2>&1
+
       - name: Terraform Plan
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         id: tf-plan
         run: terraform plan -no-color -out=tfplan -input=false > /dev/null 2>&1
         continue-on-error: true
+
       - name: Comment on PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PLAN_STATUS: ${{ steps.tf-plan.outcome }}
         run: bash $GITHUB_WORKSPACE/.github/scripts/pr-plan-comment.sh
+
       - name: Fail job
         if: steps.tf-plan.outcome == 'failure'
         run: exit 1

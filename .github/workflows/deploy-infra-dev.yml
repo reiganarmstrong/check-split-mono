@@ -34,13 +34,18 @@ jobs:
           TFVARS_CONTENT: ${{ secrets.TFVARS }}
         run: echo "$TFVARS_CONTENT" > terraform.tfvars
 
+      - name: Create backend.hcl file
+        env:
+          BACKEND_CONTENT: ${{ secrets.TF_S3_BACKEND }}
+        run: echo "$BACKEND_CONTENT" > backend.hcl
+
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.14.7"
 
       - name: Terraform Init
-        run: terraform init -input=false > /dev/null 2>&1
+        run: terraform init -input=false -backend-config=backend.hcl > /dev/null 2>&1
 
       - name: Terraform Apply
         env:
