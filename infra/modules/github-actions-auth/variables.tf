@@ -15,10 +15,13 @@ variable "github_repo_environment" {
   type = string
 }
 
-variable "s3_bucket_arn" {
+variable "website_s3_bucket_arn" {
   type = string
 }
 
-variable "s3_bucket_name" {
-
+variable "tfstate_s3_bucket_object" {
+  type = object({
+    arn           = string,
+    object_prefix = string
+  })
 }

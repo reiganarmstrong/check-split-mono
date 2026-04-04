@@ -16,10 +16,13 @@ variable "subdomain" {
   type = string
 }
 
-variable "bucket_name" {
-  type = string
-
+variable "tfstate_s3_bucket_object" {
+  type = object({
+    arn           = string
+    object_prefix = string
+  })
 }
+
 
 variable "github_repo_environment" {
   type = string
@@ -31,4 +34,9 @@ variable "github_repo_path" {
 
 variable "repo_name" {
   type = string
+}
+
+variable "website_s3_bucket_name" {
+  type = string
+
 }

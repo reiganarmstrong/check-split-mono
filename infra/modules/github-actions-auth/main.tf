@@ -38,16 +38,20 @@ data "aws_iam_policy_document" "github_actions_sts_policy" {
 
 # allow github to modify aws resources as needed while following the principle of least privilege
 data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
-  # needed for s3 sync
+
+
   statement {
     sid     = "AllowListBucket"
     effect  = "Allow"
     actions = ["s3:ListBucket"]
 
-    resources = [var.s3_bucket_arn]
+    resources = [
+      var.website_s3_bucket_arn,
+      var.tfstate_s3_bucket_object.arn
+    ]
   }
 
-  # allow read write on all objects
+
   statement {
     sid    = "AllowReadWriteObjects"
     effect = "Allow"
@@ -57,8 +61,11 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "s3:DeleteObject"
     ]
 
-    # all objects in bucket
-    resources = ["${var.s3_bucket_arn}/*"]
+    # relevant objects in each bucket
+    resources = [
+      "${var.website_s3_bucket_arn}/*",
+      "${var.tfstate_s3_bucket_object.object_prefix}/*"
+    ]
   }
 
   statement {
@@ -79,7 +86,7 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "s3:DeleteBucketTagging"
     ]
 
-    resources = [var.s3_bucket_arn]
+    resources = [var.website_s3_bucket_arn]
   }
 
   statement {
@@ -205,14 +212,14 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
 
     resources = [
       "*",
-      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.s3_bucket_name}-read-write-policy"
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.website_s3_bucket_arn}-read-write-policy"
     ]
   }
 }
 
 # create the policy resource from the definition above
 resource "aws_iam_policy" "github_actions_aws_resource_permissions" {
-  name   = "${var.s3_bucket_name}-github-actions-aws-resource-permissions"
+  name   = "${var.website_s3_bucket_arn}-github-actions-aws-resource-permissions"
   policy = data.aws_iam_policy_document.github_actions_aws_resource_permissions.json
 }
 

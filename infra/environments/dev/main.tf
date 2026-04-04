@@ -16,7 +16,7 @@ module "certificates" {
 module "static-website-hosting" {
   source                   = "../../modules/static-website-hosting"
   environment              = var.environment
-  bucket_name              = var.bucket_name
+  bucket_name              = var.website_s3_bucket_name
   cloudflare_zone_id       = var.cloudflare_zone_id
   acm_certificate_arn      = module.certificates.validated_cert_arn
   cloudfront_custom_domain = local.app_subdomain
@@ -37,11 +37,11 @@ module "cognito-auth" {
 
 
 module "github-actions-auth" {
-  source                  = "../../modules/github-actions-auth"
-  environment             = var.environment
-  repo_name               = var.repo_name
-  github_repo_path        = var.github_repo_path
-  github_repo_environment = var.github_repo_environment
-  s3_bucket_arn           = module.static-website-hosting.s3_bucket_arn
-  s3_bucket_name          = var.bucket_name
+  source                   = "../../modules/github-actions-auth"
+  environment              = var.environment
+  repo_name                = var.repo_name
+  github_repo_path         = var.github_repo_path
+  github_repo_environment  = var.github_repo_environment
+  website_s3_bucket_arn    = module.static-website-hosting.s3_bucket_arn
+  tfstate_s3_bucket_object = var.tfstate_s3_bucket_object
 }
