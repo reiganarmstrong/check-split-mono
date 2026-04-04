@@ -2,3 +2,4 @@
 .terraform*
 *.tfstate*
 *.hcl*
+environment/bootstrap/outputs.tf
