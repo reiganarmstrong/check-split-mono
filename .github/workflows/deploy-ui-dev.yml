@@ -1,4 +1,5 @@
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -37,6 +38,7 @@ jobs:
         with:
           node-version: 24
           cache: "pnpm"
+          cache-dependency-path: ui/pnpm-lock.yaml
 
       - name: Install pnpm dependencies
         run: pnpm install
