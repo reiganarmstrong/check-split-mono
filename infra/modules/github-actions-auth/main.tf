@@ -211,13 +211,13 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
 }
 
 # create the policy resource from the definition above
-resource "aws_iam_policy" "s3_read_write_policy" {
+resource "aws_iam_policy" "github_actions_aws_resource_permissions" {
   name   = "${var.s3_bucket_name}-read-write-policy"
-  policy = data.aws_iam_policy_document.s3_read_write_policy_definition.json
+  policy = data.aws_iam_policy_document.github_actions_aws_resource_permissions.json
 }
 
 # attach the policy to the iam role
-resource "aws_iam_role_policy_attachment" "github_actions_role_s3_read_write_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "github_actions_aws_resource_permissions" {
   role       = aws_iam_role.github_actions_role.name
-  policy_arn = aws_iam_policy.s3_read_write_policy.arn
+  policy_arn = aws_iam_policy.github_actions_aws_resource_permissions.arn
 }
