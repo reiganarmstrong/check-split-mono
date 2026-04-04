@@ -36,8 +36,8 @@ data "aws_iam_policy_document" "github_actions_sts_policy" {
   }
 }
 
-# allow github to read and write the s3 bucket with the static web files
-data "aws_iam_policy_document" "s3_read_write_policy_definition" {
+# allow github to modify aws resources as needed while following the principle of least privilege
+data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
   # needed for s3 sync
   statement {
     sid     = "AllowListBucket"
