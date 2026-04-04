@@ -212,7 +212,7 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
 
 # create the policy resource from the definition above
 resource "aws_iam_policy" "github_actions_aws_resource_permissions" {
-  name   = "${var.s3_bucket_name}-read-write-policy"
+  name   = "${var.s3_bucket_name}-github-actions-aws-resource-permissions"
   policy = data.aws_iam_policy_document.github_actions_aws_resource_permissions.json
 }
 
