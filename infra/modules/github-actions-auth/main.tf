@@ -38,8 +38,6 @@ data "aws_iam_policy_document" "github_actions_sts_policy" {
 
 # allow github to modify aws resources as needed while following the principle of least privilege
 data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
-
-
   statement {
     sid     = "AllowListBucket"
     effect  = "Allow"
@@ -90,10 +88,17 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
   }
 
   statement {
+    sid     = "AllowRequestAcmCertificates"
+    effect  = "Allow"
+    actions = ["acm:RequestCertificate"]
+
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "AllowManageAcmCertificates"
     effect = "Allow"
     actions = [
-      "acm:RequestCertificate",
       "acm:DescribeCertificate",
       "acm:DeleteCertificate",
       "acm:ListTagsForCertificate",
@@ -102,16 +107,22 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     ]
 
     resources = [
-      "*",
       "arn:${data.aws_partition.current.partition}:acm:us-east-1:${data.aws_caller_identity.current.account_id}:certificate/*"
     ]
+  }
+
+  statement {
+    sid     = "AllowCreateCognitoUserPools"
+    effect  = "Allow"
+    actions = ["cognito-idp:CreateUserPool"]
+
+    resources = ["*"]
   }
 
   statement {
     sid    = "AllowManageCognitoUserPools"
     effect = "Allow"
     actions = [
-      "cognito-idp:CreateUserPool",
       "cognito-idp:DescribeUserPool",
       "cognito-idp:UpdateUserPool",
       "cognito-idp:DeleteUserPool",
@@ -129,7 +140,6 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     ]
 
     resources = [
-      "*",
       "arn:${data.aws_partition.current.partition}:cognito-idp:us-east-1:${data.aws_caller_identity.current.account_id}:userpool/*"
     ]
   }
@@ -161,65 +171,25 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
   }
 
   statement {
-    sid    = "AllowReadGithubOidcProvider"
-    effect = "Allow"
-    actions = [
-      "iam:GetOpenIDConnectProvider",
-      "iam:ListOpenIDConnectProviders"
-    ]
+    sid     = "AllowListGithubOidcProviders"
+    effect  = "Allow"
+    actions = ["iam:ListOpenIDConnectProviders"]
 
-    resources = [
-      "*",
-      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
-    ]
+    resources = ["*"]
   }
 
   statement {
-    sid    = "AllowManageGithubActionsRole"
-    effect = "Allow"
-    actions = [
-      "iam:CreateRole",
-      "iam:GetRole",
-      "iam:DeleteRole",
-      "iam:UpdateAssumeRolePolicy",
-      "iam:AttachRolePolicy",
-      "iam:DetachRolePolicy",
-      "iam:ListAttachedRolePolicies",
-      "iam:TagRole",
-      "iam:UntagRole"
-    ]
+    sid     = "AllowReadGithubOidcProvider"
+    effect  = "Allow"
+    actions = ["iam:GetOpenIDConnectProvider"]
 
-    resources = [
-      "*",
-      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.repo_name}-${var.environment}-github-actions"
-    ]
-  }
-
-  statement {
-    sid    = "AllowManageGithubActionsPolicy"
-    effect = "Allow"
-    actions = [
-      "iam:CreatePolicy",
-      "iam:GetPolicy",
-      "iam:GetPolicyVersion",
-      "iam:CreatePolicyVersion",
-      "iam:DeletePolicyVersion",
-      "iam:DeletePolicy",
-      "iam:ListPolicyVersions",
-      "iam:TagPolicy",
-      "iam:UntagPolicy"
-    ]
-
-    resources = [
-      "*",
-      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.website_s3_bucket_arn}-read-write-policy"
-    ]
+    resources = [data.aws_iam_openid_connect_provider.github.arn]
   }
 }
 
 # create the policy resource from the definition above
 resource "aws_iam_policy" "github_actions_aws_resource_permissions" {
-  name   = "${var.website_s3_bucket_arn}-github-actions-aws-resource-permissions"
+  name   = "${var.repo_name}-${var.environment}-github-actions-aws-resource-permissions"
   policy = data.aws_iam_policy_document.github_actions_aws_resource_permissions.json
 }
 
