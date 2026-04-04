@@ -121,9 +121,6 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "cognito-idp:DescribeUserPoolClient",
       "cognito-idp:UpdateUserPoolClient",
       "cognito-idp:DeleteUserPoolClient",
-      "cognito-idp:CreateUserPoolDomain",
-      "cognito-idp:DescribeUserPoolDomain",
-      "cognito-idp:DeleteUserPoolDomain",
       "cognito-idp:ListUserPoolClients",
       "cognito-idp:ListTagsForResource",
       "cognito-idp:TagResource",
@@ -133,6 +130,18 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     resources = [
       "arn:${data.aws_partition.current.partition}:cognito-idp:us-east-1:${data.aws_caller_identity.current.account_id}:userpool/*"
     ]
+  }
+
+  statement {
+    sid    = "AllowManageCognitoUserPoolDomains"
+    effect = "Allow"
+    actions = [
+      "cognito-idp:CreateUserPoolDomain",
+      "cognito-idp:DescribeUserPoolDomain",
+      "cognito-idp:DeleteUserPoolDomain"
+    ]
+
+    resources = ["*"]
   }
 
   statement {
@@ -186,6 +195,7 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "iam:GetPolicy",
       "iam:GetPolicyVersion",
       "iam:CreatePolicyVersion",
+      "iam:SetDefaultPolicyVersion",
       "iam:DeletePolicyVersion",
       "iam:ListPolicyVersions"
     ]
@@ -199,6 +209,8 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     sid    = "AllowAttachGithubActionsPolicyToRole"
     effect = "Allow"
     actions = [
+      "iam:GetRole",
+      "iam:UpdateAssumeRolePolicy",
       "iam:AttachRolePolicy",
       "iam:DetachRolePolicy",
       "iam:ListAttachedRolePolicies"
