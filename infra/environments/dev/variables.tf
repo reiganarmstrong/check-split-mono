@@ -16,7 +16,7 @@ variable "subdomain" {
   type = string
 }
 
-variable "bucket_name" {
+variable "website_s3_bucket_name" {
   type = string
 
 }
