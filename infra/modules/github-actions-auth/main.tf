@@ -186,40 +186,6 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     resources = [data.aws_iam_openid_connect_provider.github.arn]
   }
 
-  statement {
-    sid    = "AllowManageGithubActionsPolicy"
-    effect = "Allow"
-    actions = [
-      "iam:CreatePolicy",
-      "iam:DeletePolicy",
-      "iam:GetPolicy",
-      "iam:GetPolicyVersion",
-      "iam:CreatePolicyVersion",
-      "iam:SetDefaultPolicyVersion",
-      "iam:DeletePolicyVersion",
-      "iam:ListPolicyVersions"
-    ]
-
-    resources = [
-      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.repo_name}-${var.environment}-github-actions-aws-resource-permissions"
-    ]
-  }
-
-  statement {
-    sid    = "AllowAttachGithubActionsPolicyToRole"
-    effect = "Allow"
-    actions = [
-      "iam:GetRole",
-      "iam:UpdateAssumeRolePolicy",
-      "iam:AttachRolePolicy",
-      "iam:DetachRolePolicy",
-      "iam:ListAttachedRolePolicies"
-    ]
-
-    resources = [
-      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.repo_name}-${var.environment}-github-actions"
-    ]
-  }
 }
 
 # create the policy resource from the definition above
