@@ -113,6 +113,8 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     effect = "Allow"
     actions = [
       "cognito-idp:DescribeUserPool",
+      "cognito-idp:GetUserPoolMfaConfig",
+      "cognito-idp:SetUserPoolMfaConfig",
       "cognito-idp:UpdateUserPool",
       "cognito-idp:DeleteUserPool",
       "cognito-idp:CreateUserPoolClient",
