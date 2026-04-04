@@ -49,7 +49,6 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     ]
   }
 
-
   statement {
     sid    = "AllowReadWriteObjects"
     effect = "Allow"
