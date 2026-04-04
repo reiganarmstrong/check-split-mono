@@ -3,6 +3,10 @@ data "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 }
 
+data "aws_caller_identity" "current" {}
+
+data "aws_partition" "current" {}
+
 # create an iam role that github actions can assume for the specified repo
 resource "aws_iam_role" "github_actions_role" {
   name               = "${var.repo_name}-${var.environment}-github-actions"
@@ -34,7 +38,6 @@ data "aws_iam_policy_document" "github_actions_sts_policy" {
 
 # allow github to read and write the s3 bucket with the static web files
 data "aws_iam_policy_document" "s3_read_write_policy_definition" {
-
   # needed for s3 sync
   statement {
     sid     = "AllowListBucket"
@@ -57,6 +60,154 @@ data "aws_iam_policy_document" "s3_read_write_policy_definition" {
     # all objects in bucket
     resources = ["${var.s3_bucket_arn}/*"]
   }
+
+  statement {
+    sid    = "AllowManageBucketConfiguration"
+    effect = "Allow"
+    actions = [
+      "s3:CreateBucket",
+      "s3:DeleteBucket",
+      "s3:GetBucketLocation",
+      "s3:GetBucketPolicy",
+      "s3:PutBucketPolicy",
+      "s3:DeleteBucketPolicy",
+      "s3:GetBucketPublicAccessBlock",
+      "s3:PutBucketPublicAccessBlock",
+      "s3:DeleteBucketPublicAccessBlock",
+      "s3:GetBucketTagging",
+      "s3:PutBucketTagging",
+      "s3:DeleteBucketTagging"
+    ]
+
+    resources = [var.s3_bucket_arn]
+  }
+
+  statement {
+    sid    = "AllowManageAcmCertificates"
+    effect = "Allow"
+    actions = [
+      "acm:RequestCertificate",
+      "acm:DescribeCertificate",
+      "acm:DeleteCertificate",
+      "acm:ListTagsForCertificate",
+      "acm:AddTagsToCertificate",
+      "acm:RemoveTagsFromCertificate"
+    ]
+
+    resources = [
+      "*",
+      "arn:${data.aws_partition.current.partition}:acm:us-east-1:${data.aws_caller_identity.current.account_id}:certificate/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageCognitoUserPools"
+    effect = "Allow"
+    actions = [
+      "cognito-idp:CreateUserPool",
+      "cognito-idp:DescribeUserPool",
+      "cognito-idp:UpdateUserPool",
+      "cognito-idp:DeleteUserPool",
+      "cognito-idp:CreateUserPoolClient",
+      "cognito-idp:DescribeUserPoolClient",
+      "cognito-idp:UpdateUserPoolClient",
+      "cognito-idp:DeleteUserPoolClient",
+      "cognito-idp:CreateUserPoolDomain",
+      "cognito-idp:DescribeUserPoolDomain",
+      "cognito-idp:DeleteUserPoolDomain",
+      "cognito-idp:ListUserPoolClients",
+      "cognito-idp:ListTagsForResource",
+      "cognito-idp:TagResource",
+      "cognito-idp:UntagResource"
+    ]
+
+    resources = [
+      "*",
+      "arn:${data.aws_partition.current.partition}:cognito-idp:us-east-1:${data.aws_caller_identity.current.account_id}:userpool/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageCloudFront"
+    effect = "Allow"
+    actions = [
+      "cloudfront:CreateCachePolicy",
+      "cloudfront:GetCachePolicy",
+      "cloudfront:GetCachePolicyConfig",
+      "cloudfront:DeleteCachePolicy",
+      "cloudfront:CreateDistribution",
+      "cloudfront:GetDistribution",
+      "cloudfront:GetDistributionConfig",
+      "cloudfront:UpdateDistribution",
+      "cloudfront:DeleteDistribution",
+      "cloudfront:CreateOriginAccessControl",
+      "cloudfront:GetOriginAccessControl",
+      "cloudfront:GetOriginAccessControlConfig",
+      "cloudfront:UpdateOriginAccessControl",
+      "cloudfront:DeleteOriginAccessControl",
+      "cloudfront:ListTagsForResource",
+      "cloudfront:TagResource",
+      "cloudfront:UntagResource"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowReadGithubOidcProvider"
+    effect = "Allow"
+    actions = [
+      "iam:GetOpenIDConnectProvider",
+      "iam:ListOpenIDConnectProviders"
+    ]
+
+    resources = [
+      "*",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageGithubActionsRole"
+    effect = "Allow"
+    actions = [
+      "iam:CreateRole",
+      "iam:GetRole",
+      "iam:DeleteRole",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:AttachRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:ListAttachedRolePolicies",
+      "iam:TagRole",
+      "iam:UntagRole"
+    ]
+
+    resources = [
+      "*",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.repo_name}-${var.environment}-github-actions"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageGithubActionsPolicy"
+    effect = "Allow"
+    actions = [
+      "iam:CreatePolicy",
+      "iam:GetPolicy",
+      "iam:GetPolicyVersion",
+      "iam:CreatePolicyVersion",
+      "iam:DeletePolicyVersion",
+      "iam:DeletePolicy",
+      "iam:ListPolicyVersions",
+      "iam:TagPolicy",
+      "iam:UntagPolicy"
+    ]
+
+    resources = [
+      "*",
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/${var.s3_bucket_name}-read-write-policy"
+    ]
+  }
 }
 
 # create the policy resource from the definition above
@@ -70,4 +221,3 @@ resource "aws_iam_role_policy_attachment" "github_actions_role_s3_read_write_pol
   role       = aws_iam_role.github_actions_role.name
   policy_arn = aws_iam_policy.s3_read_write_policy.arn
 }
-
