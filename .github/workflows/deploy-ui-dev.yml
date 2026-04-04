@@ -1,0 +1,54 @@
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ui/**"
+jobs:
+  ui-deploy-dev:
+    permissions:
+      # AWS OIDC
+      id-token: write
+      # Bring back read permissions since defaults are overwritten
+      contents: read
+    defaults:
+      run:
+        working-directory: ./ui
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          # only include the necessary files
+          sparse-checkout: |
+            ui
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ^10.32.1
+
+      - name: Install correct node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install pnpm dependencies
+        run: pnpm install
+
+      - name: Build static files
+        run: pnpm run build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        # syncs build files with s3 bucket
+        # --delete needed to remove files not in updated build
+        run: aws s3 sync ./out s3://${{ vars.S3_BUCKET_NAME }} --delete

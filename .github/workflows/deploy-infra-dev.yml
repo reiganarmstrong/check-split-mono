@@ -1,0 +1,53 @@
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/environments/dev/**"
+      - "infra/modules/**"
+jobs:
+  terraform-deploy-dev:
+    defaults:
+      run:
+        working-directory: ./infra/environments/dev
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          # only include the necessary files
+          sparse-checkout: |
+            infra/environments/dev
+            infra/modules
+
+      - name: AWS Auth
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Create tfvars file
+        # load into env variable then make to file to prevent bash from stripping out newlines needed by terraform
+        env:
+          TFVARS_CONTENT: ${{ secrets.TFVARS }}
+        run: echo "$TFVARS_CONTENT" > terraform.tfvars
+
+      - name: Create backend.hcl file
+        env:
+          BACKEND_CONTENT: ${{ secrets.TF_S3_BACKEND }}
+        run: echo "$BACKEND_CONTENT" > backend.hcl
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.14.7"
+
+      - name: Terraform Init
+        run: terraform init -input=false -backend-config=backend.hcl > /dev/null 2>&1
+
+      - name: Terraform Apply
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: terraform apply -auto-approve -input=false > /dev/null 2>&1

@@ -16,7 +16,7 @@ module "certificates" {
 module "static-website-hosting" {
   source                   = "../../modules/static-website-hosting"
   environment              = var.environment
-  bucket_name              = var.bucket_name
+  bucket_name              = var.website_s3_bucket_name
   cloudflare_zone_id       = var.cloudflare_zone_id
   acm_certificate_arn      = module.certificates.validated_cert_arn
   cloudfront_custom_domain = local.app_subdomain
@@ -34,6 +34,3 @@ module "cognito-auth" {
   cognito_user_pool_resource_name = local.cognito_user_pool_resource_name
   depends_on                      = [module.static-website-hosting]
 }
-
-
-
