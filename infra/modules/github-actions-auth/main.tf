@@ -70,27 +70,7 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     sid    = "AllowManageBucketConfiguration"
     effect = "Allow"
     actions = [
-      "s3:CreateBucket",
-      "s3:DeleteBucket",
-      "s3:GetBucketAcl",
-      "s3:GetBucketCORS",
-      "s3:GetBucketLocation",
-      "s3:GetBucketPolicy",
-      "s3:GetBucketVersioning",
-      "s3:GetBucketWebsite",
-      "s3:PutBucketCORS",
-      "s3:PutBucketVersioning",
-      "s3:PutBucketWebsite",
-      "s3:DeleteBucketCORS",
-      "s3:DeleteBucketWebsite",
-      "s3:PutBucketPolicy",
-      "s3:DeleteBucketPolicy",
-      "s3:GetBucketPublicAccessBlock",
-      "s3:PutBucketPublicAccessBlock",
-      "s3:DeleteBucketPublicAccessBlock",
-      "s3:GetBucketTagging",
-      "s3:PutBucketTagging",
-      "s3:DeleteBucketTagging"
+      "s3:*"
     ]
 
     resources = [var.website_s3_bucket_arn]
