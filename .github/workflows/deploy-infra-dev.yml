@@ -4,6 +4,13 @@ on:
     paths:
       - "infra/environments/dev/**"
       - "infra/modules/**"
+
+permissions:
+  # AWS OIDC
+  id-token: write
+  # needed since we are now defining permissions
+  contents: read
+
 jobs:
   terraform-deploy-dev:
     defaults:
