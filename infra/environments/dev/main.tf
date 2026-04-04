@@ -34,14 +34,3 @@ module "cognito-auth" {
   cognito_user_pool_resource_name = local.cognito_user_pool_resource_name
   depends_on                      = [module.static-website-hosting]
 }
-
-
-module "github-actions-auth" {
-  source                   = "../../modules/github-actions-auth"
-  environment              = var.environment
-  repo_name                = var.repo_name
-  github_repo_path         = var.github_repo_path
-  github_repo_environment  = var.github_repo_environment
-  website_s3_bucket_arn    = module.static-website-hosting.s3_bucket_arn
-  tfstate_s3_bucket_object = var.tfstate_s3_bucket_object
-}

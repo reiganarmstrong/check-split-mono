@@ -1,3 +1,3 @@
-output "github_aws_role_arn" {
-  value = module.github-actions-auth.github_actions_role_arn
+output "website_s3_bucket_arn" {
+  value = module.static-website-hosting.s3_bucket_arn
 }
