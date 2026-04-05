@@ -1,19 +1,16 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ReceiptText, ScanLine } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 
 export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="mr-6 flex items-center space-x-3 group">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 border shadow-md transition-transform duration-300 group-hover:scale-110">
-            <ReceiptText className="absolute h-5 w-5 text-black/70 z-10" />
-            <ScanLine className="absolute h-10 w-10 text-secondary/50 p-1" />
-          </div>
-          <span className="font-heading font-bold sm:inline-block text-2xl tracking-tight text-primary">
-            Check<span className="text-secondary">Split</span>
-          </span>
+        <Link href="/" className="mr-6 flex items-center group">
+          <BrandLogo
+            className="transition-transform duration-300 group-hover:scale-103"
+            wordmarkClassName="hidden sm:flex"
+          />
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-3">
