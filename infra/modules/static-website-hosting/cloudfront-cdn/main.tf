@@ -36,6 +36,14 @@ resource "aws_cloudfront_cache_policy" "this" {
   }
 }
 
+# make the cloudfront function to rewrite cloudfront uris
+resource "aws_cloudfront_function" "static_route_rewrite" {
+  name    = "static-route-rewrite-${var.s3_bucket_id}"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = file("${path.module}/functions/static-route-rewrite.js")
+}
+
 
 
 # create cloudfront distribution
@@ -58,6 +66,11 @@ resource "aws_cloudfront_distribution" "this" {
     # let cloudfront handle compression
     compress        = true
     cache_policy_id = aws_cloudfront_cache_policy.this.id
+    # attach the cloudfront function
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.static_route_rewrite.arn
+    }
   }
 
   restrictions {
