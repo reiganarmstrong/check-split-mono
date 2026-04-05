@@ -15,6 +15,10 @@ const fredoka = Fredoka({
 export const metadata: Metadata = {
   title: "CheckSplit",
   description: "Snap your receipt, let AI extract the items, and easily assign who pays.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: ["/favicon.svg"],
+  },
 };
 
 import { Navbar } from "@/components/landing/navbar";
