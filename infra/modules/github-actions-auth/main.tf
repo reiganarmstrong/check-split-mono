@@ -170,6 +170,24 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
   }
 
   statement {
+    sid    = "AllowManageCloudFrontFunctions"
+    effect = "Allow"
+    actions = [
+      "cloudfront:CreateFunction",
+      "cloudfront:DescribeFunction",
+      "cloudfront:GetFunction",
+      "cloudfront:ListFunctions",
+      "cloudfront:PublishFunction",
+      "cloudfront:UpdateFunction",
+      "cloudfront:DeleteFunction"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:cloudfront::${data.aws_caller_identity.current.account_id}:function/*"
+    ]
+  }
+
+  statement {
     sid     = "AllowListGithubOidcProviders"
     effect  = "Allow"
     actions = ["iam:ListOpenIDConnectProviders"]
