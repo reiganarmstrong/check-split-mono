@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { Receipt, Coins, ArrowRight, Zap, Users, Camera, Pizza, Beer, Croissant, Coffee, HandPlatter } from "lucide-react";
+import { Coins, ArrowRight, Zap, Users, Camera, Pizza, Beer, Croissant, Coffee, HandPlatter } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -254,7 +254,7 @@ export default function Home() {
              <span className="inline-block py-1.5 px-4 rounded-full bg-accent/20 text-[color-mix(in_srgb,var(--accent),black_40%)] text-sm font-bold tracking-wide mb-4 md:mb-6">STEP 3</span>
              <h3 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black mb-4 md:mb-6">Never do math again.</h3>
              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-               Tax and tip are automatically proportioned perfectly based on exactly what you ate. You just hit "Pay" and the relationship survives.
+               Tax and tip are automatically proportioned perfectly based on exactly what you ate. You just hit &ldquo;Pay&rdquo; and the relationship survives.
              </p>
            </div>
         </div>

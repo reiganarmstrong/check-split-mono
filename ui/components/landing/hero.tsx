@@ -25,7 +25,7 @@ export function Hero() {
           </h1>
           
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl md:text-2xl mb-12 leading-relaxed">
-            Snap your receipt, let us extract the items, and tap to assign who pays. <strong className="text-foreground font-semibold">It's that easy.</strong>
+            Snap your receipt, let us extract the items, and tap to assign who pays. <strong className="text-foreground font-semibold">It&apos;s that easy.</strong>
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full sm:w-auto">
