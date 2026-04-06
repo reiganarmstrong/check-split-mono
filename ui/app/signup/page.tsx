@@ -1,14 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { UserPlus } from "lucide-react";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 
 import { AuthCardShell } from "@/components/auth/auth-card-shell";
 import { AuthField } from "@/components/auth/auth-field";
 import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { Button } from "@/components/ui/button";
 import { signUpWithCredentials, type SignupFormValues } from "@/lib/auth";
+import { validateCognitoPassword } from "@/lib/password-policy";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -25,15 +28,7 @@ function validateEmail(value: string) {
 }
 
 function validatePassword(value: string) {
-  if (!value) {
-    return "Password is required"
-  }
-
-  if (value.length < 8) {
-    return "Password must be at least 8 characters"
-  }
-
-  return undefined
+  return validateCognitoPassword(value)
 }
 
 function validateConfirmPassword(password: string, confirmPassword: string) {
@@ -49,6 +44,10 @@ function validateConfirmPassword(password: string, confirmPassword: string) {
 }
 
 export default function SignupPage() {
+  const router = useRouter()
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [authMessage, setAuthMessage] = useState<string | null>(null)
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -56,7 +55,23 @@ export default function SignupPage() {
       confirmPassword: "",
     } satisfies SignupFormValues,
     onSubmit: async ({ value }) => {
-      await signUpWithCredentials(value)
+      setAuthError(null)
+      setAuthMessage(null)
+
+      try {
+        const result = await signUpWithCredentials(value)
+
+        if (result.status === "confirmation-required") {
+          router.push(`/confirm-signup?email=${encodeURIComponent(result.email)}`)
+          return
+        }
+
+        router.push(`/login?email=${encodeURIComponent(value.email)}&created=1`)
+      } catch (error) {
+        setAuthError(
+          error instanceof Error ? error.message : "Unable to create account.",
+        )
+      }
     },
   })
 
@@ -173,6 +188,18 @@ export default function SignupPage() {
                 )}
               </form.Field>
             </div>
+
+            {authError ? (
+              <p className="rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+                {authError}
+              </p>
+            ) : null}
+
+            {authMessage ? (
+              <p className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-medium text-primary">
+                {authMessage}
+              </p>
+            ) : null}
 
             <form.Subscribe
               selector={(state) => ({

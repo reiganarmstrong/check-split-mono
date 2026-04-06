@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "@tanstack/react-form";
 import { LogIn } from "lucide-react";
 import { motion } from "motion/react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { AuthCardShell } from "@/components/auth/auth-card-shell";
 import { AuthField } from "@/components/auth/auth-field";
@@ -34,13 +36,42 @@ function validatePassword(value: string) {
 }
 
 export default function LoginPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const seededEmail = searchParams.get("email") ?? ""
+  const confirmedMessage =
+    searchParams.get("confirmed") === "1"
+      ? "Email verified. You can sign in now."
+      : searchParams.get("created") === "1"
+        ? "Account created successfully. Sign in to continue."
+        : null
+
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [authMessage, setAuthMessage] = useState<string | null>(confirmedMessage)
+
   const form = useForm({
     defaultValues: {
-      email: "",
+      email: seededEmail,
       password: "",
     } satisfies LoginFormValues,
     onSubmit: async ({ value }) => {
-      await loginWithCredentials(value)
+      setAuthError(null)
+
+      try {
+        const result = await loginWithCredentials(value)
+
+        if (result.status === "confirmation-required") {
+          router.push(`/confirm-signup?email=${encodeURIComponent(result.email)}`)
+          return
+        }
+
+        setAuthMessage(result.message)
+      } catch (error) {
+        setAuthMessage(null)
+        setAuthError(
+          error instanceof Error ? error.message : "Unable to sign in.",
+        )
+      }
     },
   })
 
@@ -142,6 +173,18 @@ export default function LoginPage() {
                 )}
               </form.Field>
             </div>
+
+            {authError ? (
+              <p className="rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+                {authError}
+              </p>
+            ) : null}
+
+            {authMessage ? (
+              <p className="rounded-2xl border border-secondary/20 bg-secondary/10 px-4 py-3 text-sm font-medium text-secondary">
+                {authMessage}
+              </p>
+            ) : null}
 
             <form.Subscribe
               selector={(state) => ({

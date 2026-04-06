@@ -109,6 +109,11 @@
 }
 
 @layer base {
+  @keyframes onAutoFillStart {
+    from {}
+    to {}
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -123,5 +128,10 @@
   /* Make buttons and inputs inherently bouncy / rounded */
   button, input, textarea, select {
     @apply rounded-full transition-all duration-300;
+  }
+
+  input:-webkit-autofill {
+    animation-name: onAutoFillStart;
+    animation-duration: 0.001s;
   }
 }

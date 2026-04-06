@@ -18,6 +18,7 @@ export function SocialAuthButtons() {
         <Button
           variant="outline"
           type="button"
+          disabled
           className="h-12 rounded-2xl font-bold shadow-sm transition-transform hover:scale-105"
         >
           <svg className="mr-0 h-5 w-5 sm:mr-2" viewBox="0 0 24 24">
@@ -43,6 +44,7 @@ export function SocialAuthButtons() {
         <Button
           variant="outline"
           type="button"
+          disabled
           className="h-12 rounded-2xl font-bold shadow-sm transition-transform hover:scale-105"
         >
           <svg
@@ -55,6 +57,11 @@ export function SocialAuthButtons() {
           <span className="hidden sm:inline">Apple</span>
         </Button>
       </div>
+
+      <p className="mt-3 text-center text-xs font-medium text-muted-foreground">
+        Google and Apple sign-in stay disabled until OAuth providers are enabled in
+        the Cognito Terraform client.
+      </p>
     </>
   )
 }
