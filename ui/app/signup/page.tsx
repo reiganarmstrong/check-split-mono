@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { UserPlus } from "lucide-react";
 import { motion } from "motion/react";
@@ -8,7 +8,9 @@ import { useRouter } from "next/navigation";
 
 import { AuthCardShell } from "@/components/auth/auth-card-shell";
 import { AuthField } from "@/components/auth/auth-field";
+import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
+import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { signUpWithCredentials, type SignupFormValues } from "@/lib/auth";
 import { validateCognitoPassword } from "@/lib/password-policy";
@@ -45,8 +47,15 @@ function validateConfirmPassword(password: string, confirmPassword: string) {
 
 export default function SignupPage() {
   const router = useRouter()
+  const { status } = useAuth()
   const [authError, setAuthError] = useState<string | null>(null)
   const [authMessage, setAuthMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard")
+    }
+  }, [router, status])
 
   const form = useForm({
     defaultValues: {
@@ -74,6 +83,15 @@ export default function SignupPage() {
       }
     },
   })
+
+  if (status !== "unauthenticated") {
+    return (
+      <AuthSessionScreen
+        title="Checking your sign-in state"
+        description="Signed-in users are redirected straight to the dashboard."
+      />
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden px-4 md:px-0">

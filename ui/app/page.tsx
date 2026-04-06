@@ -1,11 +1,34 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Coins, ArrowRight, Zap, Users, Camera, Pizza, Beer, Croissant, Coffee, HandPlatter } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
+import { useAuth } from "@/components/auth/auth-provider";
 
 export default function Home() {
+  const router = useRouter();
+  const { status } = useAuth();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [router, status]);
+
+  if (status === "authenticated") {
+    return (
+      <AuthSessionScreen
+        title="Routing to your dashboard"
+        description="Authenticated users land on the receipt archive instead of the marketing page."
+      />
+    );
+  }
+
   const marqueeItems = [
     { text: "Late Night Pizza", icon: <Pizza /> },
     { text: "Sunday Brunch", icon: <Coffee /> },

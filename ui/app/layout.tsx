@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Quicksand, Fredoka } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/auth/auth-provider";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -34,11 +35,13 @@ export default function RootLayout({
       <body
         className={`bg-background font-sans text-foreground antialiased selection:bg-primary/20`}
       >
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-          <div className="flex-1 flex flex-col">{children}</div>
-          <SiteFooter />
-        </div>
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            <div className="flex-1 flex flex-col">{children}</div>
+            <SiteFooter />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

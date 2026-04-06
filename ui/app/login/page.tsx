@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useForm } from "@tanstack/react-form";
 import { LogIn } from "lucide-react";
@@ -9,7 +9,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { AuthCardShell } from "@/components/auth/auth-card-shell";
 import { AuthField } from "@/components/auth/auth-field";
+import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
+import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { loginWithCredentials, type LoginFormValues } from "@/lib/auth";
 
@@ -38,6 +40,7 @@ function validatePassword(value: string) {
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { status, refreshSession } = useAuth()
   const seededEmail = searchParams.get("email") ?? ""
   const confirmedMessage =
     searchParams.get("confirmed") === "1"
@@ -48,6 +51,12 @@ export default function LoginPage() {
 
   const [authError, setAuthError] = useState<string | null>(null)
   const [authMessage, setAuthMessage] = useState<string | null>(confirmedMessage)
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard")
+    }
+  }, [router, status])
 
   const form = useForm({
     defaultValues: {
@@ -65,7 +74,8 @@ export default function LoginPage() {
           return
         }
 
-        setAuthMessage(result.message)
+        await refreshSession()
+        router.replace("/dashboard")
       } catch (error) {
         setAuthMessage(null)
         setAuthError(
@@ -74,6 +84,15 @@ export default function LoginPage() {
       }
     },
   })
+
+  if (status !== "unauthenticated") {
+    return (
+      <AuthSessionScreen
+        title="Checking your sign-in state"
+        description="Signed-in users are redirected straight to the dashboard."
+      />
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden px-4 md:px-0">

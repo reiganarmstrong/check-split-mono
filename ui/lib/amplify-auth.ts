@@ -8,6 +8,10 @@ const cognitoUserPoolId = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID
 const cognitoUserPoolClientId =
   process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID
 
+export function hasAmplifyAuthConfig() {
+  return Boolean(cognitoUserPoolId && cognitoUserPoolClientId)
+}
+
 export function configureAmplifyAuth() {
   if (isAmplifyConfigured) {
     return

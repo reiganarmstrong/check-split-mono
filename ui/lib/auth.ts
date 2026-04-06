@@ -1,11 +1,16 @@
 import {
   confirmSignUp,
+  getCurrentUser,
   resendSignUpCode,
   signIn,
+  signOut,
   signUp,
 } from "aws-amplify/auth"
 
-import { configureAmplifyAuth } from "@/lib/amplify-auth"
+import {
+  configureAmplifyAuth,
+  hasAmplifyAuthConfig,
+} from "@/lib/amplify-auth"
 import { cognitoPasswordPolicyMessage } from "@/lib/password-policy"
 
 export type LoginFormValues = {
@@ -22,6 +27,11 @@ export type SignupFormValues = {
 export type ConfirmSignupFormValues = {
   email: string
   code: string
+}
+
+export type AuthenticatedUser = {
+  email: string | null
+  username: string
 }
 
 export type LoginResult =
@@ -74,6 +84,17 @@ function getErrorMessage(error: unknown) {
 
 function formatCodeDestination(destination?: string) {
   return destination ? ` at ${destination}` : ""
+}
+
+function isUnauthenticatedError(error: unknown) {
+  const errorName = getErrorName(error)
+  const errorMessage = getErrorMessage(error)
+
+  return (
+    errorName === "UserUnAuthenticatedException" ||
+    errorMessage === "The user is not authenticated" ||
+    errorMessage === "User needs to be authenticated to call this API."
+  )
 }
 
 function toAuthError(error: unknown) {
@@ -217,6 +238,47 @@ export async function resendSignupConfirmationCode(email: string): Promise<strin
       result.destination,
     )}.`
   } catch (error) {
+    throw toAuthError(error)
+  }
+}
+
+export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
+  if (!hasAmplifyAuthConfig()) {
+    return null
+  }
+
+  configureAmplifyAuth()
+
+  try {
+    const user = await getCurrentUser()
+
+    return {
+      email: user.signInDetails?.loginId ?? (user.username.includes("@") ? user.username : null),
+      username: user.username,
+    }
+  } catch (error) {
+    if (isUnauthenticatedError(error)) {
+      return null
+    }
+
+    throw toAuthError(error)
+  }
+}
+
+export async function signOutCurrentUser() {
+  if (!hasAmplifyAuthConfig()) {
+    return
+  }
+
+  configureAmplifyAuth()
+
+  try {
+    await signOut()
+  } catch (error) {
+    if (isUnauthenticatedError(error)) {
+      return
+    }
+
     throw toAuthError(error)
   }
 }

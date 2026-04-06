@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { BadgeCheck } from "lucide-react"
 import { motion } from "motion/react"
@@ -8,6 +8,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 
 import { AuthCardShell } from "@/components/auth/auth-card-shell"
 import { AuthField } from "@/components/auth/auth-field"
+import { AuthSessionScreen } from "@/components/auth/auth-session-screen"
+import { useAuth } from "@/components/auth/auth-provider"
 import { Button } from "@/components/ui/button"
 import {
   confirmSignupWithCode,
@@ -40,11 +42,18 @@ function validateCode(value: string) {
 export default function ConfirmSignupPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { status } = useAuth()
   const seededEmail = searchParams.get("email") ?? ""
 
   const [authError, setAuthError] = useState<string | null>(null)
   const [authMessage, setAuthMessage] = useState<string | null>(null)
   const [isResending, setIsResending] = useState(false)
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard")
+    }
+  }, [router, status])
 
   const form = useForm({
     defaultValues: {
@@ -89,6 +98,15 @@ export default function ConfirmSignupPage() {
     } finally {
       setIsResending(false)
     }
+  }
+
+  if (status !== "unauthenticated") {
+    return (
+      <AuthSessionScreen
+        title="Checking your sign-in state"
+        description="Signed-in users are redirected straight to the dashboard."
+      />
+    )
   }
 
   return (
