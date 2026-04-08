@@ -94,31 +94,21 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden px-4 md:px-0">
+    <div className="relative -mt-28 flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 pt-28 md:px-0">
       
-      {/* Crisp Floating Geometry (No Gradients) */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[40px_40px]"></div>
-        
+      {/* Playful Background Blobs & Grid */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[var(--color-background)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-foreground)_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.03]" />
         <motion.div
-          animate={{ y: [0, -25, 0], rotate: [0, 15, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[10%] left-[5%] xl:left-[15%] w-24 h-24 md:w-32 md:h-32 rounded-full border-10 sm:border-16 border-primary/10"
-        />
-        <motion.div
-          animate={{ x: [0, 30, 0], y: [0, 15, 0], rotate: [0, -20, 0] }}
+          animate={{ x: [0, -40, 0], y: [0, 50, 0], borderRadius: ["40%", "60%", "40%"] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] right-[5%] xl:right-[15%] w-32 h-32 md:w-48 md:h-48 bg-secondary/10 rounded-4xl rotate-12"
+          className="absolute top-[5%] -left-[10%] w-[500px] h-[500px] bg-[var(--color-blob-1)] opacity-20 blur-3xl rounded-full"
         />
         <motion.div
-          animate={{ y: [0, -20, 0], x: [0, -20, 0], rotate: [-12, -5, -12] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[20%] left-[10%] xl:left-[20%] w-48 h-12 md:w-64 md:h-16 bg-primary/5 rounded-full"
-        />
-        <motion.div
-          animate={{ y: [0, 30, 0], rotate: [45, 90, 45] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[10%] right-[10%] xl:right-[20%] w-20 h-20 md:w-28 md:h-28 bg-accent/15 rounded-2xl md:rounded-3xl"
+          animate={{ x: [0, 40, 0], y: [0, -30, 0], borderRadius: ["60%", "40%", "60%"] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -bottom-[10%] -right-[10%] w-[600px] h-[600px] bg-[var(--color-blob-2)] opacity-20 blur-3xl rounded-full"
         />
       </div>
       
@@ -229,7 +219,7 @@ export default function SignupPage() {
                 <Button
                   type="submit"
                   disabled={!canSubmit || isSubmitting}
-                  className="h-14 w-full rounded-full text-lg font-black shadow-lg shadow-primary/20 transition-transform hover:scale-[1.03]"
+                  className="h-16 w-full rounded-full border-4 border-foreground bg-primary text-lg font-black text-primary-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-1 hover:translate-y-1 hover:bg-primary/95 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:hover:translate-x-0 disabled:hover:translate-y-0"
                 >
                   {isSubmitting ? "Creating account..." : "Sign up"}
                 </Button>

@@ -1,34 +1,89 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="receipt" x1="32" y1="4" x2="32" y2="60" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#F1F6FF"/>
-    </linearGradient>
-    <linearGradient id="divider" x1="32" y1="8" x2="32" y2="52" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#4A7BE3"/>
-      <stop offset="1" stop-color="#2F62CC"/>
-    </linearGradient>
-    <linearGradient id="rowBlue" x1="16" y1="14" x2="48" y2="14" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#4274DE"/>
-      <stop offset="1" stop-color="#74A4FF"/>
-    </linearGradient>
-    <linearGradient id="splitBlue" x1="16" y1="35" x2="27" y2="41" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#3E70DA"/>
-      <stop offset="1" stop-color="#6F9EF9"/>
-    </linearGradient>
-    <linearGradient id="splitCoral" x1="37" y1="35" x2="48" y2="41" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#EA7E58"/>
-      <stop offset="1" stop-color="#FFB18B"/>
-    </linearGradient>
-  </defs>
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <title>CheckSplit favicon</title>
+  <g shape-rendering="geometricPrecision">
+    <rect
+      x="10"
+      y="4"
+      width="44"
+      height="57"
+      rx="14.7"
+      fill="#FFFFFF"
+      stroke="#000000"
+      stroke-width="3"
+    />
 
-  <rect x="8" y="4" width="48" height="56" rx="15" fill="url(#receipt)" stroke="#6D92E5" stroke-width="3"/>
-  <path d="M16 10H48" stroke="white" stroke-opacity="0.86" stroke-width="2.25" stroke-linecap="round"/>
-  <rect x="16" y="12.5" width="32" height="6" rx="3" fill="url(#rowBlue)"/>
-  <rect x="16" y="22.5" width="32" height="4.75" rx="2.375" fill="#A8C2FB"/>
-  <rect x="29" y="8" width="6" height="41" rx="3" fill="url(#divider)"/>
-  <rect x="16" y="35" width="11" height="7" rx="3.5" fill="url(#splitBlue)"/>
-  <rect x="37" y="35" width="11" height="7" rx="3.5" fill="url(#splitCoral)"/>
-  <rect x="16" y="45" width="11" height="7" rx="3.5" fill="#9EBBFF"/>
-  <rect x="37" y="45" width="11" height="7" rx="3.5" fill="#FFD3C7"/>
+    <path d="M17 10.6H46.3" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
+
+    <rect
+      x="17.3"
+      y="15"
+      width="29.3"
+      height="5.1"
+      rx="2.55"
+      fill="#4E84F5"
+      stroke="#000000"
+      stroke-width="1"
+    />
+    <rect
+      x="17.3"
+      y="25.2"
+      width="29.3"
+      height="4.4"
+      rx="2.2"
+      fill="#8DB5FF"
+      stroke="#000000"
+      stroke-width="0.85"
+    />
+    <rect
+      x="30.1"
+      y="12.1"
+      width="4.4"
+      height="41.1"
+      rx="2.2"
+      fill="#528BFF"
+      stroke="#000000"
+      stroke-width="1"
+    />
+
+    <rect
+      x="18"
+      y="38"
+      width="8.8"
+      height="5.1"
+      rx="2.4"
+      fill="#4E84F5"
+      stroke="#000000"
+      stroke-width="0.85"
+    />
+    <rect
+      x="37.1"
+      y="38"
+      width="8.8"
+      height="5.1"
+      rx="2.4"
+      fill="#F47754"
+      stroke="#000000"
+      stroke-width="0.85"
+    />
+    <rect
+      x="18"
+      y="47.4"
+      width="8.8"
+      height="5.1"
+      rx="2.4"
+      fill="#8DB5FF"
+      stroke="#000000"
+      stroke-width="0.85"
+    />
+    <rect
+      x="37.1"
+      y="47.4"
+      width="8.8"
+      height="5.1"
+      rx="2.4"
+      fill="#FFB39E"
+      stroke="#000000"
+      stroke-width="0.85"
+    />
+  </g>
 </svg>
