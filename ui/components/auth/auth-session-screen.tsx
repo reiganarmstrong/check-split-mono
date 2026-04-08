@@ -14,7 +14,7 @@ export function AuthSessionScreen({
   description,
 }: AuthSessionScreenProps) {
   return (
-    <div className="relative flex min-h-[calc(100vh-8rem)] items-center justify-center overflow-hidden px-4">
+    <div className="relative -mt-28 flex min-h-screen items-center justify-center overflow-hidden px-4 pt-28">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(82,139,238,0.14),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(247,129,94,0.16),transparent_32%)]" />
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}

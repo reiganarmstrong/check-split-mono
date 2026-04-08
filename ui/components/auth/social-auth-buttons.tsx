@@ -1,6 +1,22 @@
 import { Button } from "@/components/ui/button"
 
-export function SocialAuthButtons() {
+type SocialAuthButtonsProps = {
+  tone?: "neutral" | "primary" | "secondary"
+}
+
+export function SocialAuthButtons({
+  tone = "neutral",
+}: SocialAuthButtonsProps) {
+  const disabledToneClassName =
+    tone === "secondary"
+      ? "disabled:border-border disabled:bg-muted/80 disabled:text-muted-foreground"
+      : tone === "primary"
+        ? "disabled:border-border disabled:bg-muted/80 disabled:text-muted-foreground"
+        : "disabled:border-border disabled:bg-muted/80 disabled:text-muted-foreground"
+
+  const socialButtonClassName =
+    `h-14 rounded-[1.6rem] border-4 border-foreground bg-white font-black text-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-1 hover:translate-y-1 hover:bg-muted hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-x-0 disabled:hover:translate-y-0 ${disabledToneClassName}`
+
   return (
     <>
       <div className="relative my-8">
@@ -19,7 +35,7 @@ export function SocialAuthButtons() {
           variant="outline"
           type="button"
           disabled
-          className="h-12 rounded-2xl font-bold shadow-sm transition-transform hover:scale-105"
+          className={socialButtonClassName}
         >
           <svg className="mr-0 h-5 w-5 sm:mr-2" viewBox="0 0 24 24">
             <path
@@ -45,7 +61,7 @@ export function SocialAuthButtons() {
           variant="outline"
           type="button"
           disabled
-          className="h-12 rounded-2xl font-bold shadow-sm transition-transform hover:scale-105"
+          className={socialButtonClassName}
         >
           <svg
             className="mr-0 h-5 w-5 sm:mr-2"

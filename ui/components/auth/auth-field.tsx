@@ -29,6 +29,7 @@ type AuthFieldProps = Omit<
   labelAside?: ReactNode
   showErrors?: boolean
   onValueChange?: (value: string) => void
+  tone?: "primary" | "secondary"
 }
 
 function getFieldError(errors: unknown[]) {
@@ -42,6 +43,7 @@ export function AuthField({
   labelAside,
   showErrors = field.state.meta.isTouched,
   onValueChange,
+  tone = "primary",
   className,
   id,
   ...props
@@ -52,6 +54,10 @@ export function AuthField({
   const onValueChangeRef = useRef(onValueChange)
   const inputId = id ?? field.name
   const errorMessage = showErrors ? getFieldError(field.state.meta.errors) : undefined
+  const toneClassName =
+    tone === "secondary"
+      ? "shadow-[4px_4px_0px_0px_var(--color-secondary)] hover:shadow-[2px_2px_0px_0px_var(--color-secondary)] focus:border-secondary focus:shadow-[2px_2px_0px_0px_var(--color-secondary)]"
+      : "shadow-[4px_4px_0px_0px_var(--color-primary)] hover:shadow-[2px_2px_0px_0px_var(--color-primary)] focus:border-primary focus:shadow-[2px_2px_0px_0px_var(--color-primary)]"
   const syncFieldValue = useCallback(
     (nextValue: string) => {
       if (nextValue === fieldValueRef.current) {
@@ -137,7 +143,8 @@ export function AuthField({
         }}
         aria-invalid={Boolean(errorMessage)}
         className={cn(
-          "h-14 rounded-2xl border-transparent bg-muted/50 px-5 text-base transition-colors hover:border-border focus:bg-background",
+          "h-14 rounded-full border-4 border-foreground bg-white px-6 text-base font-medium transition-all hover:translate-x-1 hover:translate-y-1 focus:outline-none focus:ring-0",
+          toneClassName,
           className,
         )}
       />

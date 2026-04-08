@@ -110,29 +110,20 @@ export default function ConfirmSignupPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 md:px-0">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[40px_40px]"></div>
-
+    <div className="relative -mt-28 flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 pt-28 md:px-0">
+      {/* Playful Background Blobs & Grid */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[var(--color-background)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-foreground)_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.03]" />
         <motion.div
-          animate={{ y: [0, -25, 0], rotate: [0, 15, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[10%] left-[5%] xl:left-[15%] h-24 w-24 rounded-full border-10 border-primary/10 md:h-32 md:w-32 sm:border-16"
-        />
-        <motion.div
-          animate={{ x: [0, 30, 0], y: [0, 15, 0], rotate: [0, -20, 0] }}
+          animate={{ x: [0, -40, 0], y: [0, 50, 0], borderRadius: ["40%", "60%", "40%"] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] right-[5%] h-32 w-32 rotate-12 rounded-4xl bg-secondary/10 md:h-48 md:w-48 xl:right-[15%]"
+          className="absolute top-[5%] -left-[10%] w-[500px] h-[500px] bg-[var(--color-blob-1)] opacity-20 blur-3xl rounded-full"
         />
         <motion.div
-          animate={{ y: [0, -20, 0], x: [0, -20, 0], rotate: [-12, -5, -12] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[20%] left-[10%] h-12 w-48 rounded-full bg-primary/5 md:h-16 md:w-64 xl:left-[20%]"
-        />
-        <motion.div
-          animate={{ y: [0, 30, 0], rotate: [45, 90, 45] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute right-[10%] bottom-[10%] h-20 w-20 rounded-2xl bg-accent/15 md:h-28 md:w-28 md:rounded-3xl xl:right-[20%]"
+          animate={{ x: [0, 40, 0], y: [0, -30, 0], borderRadius: ["60%", "40%", "60%"] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -bottom-[10%] -right-[10%] w-[600px] h-[600px] bg-[var(--color-blob-2)] opacity-20 blur-3xl rounded-full"
         />
       </div>
 
