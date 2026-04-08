@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, LogOut } from "lucide-react";
@@ -19,7 +19,6 @@ export function Navbar() {
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
 
   const homeHref = status === "authenticated" ? "/dashboard" : "/";
-
   useEffect(() => {
     setIsAccountMenuOpen(false);
   }, [pathname, status]);
@@ -65,85 +64,97 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md">
-      <div className="container flex h-16 items-center justify-between mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-4 z-50 w-full px-4 pb-4 mt-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between rounded-[2.5rem] border-4 border-foreground bg-white px-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-transform">
         <Link href={homeHref} className="mr-6 flex items-center group">
           <BrandLogo
-            className="transition-transform duration-300 group-hover:scale-103"
+            iconClassName="-translate-y-[2px]"
             wordmarkClassName="hidden sm:flex"
           />
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-3">
             {status === "authenticated" ? (
-              <div ref={accountMenuRef} className="relative">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  aria-haspopup="menu"
-                  aria-expanded={isAccountMenuOpen}
-                  onClick={() => {
-                    setIsAccountMenuOpen((isOpen) => !isOpen);
-                  }}
-                  className="max-w-[min(18rem,calc(100vw-7rem))] rounded-full border-slate-900/10 bg-white/80 px-3 font-bold shadow-sm backdrop-blur hover:bg-white"
-                >
-                  <span className="truncate">{user?.email ?? user?.username}</span>
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform duration-200 ${isAccountMenuOpen ? "rotate-180" : ""}`}
+              <div ref={accountMenuRef} className="relative h-16">
+                <div className="absolute right-0 top-1 z-50 max-w-[min(22rem,calc(100vw-2.5rem))] origin-top-right">
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 translate-x-[4px] translate-y-[4px] rounded-[1.75rem] bg-foreground"
                   />
-                </Button>
+                  <motion.div
+                    whileHover={
+                      isAccountMenuOpen
+                        ? undefined
+                        : {
+                            x: 2,
+                            y: 2,
+                          }
+                    }
+                    transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                    className="relative overflow-hidden rounded-[1.75rem] border-3 border-foreground bg-white transform-gpu"
+                  >
+                    <motion.button
+                      type="button"
+                      aria-haspopup="menu"
+                      aria-expanded={isAccountMenuOpen}
+                      onClick={() => setIsAccountMenuOpen((isOpen) => !isOpen)}
+                      className="flex h-11 w-full items-center justify-between gap-3 px-4 text-left text-sm font-bold text-foreground"
+                    >
+                      <span className="truncate">{user?.email ?? user?.username}</span>
+                      <ChevronDown
+                        className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isAccountMenuOpen ? "rotate-180" : ""}`}
+                      />
+                    </motion.button>
 
-                <AnimatePresence>
-                  {isAccountMenuOpen ? (
                     <motion.div
-                      key="account-menu"
                       role="menu"
                       aria-label="Account actions"
-                      initial={{ opacity: 0, y: -10, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.985 }}
-                      transition={{
-                        duration: 0.22,
-                        ease: [0.22, 1, 0.36, 1],
+                      aria-hidden={!isAccountMenuOpen}
+                      initial={false}
+                      animate={{
+                        gridTemplateRows: isAccountMenuOpen ? "1fr" : "0fr",
+                        opacity: isAccountMenuOpen ? 1 : 0,
                       }}
-                      className="absolute right-0 mt-2 min-w-56 origin-top-right rounded-[1.4rem] border border-slate-900/10 bg-white/95 p-2 shadow-[0_24px_56px_-36px_rgba(31,59,133,0.38)] backdrop-blur transform-gpu will-change-[opacity,transform]"
+                      transition={{
+                        gridTemplateRows: { duration: 0.24, ease: [0.22, 1, 0.36, 1] },
+                        opacity: { duration: isAccountMenuOpen ? 0.18 : 0.12 },
+                      }}
+                      className="grid overflow-hidden"
                     >
-                      <div className="px-3 py-2">
-                        <p className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-muted-foreground">
-                          Signed in as
-                        </p>
-                        <p className="mt-1 break-all text-sm font-semibold text-foreground">
-                          {user?.email ?? user?.username}
-                        </p>
-                      </div>
+                      <div className="min-h-0">
+                        <div className="border-t-2 border-dashed border-border px-4 pb-4 pt-3">
+                          <p className="text-[0.65rem] font-black uppercase tracking-widest text-muted-foreground">
+                            Signed in as
+                          </p>
+                          <p className="mt-1 break-all text-sm font-bold text-foreground">
+                            {user?.email ?? user?.username}
+                          </p>
 
-                      <button
-                        type="button"
-                        role="menuitem"
-                        onClick={() => {
-                          void handleSignOut();
-                        }}
-                        disabled={isSigningOut}
-                        className="flex w-full items-center gap-2 rounded-[1rem] px-3 py-2 text-left text-sm font-bold text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        {isSigningOut ? "Signing out..." : "Sign out"}
-                      </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => void handleSignOut()}
+                            disabled={isSigningOut}
+                            className="mt-4 flex h-12 w-full items-center justify-center gap-3 rounded-full border-3 border-foreground bg-destructive px-5 text-sm font-black text-destructive-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                          >
+                            <LogOut className="h-5 w-5" />
+                            {isSigningOut ? "Signing out..." : "Sign out"}
+                          </button>
+                        </div>
+                      </div>
                     </motion.div>
-                  ) : null}
-                </AnimatePresence>
+                  </motion.div>
+                </div>
               </div>
             ) : status === "loading" ? (
-              <div className="h-8 w-28 animate-pulse rounded-full bg-muted/80" />
+              <div className="h-12 w-28 animate-[pulse_1.5s_ease-in-out_infinite] rounded-full bg-muted border-2 border-border" />
             ) : (
               <>
                 {pathname !== "/login" ? (
                   <Link href="/login">
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="rounded-full font-bold hover:bg-secondary/20"
+                      className="rounded-full font-black text-foreground border-2 border-transparent hover:border-foreground hover:bg-primary/10 px-5 transition-all text-base h-12 hidden sm:inline-flex"
                     >
                       Log in
                     </Button>
@@ -151,7 +162,7 @@ export function Navbar() {
                 ) : null}
                 {pathname !== "/signup" ? (
                   <Link href="/signup">
-                    <Button size="sm" className="rounded-full font-bold shadow-md">
+                    <Button className="-translate-y-1 rounded-full font-black border-4 border-foreground bg-primary px-6 h-12 text-primary-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-0 hover:shadow-none transition-all text-base">
                       Get Started
                     </Button>
                   </Link>

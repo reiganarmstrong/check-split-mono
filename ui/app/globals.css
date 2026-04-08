@@ -33,7 +33,7 @@
   --radius-2xl: calc(var(--radius) + 16px);
   --radius-3xl: calc(var(--radius) + 24px);
   --radius-full: 9999px;
-  
+
   --color-blob-1: var(--blob-1);
   --color-blob-2: var(--blob-2);
 }
@@ -42,35 +42,37 @@
   /* Playful Pastel Light Theme: Pearl, Cerulean, Coral, Sunflower */
   --background: oklch(0.98 0.01 250); /* soft pearl blue */
   --foreground: oklch(0.15 0.05 250); /* deep midnight blue */
-  
+
   --card: oklch(0.995 0.005 250); /* almost white, slight cool tint */
   --card-foreground: oklch(0.15 0.05 250);
-  
+
   --popover: oklch(0.995 0.005 250);
   --popover-foreground: oklch(0.15 0.05 250);
-  
-  --primary: oklch(0.55 0.15 250); /* cerulean blue (good contrast for text and bg) */
+
+  --primary: oklch(
+    0.55 0.15 250
+  ); /* cerulean blue (good contrast for text and bg) */
   --primary-foreground: oklch(0.98 0.01 250); /* white on blue */
-  
+
   --secondary: oklch(0.65 0.2 15); /* warm coral pink */
   --secondary-foreground: oklch(0.98 0.01 15); /* white on coral */
-  
+
   --muted: oklch(0.94 0.02 250);
   --muted-foreground: oklch(0.45 0.05 250); /* dusty blue */
-  
+
   --accent: oklch(0.8 0.15 85); /* sunflower yellow */
   --accent-foreground: oklch(0.15 0.05 250); /* dark blue text on yellow */
-  
+
   --destructive: oklch(0.58 0.22 25);
   --destructive-foreground: oklch(1 0 0);
-  
-  --border: oklch(0.88 0.03 250); 
+
+  --border: oklch(0.88 0.03 250);
   --input: oklch(0.88 0.03 250);
   --ring: oklch(0.55 0.15 250); /* match primary cerulean */
-  
+
   --blob-1: oklch(0.9 0.08 250); /* soft blue blob */
   --blob-2: oklch(0.92 0.1 15); /* soft pink blob */
-  
+
   --radius: 1.5rem;
 }
 
@@ -78,40 +80,42 @@
   /* Playful Pastel Dark Theme: Navy, Sky, Neon Pink, Lemon */
   --background: oklch(0.18 0.05 250); /* deep navy */
   --foreground: oklch(0.95 0.02 250); /* ice blue text */
-  
-  --card: oklch(0.24 0.06 250); 
+
+  --card: oklch(0.24 0.06 250);
   --card-foreground: oklch(0.95 0.02 250);
-  
+
   --popover: oklch(0.24 0.06 250);
   --popover-foreground: oklch(0.95 0.02 250);
-  
+
   --primary: oklch(0.7 0.15 250); /* vivid sky blue */
   --primary-foreground: oklch(0.15 0.05 250); /* navy text on blue */
-  
+
   --secondary: oklch(0.7 0.18 15); /* neon coral */
   --secondary-foreground: oklch(0.15 0.05 250); /* navy text on pink */
-  
+
   --muted: oklch(0.3 0.06 250);
   --muted-foreground: oklch(0.75 0.04 250); /* light dusty blue */
-  
+
   --accent: oklch(0.85 0.15 85); /* bright lemon */
   --accent-foreground: oklch(0.15 0.05 250); /* navy text on yellow */
-  
-  --destructive: oklch(0.60 0.20 25);
+
+  --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: oklch(0.95 0.02 300);
-  
+
   --border: oklch(0.35 0.08 250);
   --input: oklch(0.35 0.08 250);
   --ring: oklch(0.7 0.15 250);
-  
+
   --blob-1: oklch(0.3 0.12 250); /* vibrant blue blob */
   --blob-2: oklch(0.35 0.15 15); /* vibrant pink blob */
 }
 
 @layer base {
   @keyframes onAutoFillStart {
-    from {}
-    to {}
+    from {
+    }
+    to {
+    }
   }
 
   * {
@@ -120,13 +124,21 @@
   body {
     @apply bg-background text-foreground;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading tracking-tight;
   }
-  
+
   /* Make buttons and inputs inherently bouncy / rounded */
-  button, input, textarea, select {
+  button,
+  input,
+  textarea,
+  select {
     @apply rounded-full transition-all duration-300;
   }
 
