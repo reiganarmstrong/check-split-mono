@@ -206,11 +206,16 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "appsync:DeleteFunction",
       "appsync:DeleteGraphqlApi",
       "appsync:DeleteResolver",
+      "appsync:GetIntrospectionSchema",
       "appsync:GetDataSource",
       "appsync:GetFunction",
       "appsync:GetGraphqlApi",
       "appsync:GetResolver",
       "appsync:GetSchemaCreationStatus",
+      "appsync:ListDataSources",
+      "appsync:ListFunctions",
+      "appsync:ListGraphqlApis",
+      "appsync:ListResolvers",
       "appsync:ListTagsForResource",
       "appsync:StartSchemaCreation",
       "appsync:TagResource",
@@ -258,10 +263,12 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "iam:GetRolePolicy",
       "iam:ListAttachedRolePolicies",
       "iam:ListRolePolicies",
+      "iam:ListRoleTags",
       "iam:PassRole",
       "iam:PutRolePolicy",
       "iam:TagRole",
-      "iam:UntagRole"
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy"
     ]
 
     resources = [
@@ -274,11 +281,12 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     effect = "Allow"
     actions = [
       "iam:GetPolicy",
-      "iam:GetPolicyVersion"
+      "iam:GetPolicyVersion",
+      "iam:ListPolicies"
     ]
 
     resources = [
-      "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+      "*"
     ]
   }
 
