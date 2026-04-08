@@ -1,5 +1,20 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Cognito Dev Auth
+
+The UI uses Amplify JS against the Cognito user pool managed by Terraform in `../infra/environments/dev`.
+
+The Cognito values are stored in `ui/.env.local`:
+
+```env
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=...
+NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID=...
+```
+
+Start the app with `pnpm dev`.
+
+The current Terraform Cognito client only supports email/password auth. Google and Apple buttons remain disabled until OAuth flows and identity providers are enabled in Terraform.
+
 ## Getting Started
 
 First, run the development server:
