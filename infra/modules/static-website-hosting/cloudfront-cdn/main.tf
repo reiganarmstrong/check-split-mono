@@ -1,7 +1,3 @@
-locals {
-  dummy_ip = "127.0.0.1"
-}
-
 # create the oac for cloudfront as identification for points of presence for s3
 resource "aws_cloudfront_origin_access_control" "this" {
   name                              = "oac-${var.s3_bucket_id}"
