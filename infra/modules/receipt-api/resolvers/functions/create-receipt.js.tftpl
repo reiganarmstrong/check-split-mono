@@ -1,0 +1,103 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return `RECEIPT#${receiptId}`;
+}
+
+export function request(ctx) {
+  const now = util.time.nowISO8601();
+  const input = ctx.args.input;
+  const ownerUserId = requireUserSub(ctx);
+  const receiptId = util.autoId();
+
+  ctx.stash.createdReceipt = {
+    allocationPolicy: input.allocationPolicy ?? 'PROPORTIONAL',
+    capturedAt: input.capturedAt ?? now,
+    createdAt: now,
+    currencyCode: input.currencyCode,
+    discountCents: input.discountCents,
+    feeCents: input.feeCents,
+    itemCount: 0,
+    locationAddress: input.locationAddress ?? null,
+    locationLat: input.locationLat ?? null,
+    locationLng: input.locationLng ?? null,
+    locationName: input.locationName ?? null,
+    merchantName: input.merchantName,
+    ownerUserId,
+    participantCount: 0,
+    receiptId,
+    receiptOccurredAt: input.receiptOccurredAt,
+    status: input.status ?? 'DRAFT',
+    subtotalCents: input.subtotalCents,
+    taxCents: input.taxCents,
+    tipCents: input.tipCents,
+    totalCents: input.totalCents,
+    updatedAt: now,
+    version: 1,
+  };
+
+  return {
+    attributeValues: util.dynamodb.toMapValues({
+      allocation_policy: ctx.stash.createdReceipt.allocationPolicy,
+      captured_at: ctx.stash.createdReceipt.capturedAt,
+      created_at: ctx.stash.createdReceipt.createdAt,
+      currency_code: ctx.stash.createdReceipt.currencyCode,
+      discount_cents: ctx.stash.createdReceipt.discountCents,
+      fee_cents: ctx.stash.createdReceipt.feeCents,
+      gsi1pk: `USER#${ownerUserId}`,
+      gsi1sk: `RECEIPT_DATE#${input.receiptOccurredAt}#RECEIPT#${receiptId}`,
+      item_count: 0,
+      location_address: ctx.stash.createdReceipt.locationAddress,
+      location_lat: ctx.stash.createdReceipt.locationLat,
+      location_lng: ctx.stash.createdReceipt.locationLng,
+      location_name: ctx.stash.createdReceipt.locationName,
+      merchant_name: ctx.stash.createdReceipt.merchantName,
+      owner_user_id: ownerUserId,
+      participant_count: 0,
+      receipt_id: receiptId,
+      receipt_occurred_at: ctx.stash.createdReceipt.receiptOccurredAt,
+      status: ctx.stash.createdReceipt.status,
+      subtotal_cents: ctx.stash.createdReceipt.subtotalCents,
+      tax_cents: ctx.stash.createdReceipt.taxCents,
+      tip_cents: ctx.stash.createdReceipt.tipCents,
+      total_cents: ctx.stash.createdReceipt.totalCents,
+      updated_at: ctx.stash.createdReceipt.updatedAt,
+      version: 1,
+    }),
+    condition: {
+      expression: 'attribute_not_exists(#pk) AND attribute_not_exists(#sk)',
+      expressionNames: {
+        '#pk': 'pk',
+        '#sk': 'sk',
+      },
+    },
+    key: util.dynamodb.toMapValues({
+      pk: receiptPk(receiptId),
+      sk: 'RECEIPT',
+    }),
+    operation: 'PutItem',
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  return {
+    ...ctx.stash.createdReceipt,
+    items: [],
+    participants: [],
+  };
+}
+

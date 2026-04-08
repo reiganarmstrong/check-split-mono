@@ -1,0 +1,32 @@
+import { util } from '@aws-appsync/utils';
+
+function receiptPk(receiptId) {
+  return `RECEIPT#${receiptId}`;
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+  const itemId = input.itemId ?? util.autoId();
+
+  ctx.stash.itemId = itemId;
+
+  return {
+    consistentRead: true,
+    key: util.dynamodb.toMapValues({
+      pk: receiptPk(input.receiptId),
+      sk: `ITEM#${itemId}`,
+    }),
+    operation: 'GetItem',
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  ctx.stash.existingItem = ctx.result ?? null;
+
+  return ctx.result;
+}
+

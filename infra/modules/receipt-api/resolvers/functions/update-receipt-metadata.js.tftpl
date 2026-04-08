@@ -1,0 +1,114 @@
+import { util } from '@aws-appsync/utils';
+
+const updatableFieldMap = {
+  allocationPolicy: 'allocation_policy',
+  capturedAt: 'captured_at',
+  currencyCode: 'currency_code',
+  discountCents: 'discount_cents',
+  feeCents: 'fee_cents',
+  locationAddress: 'location_address',
+  locationLat: 'location_lat',
+  locationLng: 'location_lng',
+  locationName: 'location_name',
+  merchantName: 'merchant_name',
+  receiptOccurredAt: 'receipt_occurred_at',
+  status: 'status',
+  subtotalCents: 'subtotal_cents',
+  taxCents: 'tax_cents',
+  tipCents: 'tip_cents',
+  totalCents: 'total_cents',
+};
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return `RECEIPT#${receiptId}`;
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+  const userSub = requireUserSub(ctx);
+  const now = util.time.nowISO8601();
+  const nextVersion = input.expectedVersion + 1;
+  const expressionNames = {
+    '#gsi1sk': 'gsi1sk',
+    '#updated_at': 'updated_at',
+    '#version': 'version',
+  };
+  const expressionValues = {
+    ':gsi1sk': `RECEIPT_DATE#${input.receiptOccurredAt ?? '__UNCHANGED__'}#RECEIPT#${input.receiptId}`,
+    ':updated_at': now,
+    ':version': nextVersion,
+  };
+  const setClauses = ['#updated_at = :updated_at', '#version = :version'];
+
+  if (Object.prototype.hasOwnProperty.call(input, 'receiptOccurredAt')) {
+    setClauses.push('#gsi1sk = :gsi1sk');
+  } else {
+    delete expressionNames['#gsi1sk'];
+    delete expressionValues[':gsi1sk'];
+  }
+
+  for (const [inputKey, attributeName] of Object.entries(updatableFieldMap)) {
+    if (!Object.prototype.hasOwnProperty.call(input, inputKey) || inputKey === 'receiptOccurredAt') {
+      continue;
+    }
+
+    const nameKey = `#${attributeName}`;
+    const valueKey = `:${attributeName}`;
+
+    expressionNames[nameKey] = attributeName;
+    expressionValues[valueKey] = input[inputKey];
+    setClauses.push(`${nameKey} = ${valueKey}`);
+  }
+
+  return {
+    condition: {
+      expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
+      expressionNames: {
+        '#owner_user_id': 'owner_user_id',
+        '#version': 'version',
+      },
+      expressionValues: util.dynamodb.toMapValues({
+        ':expected_version': input.expectedVersion,
+        ':owner_user_id': userSub,
+      }),
+    },
+    key: util.dynamodb.toMapValues({
+      pk: receiptPk(input.receiptId),
+      sk: 'RECEIPT',
+    }),
+    operation: 'UpdateItem',
+    update: {
+      expression: `SET ${setClauses.join(', ')}`,
+      expressionNames,
+      expressionValues: util.dynamodb.toMapValues(expressionValues),
+    },
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  const input = ctx.args.input;
+
+  return {
+    itemCount: null,
+    participantCount: null,
+    receiptId: input.receiptId,
+    status: input.status ?? null,
+    updatedAt: util.time.nowISO8601(),
+    version: input.expectedVersion + 1,
+  };
+}
+

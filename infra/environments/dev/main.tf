@@ -3,6 +3,7 @@ locals {
   app_subdomain                   = "${local.environment_domain_prefix}${var.subdomain}"
   auth_subdomain                  = "auth.${local.app_subdomain}"
   cognito_user_pool_resource_name = "checksplit_user_pool_${var.environment}"
+  application_name                = "checksplit"
 }
 
 module "certificates" {
@@ -33,4 +34,11 @@ module "cognito-auth" {
   auth_domain                     = local.auth_subdomain
   cognito_user_pool_resource_name = local.cognito_user_pool_resource_name
   depends_on                      = [module.static-website-hosting]
+}
+
+module "receipt-api" {
+  source               = "../../modules/receipt-api"
+  application_name     = local.application_name
+  cognito_user_pool_id = module.cognito-auth.user_pool_id
+  environment          = var.environment
 }

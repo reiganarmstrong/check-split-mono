@@ -1,0 +1,116 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return `RECEIPT#${receiptId}`;
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+  const userSub = requireUserSub(ctx);
+  const now = util.time.nowISO8601();
+  const participantId = util.autoId();
+  const nextVersion = input.expectedVersion + 1;
+
+  ctx.stash.participant = {
+    createdAt: now,
+    displayName: input.displayName,
+    notes: input.notes ?? null,
+    participantId,
+    sortOrder: input.sortOrder ?? null,
+    updatedAt: now,
+  };
+
+  return {
+    operation: 'TransactWriteItems',
+    transactItems: [
+      {
+        condition: {
+          expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
+          expressionNames: {
+            '#owner_user_id': 'owner_user_id',
+            '#version': 'version',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':expected_version': input.expectedVersion,
+            ':owner_user_id': userSub,
+          }),
+        },
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'RECEIPT',
+        }),
+        operation: 'ConditionCheck',
+        table: '${table_name}',
+      },
+      {
+        attributeValues: util.dynamodb.toMapValues({
+          created_at: now,
+          display_name: input.displayName,
+          notes: input.notes ?? null,
+          participant_id: participantId,
+          sort_order: input.sortOrder ?? null,
+          updated_at: now,
+        }),
+        condition: {
+          expression: 'attribute_not_exists(#pk) AND attribute_not_exists(#sk)',
+          expressionNames: {
+            '#pk': 'pk',
+            '#sk': 'sk',
+          },
+        },
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: `PARTICIPANT#${participantId}`,
+        }),
+        operation: 'PutItem',
+        table: '${table_name}',
+      },
+      {
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'RECEIPT',
+        }),
+        operation: 'UpdateItem',
+        table: '${table_name}',
+        update: {
+          expression: 'SET #participant_count = #participant_count + :one, #updated_at = :updated_at, #version = :version',
+          expressionNames: {
+            '#participant_count': 'participant_count',
+            '#updated_at': 'updated_at',
+            '#version': 'version',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':one': 1,
+            ':updated_at': now,
+            ':version': nextVersion,
+          }),
+        },
+      },
+    ],
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  return {
+    participant: ctx.stash.participant,
+    participantCount: null,
+    receiptId: ctx.args.input.receiptId,
+    updatedAt: ctx.stash.participant.updatedAt,
+    version: ctx.args.input.expectedVersion + 1,
+  };
+}
+

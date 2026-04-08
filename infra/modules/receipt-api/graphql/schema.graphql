@@ -1,0 +1,236 @@
+enum AllocationPolicy {
+  EVEN
+  PROPORTIONAL
+}
+
+enum ReceiptStatus {
+  DRAFT
+  OPEN
+  FINALIZED
+}
+
+type Query {
+  getReceipt(receiptId: ID!): Receipt
+  listReceipts(limit: Int, nextToken: String): ReceiptConnection!
+}
+
+type Mutation {
+  addParticipant(input: AddParticipantInput!): ParticipantMutationResult!
+  createReceipt(input: CreateReceiptInput!): Receipt!
+  finalizeReceipt(input: FinalizeReceiptInput!): ReceiptMutationResult!
+  removeParticipant(input: RemoveParticipantInput!): ParticipantMutationResult!
+  removeReceiptItem(input: RemoveReceiptItemInput!): ItemMutationResult!
+  setItemAllocations(input: SetItemAllocationsInput!): AllocationMutationResult!
+  updateParticipant(input: UpdateParticipantInput!): ParticipantMutationResult!
+  updateReceiptMetadata(input: UpdateReceiptMetadataInput!): ReceiptMutationResult!
+  upsertReceiptItem(input: UpsertReceiptItemInput!): ItemMutationResult!
+}
+
+input AddParticipantInput {
+  expectedVersion: Int!
+  notes: String
+  receiptId: ID!
+  sortOrder: Int
+  displayName: String!
+}
+
+input CreateReceiptInput {
+  allocationPolicy: AllocationPolicy
+  capturedAt: AWSDateTime
+  currencyCode: String!
+  discountCents: Int!
+  feeCents: Int!
+  locationAddress: String
+  locationLat: Float
+  locationLng: Float
+  locationName: String
+  merchantName: String!
+  receiptOccurredAt: AWSDateTime!
+  status: ReceiptStatus
+  subtotalCents: Int!
+  taxCents: Int!
+  tipCents: Int!
+  totalCents: Int!
+}
+
+input FinalizeReceiptInput {
+  expectedVersion: Int!
+  receiptId: ID!
+  status: ReceiptStatus!
+}
+
+input ReceiptItemAllocationInput {
+  participantId: ID!
+  shareWeight: Float!
+}
+
+input RemoveParticipantInput {
+  expectedVersion: Int!
+  participantId: ID!
+  receiptId: ID!
+}
+
+input RemoveReceiptItemInput {
+  expectedVersion: Int!
+  itemId: ID!
+  receiptId: ID!
+}
+
+input SetItemAllocationsInput {
+  allocations: [ReceiptItemAllocationInput!]!
+  expectedVersion: Int!
+  itemId: ID!
+  receiptId: ID!
+}
+
+input UpdateParticipantInput {
+  expectedVersion: Int!
+  notes: String
+  participantId: ID!
+  receiptId: ID!
+  sortOrder: Int
+  displayName: String!
+}
+
+input UpdateReceiptMetadataInput {
+  allocationPolicy: AllocationPolicy
+  capturedAt: AWSDateTime
+  currencyCode: String
+  discountCents: Int
+  expectedVersion: Int!
+  feeCents: Int
+  locationAddress: String
+  locationLat: Float
+  locationLng: Float
+  locationName: String
+  merchantName: String
+  receiptId: ID!
+  receiptOccurredAt: AWSDateTime
+  status: ReceiptStatus
+  subtotalCents: Int
+  taxCents: Int
+  tipCents: Int
+  totalCents: Int
+}
+
+input UpsertReceiptItemInput {
+  category: String
+  description: String!
+  discountCents: Int!
+  expectedVersion: Int!
+  itemId: ID
+  lineSubtotalCents: Int!
+  quantity: Int!
+  receiptId: ID!
+  scanConfidence: Float
+  sourceLineNumber: Int
+  unitPriceCents: Int!
+}
+
+type AllocationMutationResult {
+  allocations: [ReceiptItemAllocation!]!
+  itemId: ID!
+  receiptId: ID!
+  updatedAt: AWSDateTime!
+  version: Int!
+}
+
+type ItemMutationResult {
+  item: ReceiptItem
+  itemCount: Int
+  receiptId: ID!
+  updatedAt: AWSDateTime!
+  version: Int!
+}
+
+type ParticipantMutationResult {
+  participant: ReceiptParticipant
+  participantCount: Int
+  receiptId: ID!
+  updatedAt: AWSDateTime!
+  version: Int!
+}
+
+type Receipt {
+  allocationPolicy: AllocationPolicy!
+  capturedAt: AWSDateTime
+  createdAt: AWSDateTime!
+  currencyCode: String!
+  discountCents: Int!
+  feeCents: Int!
+  itemCount: Int!
+  items: [ReceiptItem!]!
+  locationAddress: String
+  locationLat: Float
+  locationLng: Float
+  locationName: String
+  merchantName: String!
+  ownerUserId: ID!
+  participantCount: Int!
+  participants: [ReceiptParticipant!]!
+  receiptId: ID!
+  receiptOccurredAt: AWSDateTime!
+  status: ReceiptStatus!
+  subtotalCents: Int!
+  taxCents: Int!
+  tipCents: Int!
+  totalCents: Int!
+  updatedAt: AWSDateTime!
+  version: Int!
+}
+
+type ReceiptConnection {
+  items: [ReceiptListItem!]!
+  nextToken: String
+}
+
+type ReceiptItem {
+  allocations: [ReceiptItemAllocation!]!
+  category: String
+  createdAt: AWSDateTime!
+  description: String!
+  discountCents: Int!
+  itemId: ID!
+  lineSubtotalCents: Int!
+  quantity: Int!
+  scanConfidence: Float
+  sourceLineNumber: Int
+  unitPriceCents: Int!
+  updatedAt: AWSDateTime!
+}
+
+type ReceiptItemAllocation {
+  createdAt: AWSDateTime!
+  itemId: ID!
+  participantId: ID!
+  shareWeight: Float!
+  updatedAt: AWSDateTime!
+}
+
+type ReceiptListItem {
+  locationName: String
+  merchantName: String!
+  receiptId: ID!
+  receiptOccurredAt: AWSDateTime!
+  status: ReceiptStatus!
+  totalCents: Int!
+  updatedAt: AWSDateTime!
+}
+
+type ReceiptMutationResult {
+  itemCount: Int
+  participantCount: Int
+  receiptId: ID!
+  status: ReceiptStatus
+  updatedAt: AWSDateTime!
+  version: Int!
+}
+
+type ReceiptParticipant {
+  createdAt: AWSDateTime
+  displayName: String!
+  notes: String
+  participantId: ID!
+  sortOrder: Int
+  updatedAt: AWSDateTime!
+}

@@ -1,0 +1,146 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return `RECEIPT#${receiptId}`;
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+  const userSub = requireUserSub(ctx);
+  const now = util.time.nowISO8601();
+  const itemId = ctx.stash.itemId;
+  const itemExists = Boolean(ctx.stash.existingItem);
+  const nextVersion = input.expectedVersion + 1;
+
+  ctx.stash.item = {
+    allocations: [],
+    category: input.category ?? null,
+    createdAt: itemExists ? ctx.stash.existingItem.created_at : now,
+    description: input.description,
+    discountCents: input.discountCents,
+    itemId,
+    lineSubtotalCents: input.lineSubtotalCents,
+    quantity: input.quantity,
+    scanConfidence: input.scanConfidence ?? null,
+    sourceLineNumber: input.sourceLineNumber ?? null,
+    unitPriceCents: input.unitPriceCents,
+    updatedAt: now,
+  };
+
+  const putItem = {
+    attributeValues: util.dynamodb.toMapValues({
+      category: input.category ?? null,
+      created_at: ctx.stash.item.createdAt,
+      description: input.description,
+      discount_cents: input.discountCents,
+      item_id: itemId,
+      line_subtotal_cents: input.lineSubtotalCents,
+      quantity: input.quantity,
+      scan_confidence: input.scanConfidence ?? null,
+      source_line_number: input.sourceLineNumber ?? null,
+      unit_price_cents: input.unitPriceCents,
+      updated_at: now,
+    }),
+    key: util.dynamodb.toMapValues({
+      pk: receiptPk(input.receiptId),
+      sk: `ITEM#${itemId}`,
+    }),
+    operation: 'PutItem',
+    table: '${table_name}',
+  };
+
+  if (!itemExists) {
+    putItem.condition = {
+      expression: 'attribute_not_exists(#pk) AND attribute_not_exists(#sk)',
+      expressionNames: {
+        '#pk': 'pk',
+        '#sk': 'sk',
+      },
+    };
+  }
+
+  return {
+    operation: 'TransactWriteItems',
+    transactItems: [
+      {
+        condition: {
+          expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
+          expressionNames: {
+            '#owner_user_id': 'owner_user_id',
+            '#version': 'version',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':expected_version': input.expectedVersion,
+            ':owner_user_id': userSub,
+          }),
+        },
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'RECEIPT',
+        }),
+        operation: 'ConditionCheck',
+        table: '${table_name}',
+      },
+      putItem,
+      {
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'RECEIPT',
+        }),
+        operation: 'UpdateItem',
+        table: '${table_name}',
+        update: {
+          expression: itemExists
+            ? 'SET #updated_at = :updated_at, #version = :version'
+            : 'SET #item_count = #item_count + :one, #updated_at = :updated_at, #version = :version',
+          expressionNames: itemExists
+            ? {
+                '#updated_at': 'updated_at',
+                '#version': 'version',
+              }
+            : {
+                '#item_count': 'item_count',
+                '#updated_at': 'updated_at',
+                '#version': 'version',
+              },
+          expressionValues: util.dynamodb.toMapValues(
+            itemExists
+              ? {
+                  ':updated_at': now,
+                  ':version': nextVersion,
+                }
+              : {
+                  ':one': 1,
+                  ':updated_at': now,
+                  ':version': nextVersion,
+                },
+          ),
+        },
+      },
+    ],
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  return {
+    item: ctx.stash.item,
+    itemCount: null,
+    receiptId: ctx.args.input.receiptId,
+    updatedAt: ctx.stash.item.updatedAt,
+    version: ctx.args.input.expectedVersion + 1,
+  };
+}

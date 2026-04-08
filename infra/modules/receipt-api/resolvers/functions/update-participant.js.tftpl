@@ -1,0 +1,119 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return `RECEIPT#${receiptId}`;
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+  const userSub = requireUserSub(ctx);
+  const now = util.time.nowISO8601();
+
+  ctx.stash.participant = {
+    createdAt: null,
+    displayName: input.displayName,
+    notes: input.notes ?? null,
+    participantId: input.participantId,
+    sortOrder: input.sortOrder ?? null,
+    updatedAt: now,
+  };
+
+  return {
+    operation: 'TransactWriteItems',
+    transactItems: [
+      {
+        condition: {
+          expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
+          expressionNames: {
+            '#owner_user_id': 'owner_user_id',
+            '#version': 'version',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':expected_version': input.expectedVersion,
+            ':owner_user_id': userSub,
+          }),
+        },
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'RECEIPT',
+        }),
+        operation: 'ConditionCheck',
+        table: '${table_name}',
+      },
+      {
+        condition: {
+          expression: 'attribute_exists(#pk) AND attribute_exists(#sk)',
+          expressionNames: {
+            '#pk': 'pk',
+            '#sk': 'sk',
+          },
+        },
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: `PARTICIPANT#${input.participantId}`,
+        }),
+        operation: 'UpdateItem',
+        table: '${table_name}',
+        update: {
+          expression: 'SET #display_name = :display_name, #notes = :notes, #sort_order = :sort_order, #updated_at = :updated_at',
+          expressionNames: {
+            '#display_name': 'display_name',
+            '#notes': 'notes',
+            '#sort_order': 'sort_order',
+            '#updated_at': 'updated_at',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':display_name': input.displayName,
+            ':notes': input.notes ?? null,
+            ':sort_order': input.sortOrder ?? null,
+            ':updated_at': now,
+          }),
+        },
+      },
+      {
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'RECEIPT',
+        }),
+        operation: 'UpdateItem',
+        table: '${table_name}',
+        update: {
+          expression: 'SET #updated_at = :updated_at, #version = :version',
+          expressionNames: {
+            '#updated_at': 'updated_at',
+            '#version': 'version',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':updated_at': now,
+            ':version': input.expectedVersion + 1,
+          }),
+        },
+      },
+    ],
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  return {
+    participant: ctx.stash.participant,
+    participantCount: null,
+    receiptId: ctx.args.input.receiptId,
+    updatedAt: ctx.stash.participant.updatedAt,
+    version: ctx.args.input.expectedVersion + 1,
+  };
+}
+
