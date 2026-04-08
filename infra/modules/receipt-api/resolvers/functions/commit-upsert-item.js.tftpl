@@ -11,7 +11,7 @@ function requireUserSub(ctx) {
 }
 
 function receiptPk(receiptId) {
-  return `RECEIPT#${receiptId}`;
+  return 'RECEIPT#' + receiptId;
 }
 
 export function request(ctx) {
@@ -53,7 +53,7 @@ export function request(ctx) {
     }),
     key: util.dynamodb.toMapValues({
       pk: receiptPk(input.receiptId),
-      sk: `ITEM#${itemId}`,
+      sk: 'ITEM#' + itemId,
     }),
     operation: 'PutItem',
     table: '${table_name}',

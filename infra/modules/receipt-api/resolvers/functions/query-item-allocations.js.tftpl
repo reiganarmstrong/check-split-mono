@@ -1,7 +1,7 @@
 import { util } from '@aws-appsync/utils';
 
 function receiptPk(receiptId) {
-  return `RECEIPT#${receiptId}`;
+  return 'RECEIPT#' + receiptId;
 }
 
 export function request(ctx) {
@@ -13,7 +13,7 @@ export function request(ctx) {
     query: {
       expression: 'pk = :pk AND begins_with(sk, :allocation_prefix)',
       expressionValues: util.dynamodb.toMapValues({
-        ':allocation_prefix': `ALLOCATION#ITEM#${input.itemId}#`,
+        ':allocation_prefix': 'ALLOCATION#ITEM#' + input.itemId + '#',
         ':pk': receiptPk(input.receiptId),
       }),
     },
@@ -29,4 +29,3 @@ export function response(ctx) {
 
   return ctx.result;
 }
-

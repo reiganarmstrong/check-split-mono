@@ -11,7 +11,7 @@ function requireUserSub(ctx) {
 }
 
 function receiptPk(receiptId) {
-  return `RECEIPT#${receiptId}`;
+  return 'RECEIPT#' + receiptId;
 }
 
 function uniqueParticipantIds(allocations) {
@@ -83,7 +83,7 @@ export function request(ctx) {
         },
         key: util.dynamodb.toMapValues({
           pk: receiptPk(input.receiptId),
-          sk: `ITEM#${input.itemId}`,
+          sk: 'ITEM#' + input.itemId,
         }),
         operation: 'ConditionCheck',
         table: '${table_name}',
@@ -98,7 +98,7 @@ export function request(ctx) {
         },
         key: util.dynamodb.toMapValues({
           pk: receiptPk(input.receiptId),
-          sk: `PARTICIPANT#${allocation.participantId}`,
+          sk: 'PARTICIPANT#' + allocation.participantId,
         }),
         operation: 'ConditionCheck',
         table: '${table_name}',
@@ -121,7 +121,7 @@ export function request(ctx) {
         }),
         key: util.dynamodb.toMapValues({
           pk: receiptPk(input.receiptId),
-          sk: `ALLOCATION#ITEM#${allocation.itemId}#PARTICIPANT#${allocation.participantId}`,
+          sk: 'ALLOCATION#ITEM#' + allocation.itemId + '#PARTICIPANT#' + allocation.participantId,
         }),
         operation: 'PutItem',
         table: '${table_name}',
@@ -162,4 +162,3 @@ export function response(ctx) {
     version: ctx.args.input.expectedVersion + 1,
   };
 }
-

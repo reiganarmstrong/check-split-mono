@@ -30,7 +30,7 @@ function requireUserSub(ctx) {
 }
 
 function receiptPk(receiptId) {
-  return `RECEIPT#${receiptId}`;
+  return 'RECEIPT#' + receiptId;
 }
 
 export function request(ctx) {
@@ -44,7 +44,7 @@ export function request(ctx) {
     '#version': 'version',
   };
   const expressionValues = {
-    ':gsi1sk': `RECEIPT_DATE#${input.receiptOccurredAt ?? '__UNCHANGED__'}#RECEIPT#${input.receiptId}`,
+    ':gsi1sk': 'RECEIPT_DATE#' + (input.receiptOccurredAt ?? '__UNCHANGED__') + '#RECEIPT#' + input.receiptId,
     ':updated_at': now,
     ':version': nextVersion,
   };
@@ -62,12 +62,12 @@ export function request(ctx) {
       continue;
     }
 
-    const nameKey = `#${attributeName}`;
-    const valueKey = `:${attributeName}`;
+    const nameKey = '#' + attributeName;
+    const valueKey = ':' + attributeName;
 
     expressionNames[nameKey] = attributeName;
     expressionValues[valueKey] = input[inputKey];
-    setClauses.push(`${nameKey} = ${valueKey}`);
+    setClauses.push(nameKey + ' = ' + valueKey);
   }
 
   return {
@@ -88,7 +88,7 @@ export function request(ctx) {
     }),
     operation: 'UpdateItem',
     update: {
-      expression: `SET ${setClauses.join(', ')}`,
+      expression: 'SET ' + setClauses.join(', '),
       expressionNames,
       expressionValues: util.dynamodb.toMapValues(expressionValues),
     },
@@ -111,4 +111,3 @@ export function response(ctx) {
     version: input.expectedVersion + 1,
   };
 }
-

@@ -1,7 +1,7 @@
 import { util } from '@aws-appsync/utils';
 
 function receiptPk(receiptId) {
-  return `RECEIPT#${receiptId}`;
+  return 'RECEIPT#' + receiptId;
 }
 
 export function request(ctx) {
@@ -35,4 +35,3 @@ export function response(ctx) {
 
   return ctx.result;
 }
-

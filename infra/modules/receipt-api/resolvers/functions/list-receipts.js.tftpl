@@ -22,7 +22,7 @@ export function request(ctx) {
     query: {
       expression: 'gsi1pk = :gsi1pk',
       expressionValues: util.dynamodb.toMapValues({
-        ':gsi1pk': `USER#${userSub}`,
+        ':gsi1pk': 'USER#' + userSub,
       }),
     },
     scanIndexForward: false,
@@ -48,4 +48,3 @@ export function response(ctx) {
     nextToken: ctx.result.nextToken ?? null,
   };
 }
-

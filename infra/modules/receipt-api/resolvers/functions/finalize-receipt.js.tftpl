@@ -11,7 +11,7 @@ function requireUserSub(ctx) {
 }
 
 function receiptPk(receiptId) {
-  return `RECEIPT#${receiptId}`;
+  return 'RECEIPT#' + receiptId;
 }
 
 export function request(ctx) {
@@ -66,4 +66,3 @@ export function response(ctx) {
     version: ctx.args.input.expectedVersion + 1,
   };
 }
-

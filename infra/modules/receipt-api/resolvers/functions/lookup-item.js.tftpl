@@ -1,7 +1,7 @@
 import { util } from '@aws-appsync/utils';
 
 function receiptPk(receiptId) {
-  return `RECEIPT#${receiptId}`;
+  return 'RECEIPT#' + receiptId;
 }
 
 export function request(ctx) {
@@ -14,7 +14,7 @@ export function request(ctx) {
     consistentRead: true,
     key: util.dynamodb.toMapValues({
       pk: receiptPk(input.receiptId),
-      sk: `ITEM#${itemId}`,
+      sk: 'ITEM#' + itemId,
     }),
     operation: 'GetItem',
   };
@@ -29,4 +29,3 @@ export function response(ctx) {
 
   return ctx.result;
 }
-

@@ -11,7 +11,7 @@ function requireUserSub(ctx) {
 }
 
 function receiptPk(receiptId) {
-  return `RECEIPT#${receiptId}`;
+  return 'RECEIPT#' + receiptId;
 }
 
 export function request(ctx) {
@@ -54,8 +54,8 @@ export function request(ctx) {
       currency_code: ctx.stash.createdReceipt.currencyCode,
       discount_cents: ctx.stash.createdReceipt.discountCents,
       fee_cents: ctx.stash.createdReceipt.feeCents,
-      gsi1pk: `USER#${ownerUserId}`,
-      gsi1sk: `RECEIPT_DATE#${input.receiptOccurredAt}#RECEIPT#${receiptId}`,
+      gsi1pk: 'USER#' + ownerUserId,
+      gsi1sk: 'RECEIPT_DATE#' + input.receiptOccurredAt + '#RECEIPT#' + receiptId,
       item_count: 0,
       location_address: ctx.stash.createdReceipt.locationAddress,
       location_lat: ctx.stash.createdReceipt.locationLat,
@@ -100,4 +100,3 @@ export function response(ctx) {
     participants: [],
   };
 }
-
