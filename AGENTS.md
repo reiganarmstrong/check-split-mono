@@ -1,7 +1,21 @@
 # Terraform Guidelines
+
 ## General
-- Do not use hardcoded strings for arns. Always use a HCL reference to a resource arn attribute or get the arn using a datasource.
+
+- Do not use hardcoded strings for arns. Always use a HCL resource arn attribute or get the arn using a datasource.
+
 ## Formatting
-- When making singleton resources in terraform modules, use the "this" naming convention instead of "main"
+
+- When making singleton resources in terraform modules, use the "this" naming convention instead of "main."
+
 ## Diagrams
+
 - Utilize color to distinguish between elements.
+
+# Frontend Guidelines
+
+## General
+
+- Utilize shadcn components as the base for components whenever it makes sense to do so.
+- Utilize zod for validation of forms, api requests, and api responses.
+- Utilize the motion library for complex animations.
