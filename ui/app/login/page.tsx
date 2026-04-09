@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useForm } from "@tanstack/react-form";
 import { LogIn } from "lucide-react";
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { validateLoginFormField } from "@/lib/auth-form-schemas"
 import { loginWithCredentials, type LoginFormValues } from "@/lib/auth";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { status, refreshSession } = useAuth()
@@ -218,4 +218,19 @@ export default function LoginPage() {
       </motion.div>
     </div>
   );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <AuthSessionScreen
+          title="Preparing sign in"
+          description="Loading your sign-in form."
+        />
+      }
+    >
+      <LoginPageContent />
+    </Suspense>
+  )
 }
