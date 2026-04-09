@@ -1,0 +1,68 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return 'RECEIPT#' + receiptId;
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+  const userSub = requireUserSub(ctx);
+  const now = util.time.nowISO8601();
+
+  return {
+    condition: {
+      expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
+      expressionNames: {
+        '#owner_user_id': 'owner_user_id',
+        '#version': 'version',
+      },
+      expressionValues: util.dynamodb.toMapValues({
+        ':expected_version': input.expectedVersion,
+        ':owner_user_id': userSub,
+      }),
+    },
+    key: util.dynamodb.toMapValues({
+      pk: receiptPk(input.receiptId),
+      sk: 'RECEIPT',
+    }),
+    operation: 'UpdateItem',
+    update: {
+      expression: 'SET #status = :status, #updated_at = :updated_at, #version = :version',
+      expressionNames: {
+        '#status': 'status',
+        '#updated_at': 'updated_at',
+        '#version': 'version',
+      },
+      expressionValues: util.dynamodb.toMapValues({
+        ':status': input.status,
+        ':updated_at': now,
+        ':version': input.expectedVersion + 1,
+      }),
+    },
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  return {
+    itemCount: null,
+    participantCount: null,
+    receiptId: ctx.args.input.receiptId,
+    status: ctx.args.input.status,
+    updatedAt: util.time.nowISO8601(),
+    version: ctx.args.input.expectedVersion + 1,
+  };
+}

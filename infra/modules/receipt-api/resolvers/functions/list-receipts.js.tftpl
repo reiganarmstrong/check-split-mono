@@ -1,0 +1,50 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+export function request(ctx) {
+  const userSub = requireUserSub(ctx);
+  const limit = Math.min(ctx.args.limit ?? 20, 50);
+
+  return {
+    operation: 'Query',
+    index: '${gsi_name}',
+    limit,
+    nextToken: ctx.args.nextToken ?? null,
+    query: {
+      expression: 'gsi1pk = :gsi1pk',
+      expressionValues: util.dynamodb.toMapValues({
+        ':gsi1pk': 'USER#' + userSub,
+      }),
+    },
+    scanIndexForward: false,
+    select: 'ALL_PROJECTED_ATTRIBUTES',
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  return {
+    items: (ctx.result.items ?? []).map((item) => ({
+      locationName: item.location_name ?? null,
+      merchantName: item.merchant_name,
+      receiptId: item.receipt_id,
+      receiptOccurredAt: item.receipt_occurred_at,
+      status: item.status,
+      totalCents: item.total_cents,
+      updatedAt: item.updated_at,
+    })),
+    nextToken: ctx.result.nextToken ?? null,
+  };
+}

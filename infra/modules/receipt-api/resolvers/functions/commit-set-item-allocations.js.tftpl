@@ -1,0 +1,164 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return 'RECEIPT#' + receiptId;
+}
+
+function uniqueParticipantIds(allocations) {
+  const seen = new Set();
+
+  for (const allocation of allocations) {
+    if (seen.has(allocation.participantId)) {
+      util.error('Each participant may appear only once in the allocation set', 'ValidationError');
+    }
+
+    if (allocation.shareWeight <= 0) {
+      util.error('Allocation shareWeight must be greater than zero', 'ValidationError');
+    }
+
+    seen.add(allocation.participantId);
+  }
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+  const userSub = requireUserSub(ctx);
+  const now = util.time.nowISO8601();
+  const existingAllocations = ctx.stash.itemAllocations ?? [];
+  const newAllocations = input.allocations ?? [];
+
+  uniqueParticipantIds(newAllocations);
+
+  if (existingAllocations.length + (newAllocations.length * 2) + 3 > 25) {
+    util.error('Too many allocation operations for one transaction', 'ValidationError');
+  }
+
+  ctx.stash.allocations = newAllocations.map((allocation) => ({
+    createdAt: now,
+    itemId: input.itemId,
+    participantId: allocation.participantId,
+    shareWeight: allocation.shareWeight,
+    updatedAt: now,
+  }));
+
+  return {
+    operation: 'TransactWriteItems',
+    transactItems: [
+      {
+        condition: {
+          expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
+          expressionNames: {
+            '#owner_user_id': 'owner_user_id',
+            '#version': 'version',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':expected_version': input.expectedVersion,
+            ':owner_user_id': userSub,
+          }),
+        },
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'RECEIPT',
+        }),
+        operation: 'ConditionCheck',
+        table: '${table_name}',
+      },
+      {
+        condition: {
+          expression: 'attribute_exists(#pk) AND attribute_exists(#sk)',
+          expressionNames: {
+            '#pk': 'pk',
+            '#sk': 'sk',
+          },
+        },
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'ITEM#' + input.itemId,
+        }),
+        operation: 'ConditionCheck',
+        table: '${table_name}',
+      },
+      ...newAllocations.map((allocation) => ({
+        condition: {
+          expression: 'attribute_exists(#pk) AND attribute_exists(#sk)',
+          expressionNames: {
+            '#pk': 'pk',
+            '#sk': 'sk',
+          },
+        },
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'PARTICIPANT#' + allocation.participantId,
+        }),
+        operation: 'ConditionCheck',
+        table: '${table_name}',
+      })),
+      ...existingAllocations.map((allocation) => ({
+        key: util.dynamodb.toMapValues({
+          pk: allocation.pk,
+          sk: allocation.sk,
+        }),
+        operation: 'DeleteItem',
+        table: '${table_name}',
+      })),
+      ...ctx.stash.allocations.map((allocation) => ({
+        attributeValues: util.dynamodb.toMapValues({
+          created_at: allocation.createdAt,
+          item_id: allocation.itemId,
+          participant_id: allocation.participantId,
+          share_weight: allocation.shareWeight,
+          updated_at: allocation.updatedAt,
+        }),
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'ALLOCATION#ITEM#' + allocation.itemId + '#PARTICIPANT#' + allocation.participantId,
+        }),
+        operation: 'PutItem',
+        table: '${table_name}',
+      })),
+      {
+        key: util.dynamodb.toMapValues({
+          pk: receiptPk(input.receiptId),
+          sk: 'RECEIPT',
+        }),
+        operation: 'UpdateItem',
+        table: '${table_name}',
+        update: {
+          expression: 'SET #updated_at = :updated_at, #version = :version',
+          expressionNames: {
+            '#updated_at': 'updated_at',
+            '#version': 'version',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':updated_at': now,
+            ':version': input.expectedVersion + 1,
+          }),
+        },
+      },
+    ],
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  return {
+    allocations: ctx.stash.allocations,
+    itemId: ctx.args.input.itemId,
+    receiptId: ctx.args.input.receiptId,
+    updatedAt: util.time.nowISO8601(),
+    version: ctx.args.input.expectedVersion + 1,
+  };
+}

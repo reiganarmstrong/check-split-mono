@@ -1,0 +1,161 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return 'RECEIPT#' + receiptId;
+}
+
+function toParticipant(item) {
+  return {
+    createdAt: item.created_at,
+    displayName: item.display_name,
+    notes: item.notes ?? null,
+    participantId: item.participant_id,
+    sortOrder: item.sort_order ?? null,
+    updatedAt: item.updated_at,
+  };
+}
+
+function toReceiptItem(item) {
+  return {
+    allocations: [],
+    category: item.category ?? null,
+    createdAt: item.created_at,
+    description: item.description,
+    discountCents: item.discount_cents,
+    itemId: item.item_id,
+    lineSubtotalCents: item.line_subtotal_cents,
+    quantity: item.quantity,
+    scanConfidence: item.scan_confidence ?? null,
+    sourceLineNumber: item.source_line_number ?? null,
+    unitPriceCents: item.unit_price_cents,
+    updatedAt: item.updated_at,
+  };
+}
+
+function toAllocation(item) {
+  return {
+    createdAt: item.created_at,
+    itemId: item.item_id,
+    participantId: item.participant_id,
+    shareWeight: item.share_weight,
+    updatedAt: item.updated_at,
+  };
+}
+
+export function request(ctx) {
+  requireUserSub(ctx);
+
+  return {
+    consistentRead: true,
+    operation: 'Query',
+    query: {
+      expression: 'pk = :pk',
+      expressionValues: util.dynamodb.toMapValues({
+        ':pk': receiptPk(ctx.args.receiptId),
+      }),
+    },
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  const userSub = requireUserSub(ctx);
+  const items = ctx.result.items ?? [];
+  const root = items.find((item) => item.sk === 'RECEIPT');
+
+  if (!root) {
+    return null;
+  }
+
+  if (root.owner_user_id !== userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  const participants = [];
+  const allocations = [];
+  const itemMap = new Map();
+
+  for (const item of items) {
+    if (item.sk === 'RECEIPT') {
+      continue;
+    }
+
+    if (item.sk.startsWith('PARTICIPANT#')) {
+      participants.push(toParticipant(item));
+      continue;
+    }
+
+    if (item.sk.startsWith('ITEM#')) {
+      itemMap.set(item.item_id, toReceiptItem(item));
+      continue;
+    }
+
+    if (item.sk.startsWith('ALLOCATION#')) {
+      allocations.push(toAllocation(item));
+    }
+  }
+
+  for (const allocation of allocations) {
+    const receiptItem = itemMap.get(allocation.itemId);
+
+    if (receiptItem) {
+      receiptItem.allocations.push(allocation);
+    }
+  }
+
+  const receiptItems = Array.from(itemMap.values());
+
+  participants.sort((left, right) => {
+    const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
+    const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
+
+    if (leftOrder !== rightOrder) {
+      return leftOrder - rightOrder;
+    }
+
+    return left.participantId.localeCompare(right.participantId);
+  });
+
+  receiptItems.sort((left, right) => left.itemId.localeCompare(right.itemId));
+
+  return {
+    allocationPolicy: root.allocation_policy,
+    capturedAt: root.captured_at ?? null,
+    createdAt: root.created_at,
+    currencyCode: root.currency_code,
+    discountCents: root.discount_cents,
+    feeCents: root.fee_cents,
+    itemCount: receiptItems.length,
+    items: receiptItems,
+    locationAddress: root.location_address ?? null,
+    locationLat: root.location_lat ?? null,
+    locationLng: root.location_lng ?? null,
+    locationName: root.location_name ?? null,
+    merchantName: root.merchant_name,
+    ownerUserId: root.owner_user_id,
+    participantCount: participants.length,
+    participants,
+    receiptId: root.receipt_id,
+    receiptOccurredAt: root.receipt_occurred_at,
+    status: root.status,
+    subtotalCents: root.subtotal_cents,
+    taxCents: root.tax_cents,
+    tipCents: root.tip_cents,
+    totalCents: root.total_cents,
+    updatedAt: root.updated_at,
+    version: root.version,
+  };
+}

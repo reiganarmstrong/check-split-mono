@@ -11,3 +11,18 @@ output "cognito_user_pool_client_id" {
   description = "The Cognito user pool client ID for the dev UI."
   value       = module.cognito-auth.user_pool_client_id
 }
+
+output "receipt_api_graphql_api_id" {
+  description = "The receipt AppSync GraphQL API ID for the dev environment."
+  value       = module.receipt-api.graphql_api_id
+}
+
+output "receipt_api_graphql_api_url" {
+  description = "The receipt AppSync GraphQL API URL for the dev environment."
+  value       = module.receipt-api.graphql_api_url
+}
+
+output "receipt_api_table_name" {
+  description = "The receipts DynamoDB table name for the dev environment."
+  value       = module.receipt-api.dynamodb_table_name
+}

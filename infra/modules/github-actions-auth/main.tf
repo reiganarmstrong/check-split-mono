@@ -188,6 +188,109 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
   }
 
   statement {
+    sid     = "AllowCreateAppSyncApis"
+    effect  = "Allow"
+    actions = ["appsync:CreateGraphqlApi"]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowManageAppSyncReceiptApi"
+    effect = "Allow"
+    actions = [
+      "appsync:CreateDataSource",
+      "appsync:CreateFunction",
+      "appsync:CreateResolver",
+      "appsync:DeleteDataSource",
+      "appsync:DeleteFunction",
+      "appsync:DeleteGraphqlApi",
+      "appsync:DeleteResolver",
+      "appsync:GetIntrospectionSchema",
+      "appsync:GetDataSource",
+      "appsync:GetFunction",
+      "appsync:GetGraphqlApi",
+      "appsync:GetResolver",
+      "appsync:GetSchemaCreationStatus",
+      "appsync:ListDataSources",
+      "appsync:ListFunctions",
+      "appsync:ListGraphqlApis",
+      "appsync:ListResolvers",
+      "appsync:ListTagsForResource",
+      "appsync:StartSchemaCreation",
+      "appsync:TagResource",
+      "appsync:UntagResource",
+      "appsync:UpdateDataSource",
+      "appsync:UpdateFunction",
+      "appsync:UpdateGraphqlApi",
+      "appsync:UpdateResolver"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowManageReceiptTable"
+    effect = "Allow"
+    actions = [
+      "dynamodb:CreateTable",
+      "dynamodb:DeleteTable",
+      "dynamodb:DescribeContinuousBackups",
+      "dynamodb:DescribeTable",
+      "dynamodb:ListTagsOfResource",
+      "dynamodb:TagResource",
+      "dynamodb:UntagResource",
+      "dynamodb:UpdateContinuousBackups",
+      "dynamodb:UpdateTable"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:dynamodb:us-east-1:${data.aws_caller_identity.current.account_id}:table/checksplit-receipts-${var.environment}",
+      "arn:${data.aws_partition.current.partition}:dynamodb:us-east-1:${data.aws_caller_identity.current.account_id}:table/checksplit-receipts-${var.environment}/index/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageAppSyncServiceRoles"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:GetRole",
+      "iam:GetRolePolicy",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies",
+      "iam:ListRoleTags",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/checksplit-receipt-api-${var.environment}-*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowReadAppSyncManagedPolicies"
+    effect = "Allow"
+    actions = [
+      "iam:GetPolicy",
+      "iam:GetPolicyVersion",
+      "iam:ListPolicies"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
     sid     = "AllowListGithubOidcProviders"
     effect  = "Allow"
     actions = ["iam:ListOpenIDConnectProviders"]

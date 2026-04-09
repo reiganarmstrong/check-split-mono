@@ -1,0 +1,37 @@
+import { util } from '@aws-appsync/utils';
+
+function receiptPk(receiptId) {
+  return 'RECEIPT#' + receiptId;
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+
+  return {
+    consistentRead: true,
+    filter: {
+      expression: 'participant_id = :participant_id',
+      expressionValues: util.dynamodb.toMapValues({
+        ':participant_id': input.participantId,
+      }),
+    },
+    operation: 'Query',
+    query: {
+      expression: 'pk = :pk AND begins_with(sk, :allocation_prefix)',
+      expressionValues: util.dynamodb.toMapValues({
+        ':allocation_prefix': 'ALLOCATION#',
+        ':pk': receiptPk(input.receiptId),
+      }),
+    },
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  ctx.stash.participantAllocations = ctx.result.items ?? [];
+
+  return ctx.result;
+}
