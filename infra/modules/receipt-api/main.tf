@@ -148,10 +148,9 @@ resource "aws_appsync_datasource" "receipts" {
 resource "aws_appsync_function" "this" {
   for_each = local.function_definitions
 
-  api_id           = aws_appsync_graphql_api.this.id
-  data_source      = aws_appsync_datasource.receipts.name
-  function_version = "2018-05-29"
-  name             = each.value.name
+  api_id      = aws_appsync_graphql_api.this.id
+  data_source = aws_appsync_datasource.receipts.name
+  name        = each.value.name
 
   code = templatefile(each.value.path, local.template_vars)
 

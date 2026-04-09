@@ -15,10 +15,10 @@ function receiptPk(receiptId) {
 }
 
 function uniqueParticipantIds(allocations) {
-  const seen = new Set();
+  const seen = {};
 
   for (const allocation of allocations) {
-    if (seen.has(allocation.participantId)) {
+    if (Object.hasOwn(seen, allocation.participantId)) {
       util.error('Each participant may appear only once in the allocation set', 'ValidationError');
     }
 
@@ -26,7 +26,7 @@ function uniqueParticipantIds(allocations) {
       util.error('Allocation shareWeight must be greater than zero', 'ValidationError');
     }
 
-    seen.add(allocation.participantId);
+    seen[allocation.participantId] = true;
   }
 }
 

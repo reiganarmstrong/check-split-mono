@@ -52,6 +52,59 @@ function toAllocation(item) {
   };
 }
 
+function compareStrings(left, right) {
+  if (left < right) {
+    return -1;
+  }
+
+  if (left > right) {
+    return 1;
+  }
+
+  return 0;
+}
+
+function insertParticipantSorted(participants, participant) {
+  const participantCount = participants.length;
+
+  for (const index in participants) {
+    const current = participants[index];
+    const currentOrder = current.sortOrder ?? 2147483647;
+    const nextOrder = participant.sortOrder ?? 2147483647;
+
+    if (nextOrder < currentOrder) {
+      participants.splice(index, 0, participant);
+      return;
+    }
+
+    if (nextOrder === currentOrder && compareStrings(participant.participantId, current.participantId) < 0) {
+      participants.splice(index, 0, participant);
+      return;
+    }
+  }
+
+  if (participantCount === 0 || participants.length === participantCount) {
+    participants.push(participant);
+  }
+}
+
+function insertItemSorted(receiptItems, receiptItem) {
+  const itemCount = receiptItems.length;
+
+  for (const index in receiptItems) {
+    const current = receiptItems[index];
+
+    if (compareStrings(receiptItem.itemId, current.itemId) < 0) {
+      receiptItems.splice(index, 0, receiptItem);
+      return;
+    }
+  }
+
+  if (itemCount === 0 || receiptItems.length === itemCount) {
+    receiptItems.push(receiptItem);
+  }
+}
+
 export function request(ctx) {
   requireUserSub(ctx);
 
@@ -74,7 +127,16 @@ export function response(ctx) {
 
   const userSub = requireUserSub(ctx);
   const items = ctx.result.items ?? [];
-  const root = items.find((item) => item.sk === 'RECEIPT');
+  let root = null;
+
+  for (const index in items) {
+    const item = items[index];
+
+    if (item.sk === 'RECEIPT') {
+      root = item;
+      break;
+    }
+  }
 
   if (!root) {
     return null;
@@ -86,50 +148,30 @@ export function response(ctx) {
 
   const participants = [];
   const allocations = [];
-  const itemMap = new Map();
+  const itemMap = {};
+  const receiptItems = [];
 
   for (const item of items) {
     if (item.sk === 'RECEIPT') {
-      continue;
-    }
-
-    if (item.sk.startsWith('PARTICIPANT#')) {
-      participants.push(toParticipant(item));
-      continue;
-    }
-
-    if (item.sk.startsWith('ITEM#')) {
-      itemMap.set(item.item_id, toReceiptItem(item));
-      continue;
-    }
-
-    if (item.sk.startsWith('ALLOCATION#')) {
+      // Skip the receipt root because it is handled separately.
+    } else if (item.sk.startsWith('PARTICIPANT#')) {
+      insertParticipantSorted(participants, toParticipant(item));
+    } else if (item.sk.startsWith('ITEM#')) {
+      const receiptItem = toReceiptItem(item);
+      itemMap[item.item_id] = receiptItem;
+      insertItemSorted(receiptItems, receiptItem);
+    } else if (item.sk.startsWith('ALLOCATION#')) {
       allocations.push(toAllocation(item));
     }
   }
 
   for (const allocation of allocations) {
-    const receiptItem = itemMap.get(allocation.itemId);
+    const receiptItem = itemMap[allocation.itemId];
 
     if (receiptItem) {
       receiptItem.allocations.push(allocation);
     }
   }
-
-  const receiptItems = Array.from(itemMap.values());
-
-  participants.sort((left, right) => {
-    const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
-    const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
-
-    if (leftOrder !== rightOrder) {
-      return leftOrder - rightOrder;
-    }
-
-    return left.participantId.localeCompare(right.participantId);
-  });
-
-  receiptItems.sort((left, right) => left.itemId.localeCompare(right.itemId));
 
   return {
     allocationPolicy: root.allocation_policy,

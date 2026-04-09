@@ -38,6 +38,7 @@ export function request(ctx) {
   const userSub = requireUserSub(ctx);
   const now = util.time.nowISO8601();
   const nextVersion = input.expectedVersion + 1;
+  const inputKeys = Object.keys(updatableFieldMap);
   const expressionNames = {
     '#gsi1sk': 'gsi1sk',
     '#updated_at': 'updated_at',
@@ -50,24 +51,25 @@ export function request(ctx) {
   };
   const setClauses = ['#updated_at = :updated_at', '#version = :version'];
 
-  if (Object.prototype.hasOwnProperty.call(input, 'receiptOccurredAt')) {
+  if (Object.hasOwn(input, 'receiptOccurredAt')) {
     setClauses.push('#gsi1sk = :gsi1sk');
   } else {
     delete expressionNames['#gsi1sk'];
     delete expressionValues[':gsi1sk'];
   }
 
-  for (const [inputKey, attributeName] of Object.entries(updatableFieldMap)) {
-    if (!Object.prototype.hasOwnProperty.call(input, inputKey) || inputKey === 'receiptOccurredAt') {
-      continue;
+  for (const index in inputKeys) {
+    const inputKey = inputKeys[index];
+    const attributeName = updatableFieldMap[inputKey];
+
+    if (Object.hasOwn(input, inputKey) && inputKey !== 'receiptOccurredAt') {
+      const nameKey = '#' + attributeName;
+      const valueKey = ':' + attributeName;
+
+      expressionNames[nameKey] = attributeName;
+      expressionValues[valueKey] = input[inputKey];
+      setClauses.push(nameKey + ' = ' + valueKey);
     }
-
-    const nameKey = '#' + attributeName;
-    const valueKey = ':' + attributeName;
-
-    expressionNames[nameKey] = attributeName;
-    expressionValues[valueKey] = input[inputKey];
-    setClauses.push(nameKey + ' = ' + valueKey);
   }
 
   return {

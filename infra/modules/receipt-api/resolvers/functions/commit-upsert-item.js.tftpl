@@ -19,8 +19,27 @@ export function request(ctx) {
   const userSub = requireUserSub(ctx);
   const now = util.time.nowISO8601();
   const itemId = ctx.stash.itemId;
-  const itemExists = Boolean(ctx.stash.existingItem);
+  const itemExists = ctx.stash.existingItem ? true : false;
   const nextVersion = input.expectedVersion + 1;
+  const receiptUpdate = {
+    key: util.dynamodb.toMapValues({
+      pk: receiptPk(input.receiptId),
+      sk: 'RECEIPT',
+    }),
+    operation: 'UpdateItem',
+    table: '${table_name}',
+    update: {
+      expression: 'SET #updated_at = :updated_at, #version = :version',
+      expressionNames: {
+        '#updated_at': 'updated_at',
+        '#version': 'version',
+      },
+      expressionValues: util.dynamodb.toMapValues({
+        ':updated_at': now,
+        ':version': nextVersion,
+      }),
+    },
+  };
 
   ctx.stash.item = {
     allocations: [],
@@ -67,6 +86,20 @@ export function request(ctx) {
         '#sk': 'sk',
       },
     };
+
+    receiptUpdate.update = {
+      expression: 'SET #item_count = #item_count + :one, #updated_at = :updated_at, #version = :version',
+      expressionNames: {
+        '#item_count': 'item_count',
+        '#updated_at': 'updated_at',
+        '#version': 'version',
+      },
+      expressionValues: util.dynamodb.toMapValues({
+        ':one': 1,
+        ':updated_at': now,
+        ':version': nextVersion,
+      }),
+    };
   }
 
   return {
@@ -92,41 +125,7 @@ export function request(ctx) {
         table: '${table_name}',
       },
       putItem,
-      {
-        key: util.dynamodb.toMapValues({
-          pk: receiptPk(input.receiptId),
-          sk: 'RECEIPT',
-        }),
-        operation: 'UpdateItem',
-        table: '${table_name}',
-        update: {
-          expression: itemExists
-            ? 'SET #updated_at = :updated_at, #version = :version'
-            : 'SET #item_count = #item_count + :one, #updated_at = :updated_at, #version = :version',
-          expressionNames: itemExists
-            ? {
-                '#updated_at': 'updated_at',
-                '#version': 'version',
-              }
-            : {
-                '#item_count': 'item_count',
-                '#updated_at': 'updated_at',
-                '#version': 'version',
-              },
-          expressionValues: util.dynamodb.toMapValues(
-            itemExists
-              ? {
-                  ':updated_at': now,
-                  ':version': nextVersion,
-                }
-              : {
-                  ':one': 1,
-                  ':updated_at': now,
-                  ':version': nextVersion,
-                },
-          ),
-        },
-      },
+      receiptUpdate,
     ],
   };
 }

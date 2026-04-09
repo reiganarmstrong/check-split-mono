@@ -237,6 +237,7 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "dynamodb:DeleteTable",
       "dynamodb:DescribeContinuousBackups",
       "dynamodb:DescribeTable",
+      "dynamodb:DescribeTimeToLive",
       "dynamodb:ListTagsOfResource",
       "dynamodb:TagResource",
       "dynamodb:UntagResource",
