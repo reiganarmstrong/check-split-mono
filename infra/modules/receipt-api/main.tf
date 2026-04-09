@@ -117,7 +117,7 @@ resource "aws_appsync_graphql_api" "this" {
   authentication_type = "AMAZON_COGNITO_USER_POOLS"
   name                = local.graphql_api_name
   schema              = file(local.graphql_schema_path)
-  xray_enabled        = true
+  xray_enabled        = false
 
   log_config {
     cloudwatch_logs_role_arn = aws_iam_role.appsync_cloudwatch.arn
