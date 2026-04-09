@@ -12,38 +12,8 @@ import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
+import { validateSignupFormField } from "@/lib/auth-form-schemas"
 import { signUpWithCredentials, type SignupFormValues } from "@/lib/auth";
-import { validateCognitoPassword } from "@/lib/password-policy";
-
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validateEmail(value: string) {
-  if (!value) {
-    return "Email is required"
-  }
-
-  if (!emailPattern.test(value)) {
-    return "Enter a valid email address"
-  }
-
-  return undefined
-}
-
-function validatePassword(value: string) {
-  return validateCognitoPassword(value)
-}
-
-function validateConfirmPassword(password: string, confirmPassword: string) {
-  if (!confirmPassword) {
-    return "Confirm your password"
-  }
-
-  if (confirmPassword !== password) {
-    return "Passwords must match"
-  }
-
-  return undefined
-}
 
 export default function SignupPage() {
   const router = useRouter()
@@ -140,9 +110,18 @@ export default function SignupPage() {
               <form.Field
                 name="email"
                 validators={{
-                  onMount: ({ value }) => validateEmail(value),
-                  onChange: ({ value }) => validateEmail(value),
-                  onBlur: ({ value }) => validateEmail(value),
+                  onMount: () =>
+                    validateSignupFormField("email", form.state.values),
+                  onChange: ({ value }) =>
+                    validateSignupFormField("email", {
+                      ...form.state.values,
+                      email: value,
+                    }),
+                  onBlur: ({ value }) =>
+                    validateSignupFormField("email", {
+                      ...form.state.values,
+                      email: value,
+                    }),
                 }}
               >
                 {(field) => (
@@ -158,9 +137,18 @@ export default function SignupPage() {
               <form.Field
                 name="password"
                 validators={{
-                  onMount: ({ value }) => validatePassword(value),
-                  onChange: ({ value }) => validatePassword(value),
-                  onBlur: ({ value }) => validatePassword(value),
+                  onMount: () =>
+                    validateSignupFormField("password", form.state.values),
+                  onChange: ({ value }) =>
+                    validateSignupFormField("password", {
+                      ...form.state.values,
+                      password: value,
+                    }),
+                  onBlur: ({ value }) =>
+                    validateSignupFormField("password", {
+                      ...form.state.values,
+                      password: value,
+                    }),
                 }}
               >
                 {(field) => (
@@ -178,12 +166,18 @@ export default function SignupPage() {
               <form.Field
                 name="confirmPassword"
                 validators={{
-                  onMount: ({ value }) =>
-                    validateConfirmPassword(form.getFieldValue("password"), value),
+                  onMount: () =>
+                    validateSignupFormField("confirmPassword", form.state.values),
                   onChange: ({ value }) =>
-                    validateConfirmPassword(form.getFieldValue("password"), value),
+                    validateSignupFormField("confirmPassword", {
+                      ...form.state.values,
+                      confirmPassword: value,
+                    }),
                   onBlur: ({ value }) =>
-                    validateConfirmPassword(form.getFieldValue("password"), value),
+                    validateSignupFormField("confirmPassword", {
+                      ...form.state.values,
+                      confirmPassword: value,
+                    }),
                 }}
               >
                 {(field) => (

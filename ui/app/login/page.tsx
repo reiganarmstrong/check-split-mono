@@ -13,29 +13,8 @@ import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
+import { validateLoginFormField } from "@/lib/auth-form-schemas"
 import { loginWithCredentials, type LoginFormValues } from "@/lib/auth";
-
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function validateEmail(value: string) {
-  if (!value) {
-    return "Email is required"
-  }
-
-  if (!emailPattern.test(value)) {
-    return "Enter a valid email address"
-  }
-
-  return undefined
-}
-
-function validatePassword(value: string) {
-  if (!value) {
-    return "Password is required"
-  }
-
-  return undefined
-}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -142,9 +121,18 @@ export default function LoginPage() {
               <form.Field
                 name="email"
                 validators={{
-                  onMount: ({ value }) => validateEmail(value),
-                  onChange: ({ value }) => validateEmail(value),
-                  onBlur: ({ value }) => validateEmail(value),
+                  onMount: () =>
+                    validateLoginFormField("email", form.state.values),
+                  onChange: ({ value }) =>
+                    validateLoginFormField("email", {
+                      ...form.state.values,
+                      email: value,
+                    }),
+                  onBlur: ({ value }) =>
+                    validateLoginFormField("email", {
+                      ...form.state.values,
+                      email: value,
+                    }),
                 }}
               >
                 {(field) => (
@@ -161,9 +149,18 @@ export default function LoginPage() {
               <form.Field
                 name="password"
                 validators={{
-                  onMount: ({ value }) => validatePassword(value),
-                  onChange: ({ value }) => validatePassword(value),
-                  onBlur: ({ value }) => validatePassword(value),
+                  onMount: () =>
+                    validateLoginFormField("password", form.state.values),
+                  onChange: ({ value }) =>
+                    validateLoginFormField("password", {
+                      ...form.state.values,
+                      password: value,
+                    }),
+                  onBlur: ({ value }) =>
+                    validateLoginFormField("password", {
+                      ...form.state.values,
+                      password: value,
+                    }),
                 }}
               >
                 {(field) => (
