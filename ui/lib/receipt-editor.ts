@@ -225,13 +225,105 @@ export function getReceiptTotalCents(state: ReceiptEditorState) {
   )
 }
 
+function distributeCentsAcrossRecipients(
+  totalCents: number,
+  recipientIds: string[],
+) {
+  const distributed = new Map<string, number>()
+
+  for (const recipientId of recipientIds) {
+    distributed.set(recipientId, 0)
+  }
+
+  if (recipientIds.length === 0 || totalCents === 0) {
+    return distributed
+  }
+
+  const sign = totalCents < 0 ? -1 : 1
+  const absoluteTotal = Math.abs(totalCents)
+  const baseShare = Math.floor(absoluteTotal / recipientIds.length)
+  let remainder = absoluteTotal % recipientIds.length
+
+  for (const recipientId of recipientIds) {
+    const extraCent = remainder > 0 ? 1 : 0
+    const amountCents = sign * (baseShare + extraCent)
+    distributed.set(recipientId, amountCents === 0 ? 0 : amountCents)
+    remainder = Math.max(remainder - 1, 0)
+  }
+
+  return distributed
+}
+
+function distributeCentsByWeight(
+  totalCents: number,
+  weightedRecipients: Array<{ recipientId: string; weight: number }>,
+  fallbackRecipientIds: string[],
+) {
+  const distributed = new Map<string, number>()
+
+  for (const { recipientId } of weightedRecipients) {
+    distributed.set(recipientId, 0)
+  }
+
+  if (totalCents === 0) {
+    return distributed
+  }
+
+  const totalWeight = weightedRecipients.reduce((sum, entry) => sum + entry.weight, 0)
+
+  if (totalWeight <= 0) {
+    const fallbackDistribution = distributeCentsAcrossRecipients(totalCents, fallbackRecipientIds)
+
+    for (const [recipientId, amountCents] of fallbackDistribution.entries()) {
+      distributed.set(recipientId, amountCents)
+    }
+
+    return distributed
+  }
+
+  const sign = totalCents < 0 ? -1 : 1
+  const absoluteTotal = Math.abs(totalCents)
+  const rankedRecipients = weightedRecipients.map((entry, index) => {
+    const weightedNumerator = absoluteTotal * entry.weight
+    const baseShare = Math.floor(weightedNumerator / totalWeight)
+
+    return {
+      ...entry,
+      baseShare,
+      index,
+      remainderNumerator: weightedNumerator % totalWeight,
+    }
+  })
+
+  let remainingCents =
+    absoluteTotal - rankedRecipients.reduce((sum, entry) => sum + entry.baseShare, 0)
+
+  rankedRecipients
+    .sort((left, right) => {
+      if (right.remainderNumerator !== left.remainderNumerator) {
+        return right.remainderNumerator - left.remainderNumerator
+      }
+
+      return left.index - right.index
+    })
+    .forEach((entry) => {
+      const extraCent = remainingCents > 0 ? 1 : 0
+      const amountCents = sign * (entry.baseShare + extraCent)
+      distributed.set(entry.recipientId, amountCents === 0 ? 0 : amountCents)
+      remainingCents = Math.max(remainingCents - 1, 0)
+    })
+
+  return distributed
+}
+
 export function getGroupShareSummaries(
   state: ReceiptEditorState,
 ): GroupShareSummary[] {
-  const summaries = new Map<string, number>()
+  const itemSubtotals = new Map<string, number>()
+  const participatingGroupIds = new Set<string>()
 
   for (const group of state.groups) {
-    summaries.set(group.id, 0)
+    itemSubtotals.set(group.id, 0)
   }
 
   for (const item of state.items) {
@@ -239,21 +331,63 @@ export function getGroupShareSummaries(
       continue
     }
 
-    const lineSubtotal = getItemLineSubtotalCents(item)
-    const shareBase = Math.floor(lineSubtotal / item.selectedGroupIds.length)
-    let remainder = lineSubtotal % item.selectedGroupIds.length
-
     for (const groupId of item.selectedGroupIds) {
-      const current = summaries.get(groupId) ?? 0
-      const extraCent = remainder > 0 ? 1 : 0
-      summaries.set(groupId, current + shareBase + extraCent)
-      remainder = Math.max(remainder - 1, 0)
+      participatingGroupIds.add(groupId)
+    }
+
+    const lineSubtotal = getItemLineSubtotalCents(item)
+    const distributedLineSubtotal = distributeCentsAcrossRecipients(
+      lineSubtotal,
+      item.selectedGroupIds,
+    )
+
+    for (const [groupId, amountCents] of distributedLineSubtotal.entries()) {
+      itemSubtotals.set(groupId, (itemSubtotals.get(groupId) ?? 0) + amountCents)
     }
   }
 
+  const weightedGroups = state.groups.map((group) => ({
+    recipientId: group.id,
+    weight: itemSubtotals.get(group.id) ?? 0,
+  }))
+  const fallbackRecipientIds = state.groups
+    .map((group) => group.id)
+    .filter((groupId) => participatingGroupIds.has(groupId))
+
+  const taxShares = distributeCentsByWeight(
+    parseMoneyInputToCents(state.tax),
+    weightedGroups,
+    fallbackRecipientIds,
+  )
+  const tipShares = distributeCentsByWeight(
+    parseMoneyInputToCents(state.tip),
+    weightedGroups,
+    fallbackRecipientIds,
+  )
+  const feeShares = distributeCentsByWeight(
+    parseMoneyInputToCents(state.fee),
+    weightedGroups,
+    fallbackRecipientIds,
+  )
+  const discountShares = distributeCentsByWeight(
+    -parseMoneyInputToCents(state.discount),
+    weightedGroups,
+    fallbackRecipientIds,
+  )
+
   return state.groups.map((group) => ({
-    amountCents: summaries.get(group.id) ?? 0,
+    amountCents:
+      (itemSubtotals.get(group.id) ?? 0) +
+      (taxShares.get(group.id) ?? 0) +
+      (tipShares.get(group.id) ?? 0) +
+      (feeShares.get(group.id) ?? 0) +
+      (discountShares.get(group.id) ?? 0),
+    discountShareCents: discountShares.get(group.id) ?? 0,
+    feeShareCents: feeShares.get(group.id) ?? 0,
     groupId: group.id,
+    itemSubtotalCents: itemSubtotals.get(group.id) ?? 0,
+    taxShareCents: taxShares.get(group.id) ?? 0,
+    tipShareCents: tipShares.get(group.id) ?? 0,
   }))
 }
 

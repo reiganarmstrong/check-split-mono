@@ -112,6 +112,11 @@ export type ReceiptEditorState = {
 export type GroupShareSummary = {
   amountCents: number
   groupId: string
+  discountShareCents: number
+  feeShareCents: number
+  itemSubtotalCents: number
+  taxShareCents: number
+  tipShareCents: number
 }
 
 export type ReceiptSavePlan = {
