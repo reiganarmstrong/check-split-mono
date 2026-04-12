@@ -16,6 +16,8 @@ The trust policy is intentionally narrow: only a specific repository path and Gi
    - ACM certificate lifecycle operations
    - Cognito user pool and domain management
    - CloudFront distribution, cache policy, function, and OAC management
+   - API Gateway HTTP API management for receipt parsing ingress
+   - Lambda and CloudWatch Logs management for the receipt parsing function
    - read access to the GitHub OIDC provider metadata
 5. The policy is attached to the role and the role ARN is exported for workflow configuration.
 
@@ -39,9 +41,11 @@ flowchart LR
   R --> S["sts:AssumeRoleWithWebIdentity"]
   S --> I["GitHub Actions IAM role"]
   I --> A["AWS permissions policy"]
+  A --> AG["API Gateway"]
   A --> CF["CloudFront"]
   A --> C["Cognito"]
   A --> ACM["ACM"]
+  A --> L["Lambda"]
   A --> S3["S3"]
 
   classDef ci fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
@@ -52,7 +56,7 @@ flowchart LR
   class G,T ci;
   class R,S trust;
   class I,A iam;
-  class CF,C,ACM,S3 aws;
+  class AG,CF,C,ACM,L,S3 aws;
 ```
 
 ## Trust Boundary
@@ -132,3 +136,4 @@ module "dev-github-actions-auth" {
 
 - This module assumes the GitHub OIDC provider already exists in the account.
 - The attached policy is broad enough to support the currently-managed infra modules, but it is still scoped by service and resource shape rather than using full admin access.
+- The module intentionally does not grant GitHub Actions write access to the Gemini API key in SSM Parameter Store. That secret is created and rotated out of band.

@@ -42,3 +42,15 @@ module "receipt-api" {
   cognito_user_pool_id = module.cognito-auth.user_pool_id
   environment          = var.environment
 }
+
+module "receipt-ingestion-api" {
+  source                            = "../../modules/receipt-ingestion-api"
+  application_name                  = local.application_name
+  cognito_user_pool_client_id       = module.cognito-auth.user_pool_client_id
+  cognito_user_pool_id              = module.cognito-auth.user_pool_id
+  environment                       = var.environment
+  gemini_api_key_ssm_parameter_name = var.gemini_api_key_ssm_parameter_name
+  gemini_model_id                   = var.gemini_model_id
+  receipt_parse_allowed_origin      = coalesce(var.receipt_parse_allowed_origin, "https://${local.app_subdomain}")
+  receipt_parse_max_upload_bytes    = var.receipt_parse_max_upload_bytes
+}

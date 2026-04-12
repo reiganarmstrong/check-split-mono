@@ -1,0 +1,12 @@
+{
+  "name": "receipt-ingestion-api-lambda",
+  "private": true,
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.914.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && rm -rf package && mkdir -p package && cp -R dist package/dist && cp -R node_modules package/node_modules && cp package.json package/package.json",
+    "clean": "rm -rf dist package",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

@@ -278,6 +278,111 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
   }
 
   statement {
+    sid    = "AllowManageReceiptIngestionHttpApi"
+    effect = "Allow"
+    actions = [
+      "apigateway:DELETE",
+      "apigateway:GET",
+      "apigateway:PATCH",
+      "apigateway:POST",
+      "apigateway:PUT",
+      "apigateway:TagResource",
+      "apigateway:UntagResource"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/authorizers",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/authorizers/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/cors",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/deployments",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/deployments/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/integrations",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/integrations/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/routes",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/routes/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/stages",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/stages/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageReceiptParsingLambda"
+    effect = "Allow"
+    actions = [
+      "lambda:AddPermission",
+      "lambda:CreateFunction",
+      "lambda:DeleteFunction",
+      "lambda:GetFunction",
+      "lambda:GetFunctionConfiguration",
+      "lambda:GetPolicy",
+      "lambda:ListTags",
+      "lambda:RemovePermission",
+      "lambda:TagResource",
+      "lambda:UntagResource",
+      "lambda:UpdateFunctionCode",
+      "lambda:UpdateFunctionConfiguration"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:checksplit-receipt-parse-${var.environment}"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageReceiptParsingLambdaRoles"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:GetRole",
+      "iam:GetRolePolicy",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies",
+      "iam:ListRoleTags",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/checksplit-receipt-parse-${var.environment}-lambda"
+    ]
+  }
+
+  statement {
+    sid    = "AllowReadReceiptParsingLogGroups"
+    effect = "Allow"
+    actions = [
+      "logs:DescribeLogGroups"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowManageReceiptParsingLogGroups"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:DeleteLogGroup",
+      "logs:PutRetentionPolicy",
+      "logs:TagResource",
+      "logs:UntagResource"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-receipt-parse-${var.environment}"
+    ]
+  }
+
+  statement {
     sid    = "AllowReadAppSyncManagedPolicies"
     effect = "Allow"
     actions = [
