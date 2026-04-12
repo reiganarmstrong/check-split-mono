@@ -9,6 +9,7 @@ type BrandLogoProps = {
   showWordmark?: boolean;
   showTagline?: boolean;
   animateOnHover?: boolean;
+  showIconShadow?: boolean;
 };
 
 export function BrandLogo({
@@ -20,6 +21,7 @@ export function BrandLogo({
   showWordmark = true,
   showTagline = false,
   animateOnHover = true,
+  showIconShadow = true,
 }: BrandLogoProps) {
   return (
     <div className={cn("group/brand flex items-center gap-3", className)}>
@@ -31,8 +33,12 @@ export function BrandLogo({
       >
         <svg viewBox="0 0 64 64" aria-hidden="true" className="h-full w-full">
           <g transform="translate(32 32) scale(1.18) translate(-32 -32)">
-            {/* Diagonal shadow stays fixed while the receipt face presses into it */}
-            <rect x="21" y="15" width="30" height="39" rx="10" fill="currentColor" className="text-foreground" />
+            {showIconShadow ? (
+              <>
+                {/* Diagonal shadow stays fixed while the receipt face presses into it */}
+                <rect x="21" y="15" width="30" height="39" rx="10" fill="currentColor" className="text-foreground" />
+              </>
+            ) : null}
             <g
               className={cn(
                 animateOnHover &&

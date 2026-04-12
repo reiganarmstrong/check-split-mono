@@ -154,7 +154,7 @@ export function Navbar() {
                   <Link href="/login">
                     <Button
                       variant="ghost"
-                      className="rounded-full font-black text-foreground border-2 border-transparent hover:border-foreground hover:bg-primary/10 px-5 transition-all text-base h-12 hidden sm:inline-flex"
+                      className="inline-flex h-11 rounded-full border-2 border-transparent px-4 text-sm font-black text-foreground transition-all hover:border-foreground hover:bg-primary/10 sm:h-12 sm:px-5 sm:text-base"
                     >
                       Log in
                     </Button>

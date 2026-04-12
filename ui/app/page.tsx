@@ -134,7 +134,7 @@ export default function Home() {
             <motion.div
               animate={{ y: [0, -10, 0], rotate: [2, 0, 2] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative w-full h-full bg-white rounded-[3rem] border-4 border-foreground shadow-[12px_12px_0px_0px_var(--color-primary)] z-20 overflow-hidden flex flex-col p-6"
+              className="relative w-full h-full bg-white rounded-[3rem] border-4 border-foreground shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] z-20 overflow-hidden flex flex-col p-6"
             >
               <div className="absolute top-0 left-0 right-0 h-3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxMiI+PHBhdGggZD0iTTEwIDEyTDAgMGgyMGwtMTAgMTJ6IiBmaWxsPSJyZ2JhKDAsMCwwLDAuMDUpIi8+PC9zdmc+')] opacity-20 repeat-x background-size-[24px]" />
               
@@ -177,7 +177,7 @@ export default function Home() {
               transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
               className="absolute -right-16 sm:-right-24 bottom-8 sm:bottom-12 w-20 h-20 sm:w-24 sm:h-24 bg-accent border-4 border-foreground rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center z-10"
             >
-              <Coins className="w-8 h-8 sm:w-10 sm:h-10 text-accent-foreground" />
+              <Coins className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
             </motion.div>
           </div>
         </motion.div>
@@ -300,7 +300,7 @@ export default function Home() {
            </motion.div>
            
            <div className="flex-1 text-center md:text-left">
-             <span className="inline-block py-2 px-5 rounded-full border-2 border-accent bg-accent/30 text-accent-foreground text-base font-black tracking-widest mb-6">STEP 3</span>
+             <span className="inline-block py-2 px-5 rounded-full border-2 border-accent bg-accent/30 text-[color-mix(in_oklab,var(--color-accent),black_30%)] text-base font-black tracking-widest mb-6">STEP 3</span>
              <h3 className="text-4xl lg:text-6xl font-heading font-black mb-6">Never do math again.</h3>
              <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-relaxed">
                Tax and tip are automatically proportioned perfectly based on exactly what you ate. You just hit &ldquo;Pay&rdquo; and the relationship survives.
@@ -311,11 +311,11 @@ export default function Home() {
       </section>
 
       {/* Geometric Visual Divider */}
-      <div className="w-full flex justify-center items-center gap-4 py-16">
+      <div className="relative z-10 w-full flex justify-center items-center gap-4 py-16">
         <div className="w-20 md:w-32 h-2 bg-foreground rounded-full"></div>
-        <div className="w-6 h-6 rounded-full bg-primary border-2 border-foreground shrink-0"></div>
-        <div className="w-6 h-6 rounded-md bg-secondary rotate-12 border-2 border-foreground shrink-0"></div>
-        <div className="w-6 h-6 rounded-full bg-accent border-2 border-foreground shrink-0"></div>
+        <div className="h-8 w-8 shrink-0 rounded-full border-2 border-foreground bg-primary"></div>
+        <div className="h-8 w-8 shrink-0 rounded-full border-2 border-foreground bg-secondary"></div>
+        <div className="h-8 w-8 shrink-0 rounded-full border-2 border-foreground bg-accent"></div>
         <div className="w-20 md:w-32 h-2 bg-foreground rounded-full"></div>
       </div>
       
@@ -326,7 +326,7 @@ export default function Home() {
         viewport={{ once: true }}
         className="w-full relative z-10 py-24 md:py-40 px-6 max-w-5xl mx-auto flex flex-col items-center justify-center text-center"
       >
-        <div className="w-full flex-1 bg-white border-4 border-foreground rounded-[3rem] px-8 py-16 md:py-24 shadow-[12px_12px_0px_0px_var(--color-secondary)] relative overflow-hidden">
+        <div className="w-full flex-1 bg-white border-4 border-foreground rounded-[3rem] px-8 py-16 md:py-24 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full blur-3xl -z-10" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
 
@@ -337,8 +337,8 @@ export default function Home() {
             Join thousands of friends saving time, money, and their group chats. The easiest way to split the bill is here.
           </p>
           <Link href="/signup">
-            <Button size="lg" className="h-20 px-10 md:px-16 text-xl md:text-2xl font-black rounded-full group border-4 border-foreground !bg-secondary !text-secondary-foreground hover:!bg-secondary/90 active:!bg-secondary/90 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all w-full sm:w-auto">
-              Try CheckSplit Free
+            <Button size="lg" className="h-20 px-10 md:px-16 text-xl md:text-2xl font-black rounded-full group border-4 border-foreground !bg-primary !text-primary-foreground hover:!bg-primary/90 active:!bg-primary/90 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all w-full sm:w-auto">
+              Try CheckSplit now
               <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
                 <ArrowRight className="ml-4 w-6 h-6 md:w-8 md:h-8 stroke-[3]" />
               </motion.span>

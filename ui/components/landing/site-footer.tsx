@@ -10,6 +10,7 @@ export function SiteFooter() {
           iconClassName="h-12 w-12"
           nameClassName="text-[1.6rem] font-black"
           animateOnHover={false}
+          showIconShadow={false}
         />
         <div className="flex space-x-6 mt-8 md:mt-0">
           <Link href="/privacy" className="hover:text-foreground hover:underline underline-offset-4 decoration-2 transition-all">
