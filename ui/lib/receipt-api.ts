@@ -463,6 +463,18 @@ const createReceiptMutation = /* GraphQL */ `
   }
 `
 
+const deleteReceiptMutation = /* GraphQL */ `
+  mutation DeleteReceipt($input: DeleteReceiptInput!) {
+    deleteReceipt(input: $input) {
+      itemCount
+      participantCount
+      receiptId
+      updatedAt
+      version
+    }
+  }
+`
+
 const updateReceiptMetadataMutation = /* GraphQL */ `
   mutation UpdateReceiptMetadata($input: UpdateReceiptMetadataInput!) {
     updateReceiptMetadata(input: $input) {
@@ -707,6 +719,18 @@ async function createReceipt(input: Record<string, unknown>) {
   )
 
   return data.createReceipt
+}
+
+async function deleteReceiptRoot(input: Record<string, unknown>) {
+  const data = await graphQLRequest(
+    deleteReceiptMutation,
+    { input },
+    z.object({
+      deleteReceipt: receiptMutationResultSchema,
+    }),
+  )
+
+  return data.deleteReceipt
 }
 
 function requireVersion(version: number | null) {
@@ -1000,6 +1024,35 @@ export async function saveReceiptEditorState(
   }
 
   return freshReceipt
+}
+
+export async function deleteReceipt(receipt: Receipt) {
+  let version = receipt.version
+
+  for (const item of receipt.items) {
+    const result = await removeReceiptItem({
+      expectedVersion: requireVersion(version),
+      itemId: item.itemId,
+      receiptId: receipt.receiptId,
+    })
+
+    version = result.version
+  }
+
+  for (const participant of receipt.participants) {
+    const result = await removeParticipant({
+      expectedVersion: requireVersion(version),
+      participantId: participant.participantId,
+      receiptId: receipt.receiptId,
+    })
+
+    version = result.version
+  }
+
+  return deleteReceiptRoot({
+    expectedVersion: requireVersion(version),
+    receiptId: receipt.receiptId,
+  })
 }
 
 export function getReceiptRegion() {

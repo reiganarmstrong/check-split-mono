@@ -12,6 +12,7 @@ data "aws_iam_policy_document" "appsync_assume_role" {
 data "aws_iam_policy_document" "appsync_dynamodb_access" {
   statement {
     actions = [
+      "dynamodb:ConditionCheckItem",
       "dynamodb:DeleteItem",
       "dynamodb:GetItem",
       "dynamodb:PutItem",

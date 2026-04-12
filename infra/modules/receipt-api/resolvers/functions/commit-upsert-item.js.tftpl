@@ -22,6 +22,17 @@ export function request(ctx) {
   const itemExists = ctx.stash.existingItem ? true : false;
   const nextVersion = input.expectedVersion + 1;
   const receiptUpdate = {
+    condition: {
+      expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
+      expressionNames: {
+        '#owner_user_id': 'owner_user_id',
+        '#version': 'version',
+      },
+      expressionValues: util.dynamodb.toMapValues({
+        ':expected_version': input.expectedVersion,
+        ':owner_user_id': userSub,
+      }),
+    },
     key: util.dynamodb.toMapValues({
       pk: receiptPk(input.receiptId),
       sk: 'RECEIPT',
@@ -105,25 +116,6 @@ export function request(ctx) {
   return {
     operation: 'TransactWriteItems',
     transactItems: [
-      {
-        condition: {
-          expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
-          expressionNames: {
-            '#owner_user_id': 'owner_user_id',
-            '#version': 'version',
-          },
-          expressionValues: util.dynamodb.toMapValues({
-            ':expected_version': input.expectedVersion,
-            ':owner_user_id': userSub,
-          }),
-        },
-        key: util.dynamodb.toMapValues({
-          pk: receiptPk(input.receiptId),
-          sk: 'RECEIPT',
-        }),
-        operation: 'ConditionCheck',
-        table: '${table_name}',
-      },
       putItem,
       receiptUpdate,
     ],

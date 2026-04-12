@@ -29,25 +29,6 @@ export function request(ctx) {
     transactItems: [
       {
         condition: {
-          expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
-          expressionNames: {
-            '#owner_user_id': 'owner_user_id',
-            '#version': 'version',
-          },
-          expressionValues: util.dynamodb.toMapValues({
-            ':expected_version': input.expectedVersion,
-            ':owner_user_id': userSub,
-          }),
-        },
-        key: util.dynamodb.toMapValues({
-          pk: receiptPk(input.receiptId),
-          sk: 'RECEIPT',
-        }),
-        operation: 'ConditionCheck',
-        table: '${table_name}',
-      },
-      {
-        condition: {
           expression: 'attribute_exists(#pk) AND attribute_exists(#sk)',
           expressionNames: {
             '#pk': 'pk',
@@ -70,6 +51,17 @@ export function request(ctx) {
         table: '${table_name}',
       })),
       {
+        condition: {
+          expression: '#owner_user_id = :owner_user_id AND #version = :expected_version',
+          expressionNames: {
+            '#owner_user_id': 'owner_user_id',
+            '#version': 'version',
+          },
+          expressionValues: util.dynamodb.toMapValues({
+            ':expected_version': input.expectedVersion,
+            ':owner_user_id': userSub,
+          }),
+        },
         key: util.dynamodb.toMapValues({
           pk: receiptPk(input.receiptId),
           sk: 'RECEIPT',
