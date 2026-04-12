@@ -342,14 +342,16 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
       return
     }
 
+    const measuredActionBarElement = actionBarElement
+
     function updateActionBarHeight() {
-      setActionBarHeight(actionBarElement.getBoundingClientRect().height)
+      setActionBarHeight(measuredActionBarElement.getBoundingClientRect().height)
     }
 
     updateActionBarHeight()
 
     const observer = new ResizeObserver(updateActionBarHeight)
-    observer.observe(actionBarElement)
+    observer.observe(measuredActionBarElement)
 
     return () => {
       observer.disconnect()
