@@ -11,23 +11,18 @@ import {
   configureAmplifyAuth,
   hasAmplifyAuthConfig,
 } from "@/lib/amplify-auth"
+import type {
+  ConfirmSignupFormValues,
+  LoginFormValues,
+  SignupFormValues,
+} from "@/lib/auth-form-schemas"
 import { cognitoPasswordPolicyMessage } from "@/lib/password-policy"
 
-export type LoginFormValues = {
-  email: string
-  password: string
-}
-
-export type SignupFormValues = {
-  email: string
-  password: string
-  confirmPassword: string
-}
-
-export type ConfirmSignupFormValues = {
-  email: string
-  code: string
-}
+export type {
+  ConfirmSignupFormValues,
+  LoginFormValues,
+  SignupFormValues,
+} from "@/lib/auth-form-schemas"
 
 export type AuthenticatedUser = {
   email: string | null

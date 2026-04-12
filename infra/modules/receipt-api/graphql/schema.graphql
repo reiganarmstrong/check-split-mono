@@ -17,6 +17,7 @@ type Query {
 type Mutation {
   addParticipant(input: AddParticipantInput!): ParticipantMutationResult!
   createReceipt(input: CreateReceiptInput!): Receipt!
+  deleteReceipt(input: DeleteReceiptInput!): ReceiptMutationResult!
   finalizeReceipt(input: FinalizeReceiptInput!): ReceiptMutationResult!
   removeParticipant(input: RemoveParticipantInput!): ParticipantMutationResult!
   removeReceiptItem(input: RemoveReceiptItemInput!): ItemMutationResult!
@@ -51,6 +52,11 @@ input CreateReceiptInput {
   taxCents: Int!
   tipCents: Int!
   totalCents: Int!
+}
+
+input DeleteReceiptInput {
+  expectedVersion: Int!
+  receiptId: ID!
 }
 
 input FinalizeReceiptInput {

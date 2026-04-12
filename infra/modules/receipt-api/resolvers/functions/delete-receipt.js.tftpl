@@ -1,0 +1,57 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function receiptPk(receiptId) {
+  return 'RECEIPT#' + receiptId;
+}
+
+export function request(ctx) {
+  const input = ctx.args.input;
+  const userSub = requireUserSub(ctx);
+
+  return {
+    condition: {
+      expression: '#owner_user_id = :owner_user_id AND #version = :expected_version AND #item_count = :zero AND #participant_count = :zero',
+      expressionNames: {
+        '#item_count': 'item_count',
+        '#owner_user_id': 'owner_user_id',
+        '#participant_count': 'participant_count',
+        '#version': 'version',
+      },
+      expressionValues: util.dynamodb.toMapValues({
+        ':expected_version': input.expectedVersion,
+        ':owner_user_id': userSub,
+        ':zero': 0,
+      }),
+    },
+    key: util.dynamodb.toMapValues({
+      pk: receiptPk(input.receiptId),
+      sk: 'RECEIPT',
+    }),
+    operation: 'DeleteItem',
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  return {
+    itemCount: 0,
+    participantCount: 0,
+    receiptId: ctx.args.input.receiptId,
+    status: null,
+    updatedAt: util.time.nowISO8601(),
+    version: ctx.args.input.expectedVersion + 1,
+  };
+}

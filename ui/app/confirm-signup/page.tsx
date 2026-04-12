@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { BadgeCheck } from "lucide-react"
 import { motion } from "motion/react"
@@ -39,7 +39,7 @@ function validateCode(value: string) {
   return undefined
 }
 
-export default function ConfirmSignupPage() {
+function ConfirmSignupPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { status } = useAuth()
@@ -235,5 +235,20 @@ export default function ConfirmSignupPage() {
         </AuthCardShell>
       </motion.div>
     </div>
+  )
+}
+
+export default function ConfirmSignupPage() {
+  return (
+    <Suspense
+      fallback={
+        <AuthSessionScreen
+          title="Preparing verification"
+          description="Loading your confirmation form."
+        />
+      }
+    >
+      <ConfirmSignupPageContent />
+    </Suspense>
   )
 }

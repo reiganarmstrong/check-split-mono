@@ -9,11 +9,25 @@ The Cognito values are stored in `ui/.env.local`:
 ```env
 NEXT_PUBLIC_COGNITO_USER_POOL_ID=...
 NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID=...
+NEXT_PUBLIC_AWS_REGION=us-east-1
+NEXT_PUBLIC_RECEIPT_API_GRAPHQL_URL=https://...
 ```
 
 Start the app with `pnpm dev`.
 
 The current Terraform Cognito client only supports email/password auth. Google and Apple buttons remain disabled until OAuth flows and identity providers are enabled in Terraform.
+
+## Receipt API Workspace
+
+The dashboard and manual receipt editor now talk directly to the AppSync receipt API. The UI expects:
+
+- `NEXT_PUBLIC_AWS_REGION` for the Cognito/AppSync region
+- `NEXT_PUBLIC_RECEIPT_API_GRAPHQL_URL` for the AppSync GraphQL endpoint
+
+Those values come from `../infra/environments/dev/outputs.tf`:
+
+- `receipt_api_graphql_api_url`
+- the shared AWS region (`us-east-1` in the current dev environment)
 
 ## Getting Started
 
