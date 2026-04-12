@@ -1,14 +1,4 @@
-import { mockReceipts } from "@/lib/mock-receipts"
-
-import { ReceiptDetailPageClient } from "./receipt-detail-page-client"
-
-export const dynamicParams = false
-
-export function generateStaticParams() {
-  return mockReceipts.map(({ id }) => ({
-    receiptId: id,
-  }))
-}
+import { ReceiptWorkspace } from "@/components/receipts/receipt-workspace"
 
 type ReceiptDetailPageProps = {
   params: Promise<{
@@ -21,5 +11,5 @@ export default async function ReceiptDetailPage({
 }: ReceiptDetailPageProps) {
   const { receiptId } = await params
 
-  return <ReceiptDetailPageClient receiptId={receiptId} />
+  return <ReceiptWorkspace receiptId={receiptId} />
 }

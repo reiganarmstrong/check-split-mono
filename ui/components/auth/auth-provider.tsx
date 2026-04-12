@@ -30,6 +30,7 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const requestRef = useRef(0)
+  const hasResolvedSessionRef = useRef(false)
   const [status, setStatus] = useState<AuthStatus>("loading")
   const [user, setUser] = useState<AuthenticatedUser | null>(null)
 
@@ -75,7 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    void refreshSession()
+    void refreshSession({
+      showLoading: !hasResolvedSessionRef.current,
+    }).finally(() => {
+      hasResolvedSessionRef.current = true
+    })
   }, [pathname])
 
   return (

@@ -246,6 +246,7 @@ The resolver layout is declared in `locals.tf`.
 | --- | --- | --- |
 | `addParticipant` | `Mutation` | `add_participant` |
 | `createReceipt` | `Mutation` | `create_receipt` |
+| `deleteReceipt` | `Mutation` | `delete_receipt` |
 | `finalizeReceipt` | `Mutation` | `finalize_receipt` |
 | `getReceipt` | `Query` | `get_receipt` |
 | `listReceipts` | `Query` | `list_receipts` |

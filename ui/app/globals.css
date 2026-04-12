@@ -16,6 +16,8 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+  --color-required-highlight: var(--required-highlight);
+  --color-required-highlight-foreground: var(--required-highlight-foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -63,6 +65,10 @@
   --accent: oklch(0.8 0.15 85); /* sunflower yellow */
   --accent-foreground: oklch(0.15 0.05 250); /* dark blue text on yellow */
 
+  --required-highlight: #d7263d; /* signal crimson highlight for required fields */
+  --required-highlight-foreground: oklch(0.15 0.05 250); /* deep midnight text on alert */
+  --required-highlight-soft: color-mix(in oklab, var(--required-highlight) 32%, white);
+
   --destructive: oklch(0.58 0.22 25);
   --destructive-foreground: oklch(1 0 0);
 
@@ -98,6 +104,10 @@
 
   --accent: oklch(0.85 0.15 85); /* bright lemon */
   --accent-foreground: oklch(0.15 0.05 250); /* navy text on yellow */
+
+  --required-highlight: #ff5c75; /* brighter signal crimson highlight for dark mode */
+  --required-highlight-foreground: oklch(0.15 0.05 250); /* navy text on alert */
+  --required-highlight-soft: color-mix(in oklab, var(--required-highlight) 28%, white);
 
   --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: oklch(0.95 0.02 300);
@@ -145,5 +155,20 @@
   input:-webkit-autofill {
     animation-name: onAutoFillStart;
     animation-duration: 0.001s;
+  }
+}
+
+@layer utilities {
+  .required-highlight-fill {
+    background-color: var(--required-highlight);
+    color: var(--required-highlight-foreground);
+  }
+
+  .required-highlight-soft {
+    background-color: var(--required-highlight-soft);
+  }
+
+  .required-highlight-text {
+    color: var(--required-highlight);
   }
 }

@@ -7,9 +7,28 @@ let isAmplifyConfigured = false
 const cognitoUserPoolId = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID
 const cognitoUserPoolClientId =
   process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID
+const awsRegion = process.env.NEXT_PUBLIC_AWS_REGION
+const receiptApiGraphqlUrl = process.env.NEXT_PUBLIC_RECEIPT_API_GRAPHQL_URL
 
 export function hasAmplifyAuthConfig() {
   return Boolean(cognitoUserPoolId && cognitoUserPoolClientId)
+}
+
+export function hasAmplifyDataConfig() {
+  return Boolean(
+    cognitoUserPoolId &&
+      cognitoUserPoolClientId &&
+      awsRegion &&
+      receiptApiGraphqlUrl,
+  )
+}
+
+export function getReceiptApiGraphqlUrl() {
+  return receiptApiGraphqlUrl
+}
+
+export function getAwsRegion() {
+  return awsRegion
 }
 
 export function configureAmplifyAuth() {
@@ -28,6 +47,18 @@ export function configureAmplifyAuth() {
       "Missing NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID. Define the Cognito env vars in ui/.env.local.",
     )
   }
+
+  const dataConfig = hasAmplifyDataConfig()
+    ? {
+        API: {
+          GraphQL: {
+            defaultAuthMode: "userPool" as const,
+            endpoint: receiptApiGraphqlUrl as string,
+            region: awsRegion as string,
+          },
+        },
+      }
+    : {}
 
   Amplify.configure({
     Auth: {
@@ -48,6 +79,7 @@ export function configureAmplifyAuth() {
         },
       },
     },
+    ...dataConfig,
   })
 
   isAmplifyConfigured = true

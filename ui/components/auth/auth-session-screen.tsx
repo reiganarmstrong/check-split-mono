@@ -2,8 +2,6 @@
 
 import { motion } from "motion/react"
 
-import { Card, CardContent } from "@/components/ui/card"
-
 type AuthSessionScreenProps = {
   title: string
   description: string
@@ -14,38 +12,61 @@ export function AuthSessionScreen({
   description,
 }: AuthSessionScreenProps) {
   return (
-    <div className="relative -mt-28 flex min-h-screen items-center justify-center overflow-hidden px-4 pt-28">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(82,139,238,0.14),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(247,129,94,0.16),transparent_32%)]" />
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ type: "spring", stiffness: 180, damping: 20 }}
-        className="relative w-full max-w-md"
+    <main className="relative -mt-28 flex min-h-screen items-center overflow-hidden bg-background px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-foreground)_1px,transparent_1px)] bg-[size:44px_44px] opacity-[0.05]" />
+      </div>
+
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="relative z-10 mx-auto w-full max-w-2xl"
       >
-        <Card className="rounded-[2rem] border-border/70 bg-white/75 py-0 text-center shadow-[0_24px_80px_-48px_rgba(42,78,166,0.45)] backdrop-blur-xl">
-          <CardContent className="flex flex-col items-center px-8 py-10">
-            <div className="mb-6 flex gap-2">
-              {["bg-primary", "bg-secondary", "bg-accent"].map((className, index) => (
+        <div className="rounded-[3rem] border-4 border-foreground bg-white px-6 py-8 shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] sm:px-8 sm:py-10">
+          <div className="inline-flex rounded-full border-2 border-foreground bg-accent/30 px-4 py-2 text-[0.68rem] font-black uppercase tracking-[0.24em] text-foreground">
+            Loading
+          </div>
+
+          <h1 className="mt-6 text-4xl font-heading font-black leading-[0.95] tracking-tight text-foreground sm:text-5xl">
+            {title}
+          </h1>
+          <p className="mt-4 max-w-xl text-base font-medium leading-7 text-muted-foreground">
+            {description}
+          </p>
+
+          <div className="mt-8 rounded-[1.8rem] border-2 border-foreground bg-muted/50 px-4 py-5">
+            <div className="flex items-center gap-3">
+              {[0, 1, 2].map((index) => (
                 <motion.span
-                  key={className}
-                  animate={{ y: [0, -5, 0], opacity: [0.55, 1, 0.55] }}
+                  key={index}
+                  animate={{ opacity: [0.35, 1, 0.35] }}
                   transition={{
                     duration: 1,
                     repeat: Infinity,
                     ease: "easeInOut",
                     delay: index * 0.14,
                   }}
-                  className={`h-3 w-3 rounded-full ${className}`}
+                  className="h-3.5 w-3.5 rounded-full border border-foreground bg-primary"
                 />
               ))}
+              <p className="text-sm font-black text-foreground">Preparing your workspace</p>
             </div>
-            <h1 className="text-3xl font-heading font-black text-foreground">{title}</h1>
-            <p className="mt-3 text-base font-medium text-muted-foreground">
-              {description}
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
+
+            <div className="mt-4 h-4 overflow-hidden rounded-full border-2 border-foreground bg-white">
+              <motion.div
+                animate={{ x: ["-10%", "85%", "-10%"] }}
+                transition={{
+                  duration: 1.7,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="h-full w-1/3 rounded-full border-r-2 border-foreground bg-secondary"
+              />
+            </div>
+          </div>
+        </div>
+      </motion.section>
+    </main>
   )
 }
