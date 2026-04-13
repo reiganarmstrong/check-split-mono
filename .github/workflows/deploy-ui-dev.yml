@@ -22,32 +22,38 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # only include the necessary files
           sparse-checkout: |
             ui
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: ^10.32.1
 
       - name: Install correct node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: "pnpm"
           cache-dependency-path: ui/pnpm-lock.yaml
 
+      - name: Create .env file
+        # load into env variable then make to file to prevent bash from stripping out newlines needed by terraform
+        env:
+          NEXT_ENV_VARS: ${{ vars.NEXT_ENV_VARS }}
+        run: echo "$NEXT_ENV_VARS" > .env
+
       - name: Install pnpm dependencies
         run: pnpm install
 
       - name: Build static files
-        run: pnpm run build
+        run: pnpm build
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
