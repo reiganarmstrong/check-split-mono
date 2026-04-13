@@ -70,7 +70,7 @@ function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
   const showStatusBadge = receipt.status !== "DRAFT"
 
   return (
-    <Link href={`/dashboard/${receipt.receiptId}`} className="group block">
+    <Link href={`/dashboard/receipt?receiptId=${encodeURIComponent(receipt.receiptId)}`} className="group block">
       <article
         className={cn(
           "relative grid gap-4 overflow-hidden rounded-[2.25rem] border-4 border-foreground px-5 py-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:grid-cols-[minmax(0,1.2fr)_0.8fr_0.7fr_auto] sm:items-center sm:px-6",
