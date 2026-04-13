@@ -546,7 +546,7 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
 
       if (!receiptId) {
         startTransition(() => {
-          router.replace(`/dashboard/${savedReceipt.receiptId}`)
+          router.replace(`/dashboard/receipt?receiptId=${encodeURIComponent(savedReceipt.receiptId)}`)
         })
       }
     } catch (error) {
