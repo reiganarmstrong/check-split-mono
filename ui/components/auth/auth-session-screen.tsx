@@ -38,31 +38,17 @@ export function AuthSessionScreen({
           <div className="mt-8 rounded-[1.8rem] border-2 border-foreground bg-muted/50 px-4 py-5">
             <div className="flex items-center gap-3">
               {[0, 1, 2].map((index) => (
-                <motion.span
+                <span
                   key={index}
-                  animate={{ opacity: [0.35, 1, 0.35] }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: index * 0.14,
-                  }}
-                  className="h-3.5 w-3.5 rounded-full border border-foreground bg-primary"
+                  className="loading-dot h-3.5 w-3.5 rounded-full border border-foreground bg-primary"
+                  style={{ animationDelay: `${index * 0.14}s` }}
                 />
               ))}
               <p className="text-sm font-black text-foreground">Preparing your workspace</p>
             </div>
 
             <div className="mt-4 h-4 overflow-hidden rounded-full border-2 border-foreground bg-white">
-              <motion.div
-                animate={{ x: ["-10%", "85%", "-10%"] }}
-                transition={{
-                  duration: 1.7,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="h-full w-1/3 rounded-full border-r-2 border-foreground bg-secondary"
-              />
+              <div className="loading-sweep gpu-loop h-full w-1/3 rounded-full border-r-2 border-foreground bg-secondary" />
             </div>
           </div>
         </div>

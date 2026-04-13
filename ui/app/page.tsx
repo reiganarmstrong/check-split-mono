@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
+import { AnimatedBlob } from "@/components/ambient/animated-blob";
 import { useAuth } from "@/components/auth/auth-provider";
 
 export default function Home() {
@@ -37,8 +38,7 @@ export default function Home() {
     { text: "Tapas Night", icon: <HandPlatter className="w-6 h-6 stroke-[2.5]" /> },
   ];
   
-  // Duplicate array 4 times for seamless infinite scroll on ultra-wide screens
-  const marqueeContent = [...marqueeItems, ...marqueeItems, ...marqueeItems, ...marqueeItems];
+  const marqueeContent = [...marqueeItems, ...marqueeItems];
 
   return (
     <main className="-mt-28 flex flex-1 flex-col overflow-hidden bg-background relative">
@@ -46,20 +46,23 @@ export default function Home() {
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 bg-background" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-foreground)_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.03]" />
-        <motion.div
-          animate={{ x: [0, -40, 0], y: [0, 50, 0], borderRadius: ["40%", "60%", "40%"] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[10%] -left-[5%] w-[600px] h-[600px] bg-[var(--color-blob-1)] opacity-20 blur-3xl rounded-full"
+        <AnimatedBlob
+          color="var(--color-blob-1)"
+          driftClassName="ambient-blob-drift-a"
+          morphClassName="ambient-blob-morph-a"
+          className="absolute -top-[10%] -left-[5%] h-[600px] w-[600px] opacity-20"
         />
-        <motion.div
-          animate={{ x: [0, 40, 0], y: [0, -30, 0], borderRadius: ["60%", "40%", "60%"] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[30%] -right-[10%] w-[500px] h-[500px] bg-[var(--color-blob-2)] opacity-20 blur-3xl rounded-full"
+        <AnimatedBlob
+          color="var(--color-blob-2)"
+          driftClassName="ambient-blob-drift-b"
+          morphClassName="ambient-blob-morph-b"
+          className="absolute top-[30%] -right-[10%] h-[500px] w-[500px] opacity-20"
         />
-        <motion.div
-          animate={{ x: [0, -30, 0], y: [0, 20, 0], borderRadius: ["50%", "30%", "50%"] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[20%] -left-[10%] w-[400px] h-[400px] bg-accent opacity-10 blur-3xl rounded-full"
+        <AnimatedBlob
+          color="var(--color-accent)"
+          driftClassName="ambient-blob-drift-c"
+          morphClassName="ambient-blob-morph-c"
+          className="absolute bottom-[20%] -left-[10%] h-[400px] w-[400px] opacity-10"
         />
       </div>
 
@@ -114,9 +117,9 @@ export default function Home() {
             <Link href="/signup" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-xl sm:text-2xl font-black rounded-full group border-4 border-foreground bg-primary text-primary-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
                 Get Started
-                <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                <span className="arrow-nudge gpu-loop inline-flex">
                   <ArrowRight className="ml-3 w-6 h-6 sm:w-8 sm:h-8 stroke-[3]" />
-                </motion.span>
+                </span>
               </Button>
             </Link>
           </motion.div>
@@ -134,31 +137,33 @@ export default function Home() {
             <motion.div
               animate={{ y: [0, -10, 0], rotate: [2, 0, 2] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative w-full h-full bg-white rounded-[3rem] border-4 border-foreground shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] z-20 overflow-hidden flex flex-col p-6"
+              className="gpu-loop relative z-20 h-full w-full"
             >
-              <div className="absolute top-0 left-0 right-0 h-3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxMiI+PHBhdGggZD0iTTEwIDEyTDAgMGgyMGwtMTAgMTJ6IiBmaWxsPSJyZ2JhKDAsMCwwLDAuMDUpIi8+PC9zdmc+')] opacity-20 repeat-x background-size-[24px]" />
-              
-              <div className="w-full text-center border-b-4 border-dashed border-muted pb-4 mb-5 pt-2">
-                <h3 className="font-heading font-black text-3xl text-foreground">Bistro 77</h3>
-                <p className="text-muted-foreground font-bold text-sm tracking-widest uppercase mt-1">Table 4, 8:45 PM</p>
-              </div>
-              
-              <div className="flex justify-between items-center mb-5">
-                <div className="w-2/3 h-4 bg-muted rounded-full" />
-                <div className="w-1/4 h-5 bg-primary rounded-full border-2 border-foreground" />
-              </div>
-              <div className="flex justify-between items-center mb-5">
-                <div className="w-1/2 h-4 bg-muted rounded-full" />
-                <div className="w-1/3 h-5 bg-secondary rounded-full border-2 border-foreground" />
-              </div>
-              <div className="flex justify-between items-center mb-5">
-                <div className="w-3/4 h-4 bg-muted rounded-full" />
-                <div className="w-1/5 h-5 bg-accent rounded-full border-2 border-foreground" />
-              </div>
-              
-              <div className="mt-auto flex justify-between items-end w-full pt-4 border-t-4 border-dashed border-foreground">
-                <span className="font-black tracking-widest uppercase text-lg text-muted-foreground">Total</span>
-                <span className="font-heading font-black text-4xl text-foreground">$104.50</span>
+              <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[3rem] border-4 border-foreground bg-white p-6 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+                <div className="absolute top-0 left-0 right-0 h-3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxMiI+PHBhdGggZD0iTTEwIDEyTDAgMGgyMGwtMTAgMTJ6IiBmaWxsPSJyZ2JhKDAsMCwwLDAuMDUpIi8+PC9zdmc+')] opacity-20 repeat-x background-size-[24px]" />
+                
+                <div className="w-full text-center border-b-4 border-dashed border-muted pb-4 mb-5 pt-2">
+                  <h3 className="font-heading font-black text-3xl text-foreground">Bistro 77</h3>
+                  <p className="text-muted-foreground font-bold text-sm tracking-widest uppercase mt-1">Table 4, 8:45 PM</p>
+                </div>
+                
+                <div className="flex justify-between items-center mb-5">
+                  <div className="w-2/3 h-4 bg-muted rounded-full" />
+                  <div className="w-1/4 h-5 bg-primary rounded-full border-2 border-foreground" />
+                </div>
+                <div className="flex justify-between items-center mb-5">
+                  <div className="w-1/2 h-4 bg-muted rounded-full" />
+                  <div className="w-1/3 h-5 bg-secondary rounded-full border-2 border-foreground" />
+                </div>
+                <div className="flex justify-between items-center mb-5">
+                  <div className="w-3/4 h-4 bg-muted rounded-full" />
+                  <div className="w-1/5 h-5 bg-accent rounded-full border-2 border-foreground" />
+                </div>
+                
+                <div className="mt-auto flex justify-between items-end w-full pt-4 border-t-4 border-dashed border-foreground">
+                  <span className="font-black tracking-widest uppercase text-lg text-muted-foreground">Total</span>
+                  <span className="font-heading font-black text-4xl text-foreground">$104.50</span>
+                </div>
               </div>
             </motion.div>
 
@@ -166,18 +171,22 @@ export default function Home() {
             <motion.div
               animate={{ y: [0, 15, 0], x: [0, -5, 0], rotate: [-20, 0, -20] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-              className="absolute -left-16 sm:-left-24 top-8 sm:top-14 w-24 h-24 sm:w-28 sm:h-28 bg-secondary border-4 border-foreground rounded-full rotate-12 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center z-30"
+              className="gpu-loop absolute -left-16 top-8 z-30 sm:-left-24 sm:top-14"
             >
-              <Users className="w-10 h-10 sm:w-12 sm:h-12 text-secondary-foreground" />
+              <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-foreground bg-secondary shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:h-28 sm:w-28">
+                <Users className="w-10 h-10 sm:w-12 sm:h-12 text-secondary-foreground" />
+              </div>
             </motion.div>
 
             {/* Floating Sunflower Decor */}
             <motion.div
               animate={{ y: [0, -15, 0], x: [0, 10, 0], rotate: [15, -10, 15] }}
               transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute -right-16 sm:-right-24 bottom-8 sm:bottom-12 w-20 h-20 sm:w-24 sm:h-24 bg-accent border-4 border-foreground rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center z-10"
+              className="gpu-loop absolute -right-16 bottom-8 z-10 sm:-right-24 sm:bottom-12"
             >
-              <Coins className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] border-4 border-foreground bg-accent shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:h-24 sm:w-24">
+                <Coins className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              </div>
             </motion.div>
           </div>
         </motion.div>
@@ -186,10 +195,10 @@ export default function Home() {
 
       {/* 2. Scrolling Marquee */}
       <div className="relative z-10 w-full overflow-hidden bg-white border-y-4 border-foreground py-5 sm:py-7 mt-8 sm:mt-12">
-        <motion.div 
+        <motion.div
           animate={{ x: ["0%", "-50%"] }}
           transition={{ duration: 35, ease: "linear", repeat: Infinity }}
-          className="flex whitespace-nowrap w-max items-center"
+          className="gpu-loop flex items-center whitespace-nowrap w-max"
         >
           {marqueeContent.map((item, idx) => (
             <div key={idx} className="flex items-center gap-4 sm:gap-5 px-6 sm:px-8 text-2xl sm:text-3xl font-black font-heading text-foreground uppercase tracking-wide">
@@ -336,12 +345,19 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 font-medium max-w-2xl mx-auto leading-relaxed">
             Join thousands of friends saving time, money, and their group chats. The easiest way to split the bill is here.
           </p>
-          <Link href="/signup">
-            <Button size="lg" className="h-20 px-10 md:px-16 text-xl md:text-2xl font-black rounded-full group border-4 border-foreground !bg-primary !text-primary-foreground hover:!bg-primary/90 active:!bg-primary/90 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all w-full sm:w-auto">
+          <Link href="/signup" className="group/cta relative inline-flex w-full sm:w-auto">
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 translate-x-2 translate-y-2 rounded-full bg-foreground"
+            />
+            <Button
+              size="lg"
+              className="relative z-10 h-20 w-full rounded-full border-4 border-foreground !bg-primary px-10 text-xl font-black !text-primary-foreground transition-all hover:translate-x-1 hover:translate-y-1 hover:!bg-primary/90 active:!bg-primary/90 md:px-16 md:text-2xl sm:w-auto"
+            >
               Try CheckSplit now
-              <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+              <span className="arrow-nudge gpu-loop inline-flex">
                 <ArrowRight className="ml-4 w-6 h-6 md:w-8 md:h-8 stroke-[3]" />
-              </motion.span>
+              </span>
             </Button>
           </Link>
         </div>
