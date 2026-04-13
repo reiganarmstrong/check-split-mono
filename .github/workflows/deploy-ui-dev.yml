@@ -40,11 +40,17 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: ui/pnpm-lock.yaml
 
+      - name: Create .env file
+        # load into env variable then make to file to prevent bash from stripping out newlines needed by terraform
+        env:
+          NEXT_ENV_VARS: ${{ vars.NEXT_ENV_VARS }}
+        run: echo "$NEXT_ENV_VARS" > .env
+
       - name: Install pnpm dependencies
         run: pnpm install
 
       - name: Build static files
-        run: pnpm run build
+        run: pnpm build
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
