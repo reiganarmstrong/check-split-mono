@@ -1,5 +1,9 @@
 # Terraform Guidelines
 
+## Skill Usage
+
+- Use `terraform-style-guide` for Terraform modifications.
+
 ## General
 
 - Do not use hardcoded strings for arns. Always use a HCL resource arn attribute or get the arn using a datasource.
@@ -13,6 +17,11 @@
 - Utilize color to distinguish between elements.
 
 # Frontend Guidelines
+
+## Skill Usage
+
+- Use `frontend-skill` for frontend design work.
+- Use `caveman` when I am asking you to accomplish frontend tasks rather than explain something, but do not apply it during planning or Plan Mode.
 
 ## General
 
