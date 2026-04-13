@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, LogOut } from "lucide-react";
@@ -9,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { BrandLogo } from "@/components/brand-logo";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -81,19 +81,15 @@ export function Navbar() {
                     aria-hidden="true"
                     className="absolute inset-0 translate-x-[4px] translate-y-[4px] rounded-[1.75rem] bg-foreground"
                   />
-                  <motion.div
-                    whileHover={
+                  <div
+                    className={cn(
+                      "relative overflow-hidden rounded-[1.75rem] border-3 border-foreground bg-white transition-transform duration-200 ease-out transform-gpu",
                       isAccountMenuOpen
-                        ? undefined
-                        : {
-                            x: 2,
-                            y: 2,
-                          }
-                    }
-                    transition={{ type: "spring", stiffness: 380, damping: 26 }}
-                    className="relative overflow-hidden rounded-[1.75rem] border-3 border-foreground bg-white transform-gpu"
+                        ? ""
+                        : "hover:translate-x-[2px] hover:translate-y-[2px]",
+                    )}
                   >
-                    <motion.button
+                    <button
                       type="button"
                       aria-haspopup="menu"
                       aria-expanded={isAccountMenuOpen}
@@ -104,24 +100,20 @@ export function Navbar() {
                       <ChevronDown
                         className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isAccountMenuOpen ? "rotate-180" : ""}`}
                       />
-                    </motion.button>
+                    </button>
 
-                    <motion.div
+                    <div
                       role="menu"
                       aria-label="Account actions"
                       aria-hidden={!isAccountMenuOpen}
-                      initial={false}
-                      animate={{
-                        gridTemplateRows: isAccountMenuOpen ? "1fr" : "0fr",
-                        opacity: isAccountMenuOpen ? 1 : 0,
-                      }}
-                      transition={{
-                        gridTemplateRows: { duration: 0.24, ease: [0.22, 1, 0.36, 1] },
-                        opacity: { duration: isAccountMenuOpen ? 0.18 : 0.12 },
-                      }}
-                      className="grid overflow-hidden"
+                      className={cn(
+                        "overflow-hidden transition-[max-height,opacity] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                        isAccountMenuOpen
+                          ? "max-h-48 opacity-100"
+                          : "pointer-events-none max-h-0 opacity-0",
+                      )}
                     >
-                      <div className="min-h-0">
+                      <div>
                         <div className="border-t-2 border-dashed border-border px-4 pb-4 pt-3">
                           <p className="text-[0.65rem] font-black uppercase tracking-widest text-muted-foreground">
                             Signed in as
@@ -142,8 +134,8 @@ export function Navbar() {
                           </button>
                         </div>
                       </div>
-                    </motion.div>
-                  </motion.div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : status === "loading" ? (
@@ -161,8 +153,12 @@ export function Navbar() {
                   </Link>
                 ) : null}
                 {pathname !== "/signup" ? (
-                  <Link href="/signup">
-                    <Button className="-translate-y-1 rounded-full font-black border-4 border-foreground bg-primary px-6 h-12 text-primary-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-0 hover:shadow-none transition-all text-base">
+                  <Link href="/signup" className="group/nav-cta relative inline-flex">
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-0 translate-x-[6px] translate-y-[2px] rounded-full bg-foreground"
+                    />
+                    <Button className="relative z-10 translate-x-[2px] -translate-y-[2px] rounded-full border-4 border-foreground bg-primary px-6 text-base font-black text-primary-foreground transition-all hover:translate-x-1 hover:translate-y-0 hover:bg-primary/90 h-12">
                       Get Started
                     </Button>
                   </Link>

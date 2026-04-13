@@ -159,6 +159,162 @@
 }
 
 @layer utilities {
+  @keyframes ambientBlobDriftA {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(-40px, 50px, 0);
+    }
+  }
+
+  @keyframes ambientBlobDriftB {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(40px, -30px, 0);
+    }
+  }
+
+  @keyframes ambientBlobDriftC {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(-30px, 20px, 0);
+    }
+  }
+
+  @keyframes ambientBlobMorphA {
+    0%,
+    100% {
+      border-radius: 40%;
+    }
+    50% {
+      border-radius: 60%;
+    }
+  }
+
+  @keyframes ambientBlobMorphB {
+    0%,
+    100% {
+      border-radius: 60%;
+    }
+    50% {
+      border-radius: 40%;
+    }
+  }
+
+  @keyframes ambientBlobMorphC {
+    0%,
+    100% {
+      border-radius: 50%;
+    }
+    50% {
+      border-radius: 30%;
+    }
+  }
+
+  @keyframes arrowNudge {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(5px, 0, 0);
+    }
+  }
+
+  @keyframes loadingDotPulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes loadingSweep {
+    0%,
+    100% {
+      transform: translate3d(-10%, 0, 0);
+    }
+    50% {
+      transform: translate3d(85%, 0, 0);
+    }
+  }
+
+  .gpu-loop {
+    transform: translate3d(0, 0, 0);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .ambient-blob {
+    pointer-events: none;
+    contain: layout paint style;
+    isolation: isolate;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .ambient-blob-surface {
+    height: 100%;
+    width: 100%;
+    background: radial-gradient(
+      circle at center,
+      var(--ambient-blob-color) 0%,
+      transparent 72%
+    );
+    transform: translate3d(0, 0, 0);
+    will-change: border-radius;
+  }
+
+  .ambient-blob-drift-a {
+    animation: ambientBlobDriftA 15s ease-in-out infinite;
+  }
+
+  .ambient-blob-drift-b {
+    animation: ambientBlobDriftB 20s ease-in-out infinite;
+  }
+
+  .ambient-blob-drift-c {
+    animation: ambientBlobDriftC 18s ease-in-out infinite;
+  }
+
+  .ambient-blob-morph-a {
+    animation: ambientBlobMorphA 15s ease-in-out infinite;
+  }
+
+  .ambient-blob-morph-b {
+    animation: ambientBlobMorphB 20s ease-in-out infinite;
+  }
+
+  .ambient-blob-morph-c {
+    animation: ambientBlobMorphC 18s ease-in-out infinite;
+  }
+
+  .arrow-nudge {
+    animation: arrowNudge 1.5s ease-in-out infinite;
+  }
+
+  .loading-dot {
+    animation: loadingDotPulse 1s ease-in-out infinite;
+  }
+
+  .loading-sweep {
+    animation: loadingSweep 1.7s ease-in-out infinite;
+  }
+
   .required-highlight-fill {
     background-color: var(--required-highlight);
     color: var(--required-highlight-foreground);

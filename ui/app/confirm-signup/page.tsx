@@ -6,6 +6,7 @@ import { BadgeCheck } from "lucide-react"
 import { motion } from "motion/react"
 import { useRouter, useSearchParams } from "next/navigation"
 
+import { AnimatedBlob } from "@/components/ambient/animated-blob"
 import { AuthCardShell } from "@/components/auth/auth-card-shell"
 import { AuthField } from "@/components/auth/auth-field"
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen"
@@ -115,15 +116,17 @@ function ConfirmSignupPageContent() {
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 bg-[var(--color-background)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-foreground)_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.03]" />
-        <motion.div
-          animate={{ x: [0, -40, 0], y: [0, 50, 0], borderRadius: ["40%", "60%", "40%"] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[5%] -left-[10%] w-[500px] h-[500px] bg-[var(--color-blob-1)] opacity-20 blur-3xl rounded-full"
+        <AnimatedBlob
+          color="var(--color-blob-1)"
+          driftClassName="ambient-blob-drift-a"
+          morphClassName="ambient-blob-morph-a"
+          className="absolute top-[5%] -left-[10%] h-[500px] w-[500px] opacity-20"
         />
-        <motion.div
-          animate={{ x: [0, 40, 0], y: [0, -30, 0], borderRadius: ["60%", "40%", "60%"] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -bottom-[10%] -right-[10%] w-[600px] h-[600px] bg-[var(--color-blob-2)] opacity-20 blur-3xl rounded-full"
+        <AnimatedBlob
+          color="var(--color-blob-2)"
+          driftClassName="ambient-blob-drift-b"
+          morphClassName="ambient-blob-morph-b"
+          className="absolute -bottom-[10%] -right-[10%] h-[600px] w-[600px] opacity-20"
         />
       </div>
 
