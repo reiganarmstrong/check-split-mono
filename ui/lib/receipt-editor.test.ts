@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest"
 
 import type { ReceiptEditorState } from "./receipt-types"
-import { getGroupShareSummaries, getReceiptTotalCents } from "./receipt-editor"
+import {
+  getGroupItemShareDetails,
+  getGroupShareSummaries,
+  getReceiptTotalCents,
+} from "./receipt-editor"
 
 function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorState {
   return {
@@ -296,6 +300,64 @@ describe("getGroupShareSummaries", () => {
         itemSubtotalCents: 0,
         taxShareCents: 0,
         tipShareCents: 0,
+      },
+    ])
+  })
+})
+
+describe("getGroupItemShareDetails", () => {
+  it("returns per-group item rows with ratio and distributed cost", () => {
+    const details = getGroupItemShareDetails(
+      createState({
+        items: [
+          {
+            category: "",
+            description: "Fries",
+            discount: "0.00",
+            id: "item-fries",
+            itemId: null,
+            quantity: "1",
+            selectedGroupIds: ["group-a", "group-b"],
+            unitPrice: "3.99",
+          },
+          {
+            category: "",
+            description: "Burger",
+            discount: "0.00",
+            id: "item-burger",
+            itemId: null,
+            quantity: "1",
+            selectedGroupIds: ["group-a"],
+            unitPrice: "5.00",
+          },
+        ],
+      }),
+    )
+
+    expect(details).toEqual([
+      {
+        description: "Fries",
+        groupId: "group-a",
+        itemId: "item-fries",
+        lineSubtotalCents: 399,
+        ratioLabel: "1/2",
+        shareCents: 200,
+      },
+      {
+        description: "Fries",
+        groupId: "group-b",
+        itemId: "item-fries",
+        lineSubtotalCents: 399,
+        ratioLabel: "1/2",
+        shareCents: 199,
+      },
+      {
+        description: "Burger",
+        groupId: "group-a",
+        itemId: "item-burger",
+        lineSubtotalCents: 500,
+        ratioLabel: "1/1",
+        shareCents: 500,
       },
     ])
   })

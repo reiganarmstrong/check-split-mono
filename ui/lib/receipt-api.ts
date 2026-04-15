@@ -200,7 +200,7 @@ function toReceiptApiError(error: GraphQLErrorPayload) {
   }
 
   if (normalized.includes("unauthorized")) {
-    return new ReceiptApiError("You need to sign in again before editing receipts.", "unauthorized")
+    return new ReceiptApiError("You need to log in again before editing receipts.", "unauthorized")
   }
 
   if (normalized.includes("validation")) {
@@ -222,7 +222,7 @@ async function graphQLRequest<T>(
   const token = getAuthToken(session)
 
   if (!token) {
-    throw new ReceiptApiError("You need to sign in before loading receipts.", "unauthorized")
+    throw new ReceiptApiError("You need to log in before loading receipts.", "unauthorized")
   }
 
   const response = await fetch(getReceiptApiGraphqlUrl() as string, {
