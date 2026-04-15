@@ -1,26 +1,34 @@
-import Link from "next/link";
-import { BrandLogo } from "@/components/brand-logo";
+import Link from "next/link"
+
+import { BrandLogo } from "@/components/brand-logo"
 
 export function SiteFooter() {
   return (
-    <footer className="bg-white border-t-4 border-foreground py-10 mt-auto">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-sm font-bold text-muted-foreground uppercase tracking-wider">
-        <BrandLogo
-          className="gap-3"
-          iconClassName="h-12 w-12"
-          nameClassName="text-[1.6rem] font-black"
-          animateOnHover={false}
-          showIconShadow={false}
-        />
-        <div className="flex space-x-6 mt-8 md:mt-0">
-          <Link href="/privacy" className="hover:text-foreground hover:underline underline-offset-4 decoration-2 transition-all">
-            Privacy
-          </Link>
-          <Link href="/contact" className="hover:text-foreground hover:underline underline-offset-4 decoration-2 transition-all">
-            Contact
-          </Link>
+    <footer className="mt-auto pb-4 pt-1">
+      <div className="page-shell">
+        <div className="py-3">
+          <div className="flex items-start justify-between gap-3">
+            <BrandLogo
+              className="gap-2.5"
+              iconClassName="h-10 w-10"
+              nameClassName="text-[0.95rem] font-semibold tracking-[0.24em]"
+              animateOnHover={false}
+              showIcon={false}
+              showIconShadow={false}
+              showTagline={false}
+            />
+
+            <div className="flex shrink-0 items-center justify-end gap-5 text-right text-sm text-[var(--muted-foreground)]">
+              <Link href="/privacy" className="transition-colors hover:text-[var(--foreground)]">
+                Privacy
+              </Link>
+              <Link href="/contact" className="transition-colors hover:text-[var(--foreground)]">
+                Contact
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
-  );
+  )
 }

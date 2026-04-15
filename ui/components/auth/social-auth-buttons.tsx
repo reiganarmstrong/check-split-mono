@@ -9,22 +9,22 @@ export function SocialAuthButtons({
 }: SocialAuthButtonsProps) {
   const disabledToneClassName =
     tone === "secondary"
-      ? "disabled:border-border disabled:bg-muted/80 disabled:text-muted-foreground"
+      ? "disabled:border-[var(--line)] disabled:bg-[var(--surface)] disabled:text-[var(--muted-foreground)]"
       : tone === "primary"
-        ? "disabled:border-border disabled:bg-muted/80 disabled:text-muted-foreground"
-        : "disabled:border-border disabled:bg-muted/80 disabled:text-muted-foreground"
+        ? "disabled:border-[var(--line)] disabled:bg-[var(--surface)] disabled:text-[var(--muted-foreground)]"
+        : "disabled:border-[var(--line)] disabled:bg-[var(--surface)] disabled:text-[var(--muted-foreground)]"
 
   const socialButtonClassName =
-    `h-14 rounded-[1.6rem] border-4 border-foreground bg-white font-black text-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-1 hover:translate-y-1 hover:bg-muted hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:cursor-not-allowed disabled:shadow-none disabled:hover:translate-x-0 disabled:hover:translate-y-0 ${disabledToneClassName}`
+    `h-14 rounded-[1rem] border font-medium text-[var(--foreground)] transition-colors disabled:cursor-not-allowed ${disabledToneClassName}`
 
   return (
     <>
       <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
+          <span className="w-full border-t border-[var(--line)]" />
         </div>
-        <div className="relative flex justify-center text-xs font-bold uppercase text-muted-foreground">
-          <span className="rounded-full bg-white px-4 dark:bg-card">
+        <div className="relative flex justify-center text-xs font-medium uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+          <span className="bg-[var(--surface-strong)] px-4">
             Or continue with
           </span>
         </div>
@@ -35,7 +35,7 @@ export function SocialAuthButtons({
           variant="outline"
           type="button"
           disabled
-          className={socialButtonClassName}
+          className={`${socialButtonClassName} border-[var(--line)] bg-[var(--panel)] shadow-none hover:bg-[var(--surface)]`}
         >
           <svg className="mr-0 h-5 w-5 sm:mr-2" viewBox="0 0 24 24">
             <path
@@ -61,7 +61,7 @@ export function SocialAuthButtons({
           variant="outline"
           type="button"
           disabled
-          className={socialButtonClassName}
+          className={`${socialButtonClassName} border-[var(--line)] bg-[var(--panel)] shadow-none hover:bg-[var(--surface)]`}
         >
           <svg
             className="mr-0 h-5 w-5 sm:mr-2"
@@ -74,7 +74,7 @@ export function SocialAuthButtons({
         </Button>
       </div>
 
-      <p className="mt-3 text-center text-xs font-medium text-muted-foreground">
+      <p className="mt-3 text-center text-xs font-medium text-[var(--muted-foreground)]">
         Google and Apple sign-in stay disabled until OAuth providers are enabled in
         the Cognito Terraform client.
       </p>

@@ -29,7 +29,7 @@ type AuthFieldProps = Omit<
   labelAside?: ReactNode
   showErrors?: boolean
   onValueChange?: (value: string) => void
-  tone?: "primary" | "secondary"
+  tone?: "primary" | "secondary" | "accent"
 }
 
 function getFieldError(errors: unknown[]) {
@@ -55,9 +55,11 @@ export function AuthField({
   const inputId = id ?? field.name
   const errorMessage = showErrors ? getFieldError(field.state.meta.errors) : undefined
   const toneClassName =
-    tone === "secondary"
-      ? "shadow-[4px_4px_0px_0px_var(--color-secondary)] hover:shadow-[2px_2px_0px_0px_var(--color-secondary)] focus:border-secondary focus:shadow-[2px_2px_0px_0px_var(--color-secondary)]"
-      : "shadow-[4px_4px_0px_0px_var(--color-primary)] hover:shadow-[2px_2px_0px_0px_var(--color-primary)] focus:border-primary focus:shadow-[2px_2px_0px_0px_var(--color-primary)]"
+    tone === "accent"
+      ? "focus:border-[var(--accent)] focus-visible:border-[var(--accent)] focus-visible:ring-[color-mix(in_oklab,var(--accent)_28%,transparent)]"
+      : tone === "secondary"
+      ? "focus:border-[var(--secondary)] focus-visible:border-[var(--secondary)] focus-visible:ring-[color-mix(in_oklab,var(--secondary)_28%,transparent)]"
+      : "focus:border-[var(--primary)] focus:bg-[var(--surface-strong)]"
   const syncFieldValue = useCallback(
     (nextValue: string) => {
       if (nextValue === fieldValueRef.current) {
@@ -108,9 +110,9 @@ export function AuthField({
   }, [syncFieldValue])
 
   return (
-    <div className="space-y-2">
-      <div className="ml-1 flex items-center justify-between gap-4">
-        <Label htmlFor={inputId} className="font-bold">
+    <div className="space-y-2.5">
+      <div className="flex items-center justify-between gap-4">
+        <Label htmlFor={inputId} className="text-sm font-medium text-[var(--foreground)]">
           {label}
         </Label>
         {labelAside}
@@ -143,13 +145,13 @@ export function AuthField({
         }}
         aria-invalid={Boolean(errorMessage)}
         className={cn(
-          "h-14 rounded-full border-4 border-foreground bg-white px-6 text-base font-medium transition-all hover:translate-x-1 hover:translate-y-1 focus:outline-none focus:ring-0",
+          "h-[3.25rem] rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 text-base font-medium text-[var(--foreground)] transition-colors focus:outline-none focus:ring-0",
           toneClassName,
           className,
         )}
       />
       {errorMessage ? (
-        <p className="pl-1 text-sm font-medium text-destructive">
+        <p className="text-sm font-medium text-destructive">
           {errorMessage}
         </p>
       ) : null}

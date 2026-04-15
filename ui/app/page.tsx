@@ -1,19 +1,489 @@
 "use client";
 
-import { useEffect } from "react";
-import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
-import { Coins, ArrowRight, Zap, Users, Camera, Pizza, Beer, Croissant, Coffee, HandPlatter } from "lucide-react";
 import Link from "next/link";
+import { useEffect, type ReactNode } from "react";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import { ArrowRight, Camera, ChevronDown, Coins, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
-import { AnimatedBlob } from "@/components/ambient/animated-blob";
 import { useAuth } from "@/components/auth/auth-provider";
+import { Button } from "@/components/ui/button";
+
+const savedSplitFigureRows = [
+  { title: "Bar Clara", state: "Unpaid", amount: "$84.20" },
+  { title: "Cafe Orchard", state: "Unpaid", amount: "$41.65" },
+  { title: "Late Lunch Club", state: "Paid", amount: "$63.18" },
+];
+
+function SectionReveal({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.24 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function AbstractReceiptHero() {
+  return (
+    <div className="relative mx-auto flex h-[420px] w-full max-w-[34rem] items-center justify-center">
+      <motion.div
+        animate={{ y: [0, -10, 0], rotate: [2, 0, 2] }}
+        transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+        className="relative z-20 w-[17rem] sm:w-[19rem]"
+      >
+        <div className="overflow-hidden rounded-[2.2rem] border border-[var(--line)] bg-white px-5 py-5 text-[var(--foreground)] shadow-[var(--shadow-strong)]">
+          <div className="border-b border-dashed border-[var(--line)] pb-4">
+            <p className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Receipt
+            </p>
+            <h3 className="mt-2 text-3xl font-semibold leading-none text-[var(--foreground)]">
+              Bistro 77
+            </h3>
+          </div>
+
+          <div className="space-y-4 py-5">
+            <div className="flex items-center justify-between gap-4">
+              <div className="h-3 w-28 rounded-full bg-[var(--muted)]" />
+              <div className="h-6 w-18 rounded-full bg-[var(--primary)]" />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="h-3 w-20 rounded-full bg-[var(--muted)]" />
+              <div className="h-6 w-24 rounded-full bg-[var(--secondary)]" />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="h-3 w-32 rounded-full bg-[var(--muted)]" />
+              <div className="h-6 w-16 rounded-full bg-[var(--accent)]" />
+            </div>
+          </div>
+
+          <div className="border-t border-dashed border-[var(--line)] pt-4">
+            <p className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              Split total
+            </p>
+            <p className="mt-2 text-4xl font-semibold leading-none text-[var(--foreground)]">
+              $104.50
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        animate={{ y: [0, 12, 0], x: [0, -4, 0], rotate: [-10, -4, -10] }}
+        transition={{ duration: 6.4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute left-0 top-12 z-30 rounded-[1.4rem] bg-[var(--secondary)] px-5 py-4 text-[var(--secondary-foreground)] shadow-[var(--shadow-soft)]"
+      >
+        <Users className="h-9 w-9" />
+      </motion.div>
+
+      <motion.div
+        animate={{ y: [0, -14, 0], x: [0, 8, 0], rotate: [10, 4, 10] }}
+        transition={{ duration: 6.8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-10 right-2 z-10 rounded-[1.6rem] bg-[var(--accent)] px-5 py-5 text-[var(--accent-foreground)] shadow-[var(--shadow-soft)]"
+      >
+        <Coins className="h-10 w-10" />
+      </motion.div>
+
+      <div className="absolute -left-2 bottom-24 h-20 w-20 rounded-full bg-[var(--primary)]/16" />
+      <div className="absolute right-16 top-2 h-12 w-12 rounded-full bg-[var(--accent)]/24" />
+    </div>
+  );
+}
+
+function ParseReceiptFigure() {
+  return (
+    <div className="relative rounded-[2.2rem] border border-[var(--line)] bg-[#f8f8f3] p-5 shadow-[0_18px_40px_rgba(14,18,24,0.06)] sm:p-6">
+      <div className="relative grid gap-5 lg:grid-cols-[0.9fr_0.46fr] lg:items-center">
+        <div className="relative rounded-[2rem] border border-[var(--line)] bg-white px-5 py-5 shadow-[0_18px_38px_rgba(14,18,24,0.05)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                Live parse
+              </p>
+              <p className="mt-2 text-3xl font-semibold leading-none text-[var(--foreground)]">
+                Receipt scan
+              </p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[var(--line)] bg-white">
+              <Camera className="h-5 w-5 text-[var(--foreground)]" />
+            </div>
+          </div>
+
+          <div className="relative mt-6 h-[17rem] overflow-hidden rounded-[1.8rem] border border-[var(--line)] bg-white px-5 py-5">
+            <div className="flex h-full flex-col justify-between opacity-90">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-24 rounded-full bg-[var(--muted)]" />
+                  <div className="h-3 w-12 rounded-full bg-[var(--muted)]" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-32 rounded-full bg-[var(--muted)]" />
+                  <div className="h-3 w-14 rounded-full bg-[var(--muted)]" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-20 rounded-full bg-[var(--muted)]" />
+                  <div className="h-3 w-10 rounded-full bg-[var(--muted)]" />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-28 rounded-full bg-[var(--muted)]" />
+                  <div className="h-3 w-11 rounded-full bg-[var(--muted)]" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-22 rounded-full bg-[var(--muted)]" />
+                  <div className="h-3 w-13 rounded-full bg-[var(--muted)]" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-30 rounded-full bg-[var(--muted)]" />
+                  <div className="h-3 w-12 rounded-full bg-[var(--muted)]" />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-18 rounded-full bg-[var(--muted)]" />
+                  <div className="h-3 w-10 rounded-full bg-[var(--muted)]" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="h-3 w-26 rounded-full bg-[var(--muted)]" />
+                  <div className="h-3 w-14 rounded-full bg-[var(--muted)]" />
+                </div>
+                <div className="flex items-center justify-between border-t border-dashed border-[var(--line)] pt-4">
+                  <div className="h-3 w-16 rounded-full bg-[var(--muted)]" />
+                  <div className="h-4 w-18 rounded-full bg-[var(--foreground)]/18" />
+                </div>
+              </div>
+            </div>
+
+            <div className="pointer-events-none absolute inset-x-4 top-7 h-11 rounded-[1rem] border border-[var(--secondary)] bg-[var(--secondary)]/18" />
+            <div className="pointer-events-none absolute inset-x-8 top-[5.5rem] h-11 rounded-[1rem] border border-[var(--accent)] bg-[var(--accent)]/18" />
+            <div className="pointer-events-none absolute inset-x-6 top-[9.2rem] h-9 rounded-[1rem] border border-[var(--foreground)]/18" />
+            <div className="pointer-events-none absolute inset-x-0 top-[46%] h-px bg-[var(--foreground)]/16" />
+            <motion.div
+              animate={{ y: [0, 208, 0] }}
+              transition={{
+                duration: 4.6,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="pointer-events-none absolute inset-x-3 top-10 h-1.5 rounded-full bg-[var(--foreground)]/80 shadow-[0_0_24px_rgba(19,24,31,0.18)]"
+            />
+          </div>
+        </div>
+
+        <div className="hidden gap-3 lg:grid">
+          <div className="rounded-[1.35rem] border border-[var(--line)] bg-[var(--secondary)] px-4 py-4 text-[var(--secondary-foreground)] shadow-[0_12px_26px_rgba(14,18,24,0.04)]">
+            <p className="text-[0.68rem] uppercase tracking-[0.18em] opacity-70">
+              Items found
+            </p>
+            <p className="mt-2 text-3xl font-semibold leading-none">8</p>
+          </div>
+          <div className="rounded-[1.35rem] border border-[var(--line)] bg-white px-4 py-4 shadow-[0_12px_26px_rgba(14,18,24,0.04)]">
+            <p className="text-[0.68rem] uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Extracted
+            </p>
+            <div className="mt-3 space-y-2">
+              <div className="rounded-full border border-[var(--line)] px-3 py-2 text-sm font-medium text-[var(--foreground)]">
+                Tax $3.10
+              </div>
+              <div className="rounded-full border border-[var(--line)] px-3 py-2 text-sm font-medium text-[var(--foreground)]">
+                Tip $4.00
+              </div>
+              <div className="rounded-full bg-[var(--accent)] px-3 py-2 text-sm font-medium text-[var(--accent-foreground)]">
+                Total $104.50
+              </div>
+            </div>
+          </div>
+          <div className="rounded-[1.35rem] border border-[var(--line)] bg-white px-4 py-4 shadow-[0_12px_26px_rgba(14,18,24,0.04)]">
+            <p className="text-[0.68rem] uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+              Detected line
+            </p>
+            <p className="mt-2 text-2xl font-semibold leading-none text-[var(--foreground)]">
+              House noodles
+            </p>
+            <p className="mt-3 text-sm text-[var(--muted-foreground)]">
+              $18.50 ready for assignment
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MakeGroupsFigure() {
+  return (
+    <div className="relative rounded-[2.2rem] border border-[var(--line)] bg-[#f8f8f3] p-5 shadow-[0_18px_40px_rgba(14,18,24,0.06)] sm:p-6">
+      <div className="relative grid gap-5 lg:grid-cols-[0.34fr_1fr] lg:items-center">
+        <div className="flex flex-wrap gap-3 lg:block lg:space-y-3">
+          {[
+            {
+              name: "Alex",
+              tone: "bg-[var(--foreground)] text-[var(--background)]",
+            },
+            {
+              name: "Nina",
+              tone: "bg-[var(--secondary)] text-[var(--secondary-foreground)]",
+            },
+            {
+              name: "June",
+              tone: "bg-[var(--accent)] text-[var(--accent-foreground)]",
+            },
+            { name: "Kai", tone: "bg-white text-[var(--foreground)]" },
+          ].map((person) => (
+            <div
+              key={person.name}
+              className={`w-fit rounded-full border border-[var(--line)] px-4 py-2 text-sm font-medium shadow-[0_8px_18px_rgba(14,18,24,0.04)] ${person.tone}`}
+            >
+              {person.name}
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-[1.9rem] border border-[var(--line)] bg-white px-5 py-5 shadow-[0_14px_30px_rgba(14,18,24,0.05)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                Make groups
+              </p>
+              <p className="mt-2 text-3xl font-semibold leading-none text-[var(--foreground)]">
+                Assign people
+              </p>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] border border-[var(--line)] bg-[#f8f8f3]">
+              <Users className="h-5 w-5 text-[var(--foreground)]" />
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-[1fr_auto] md:items-start">
+            <div className="space-y-3">
+              <div className="rounded-[1.3rem] border border-[var(--line)] px-4 py-4">
+                <p className="text-[0.68rem] uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                  Couple tab
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[
+                    {
+                      name: "Alex",
+                      tone: "bg-[var(--foreground)] text-[var(--background)]",
+                    },
+                    { name: "Nina", tone: "bg-white text-[var(--foreground)]" },
+                  ].map((person, index) => (
+                    <motion.span
+                      key={person.name}
+                      animate={{
+                        x: [0, index % 2 === 0 ? 5 : -5, 0],
+                        y: [0, index % 2 === 0 ? -2 : 2, 0],
+                      }}
+                      transition={{
+                        duration: 6.8,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: index * 0.7,
+                      }}
+                      className={`rounded-full border border-[var(--foreground)] px-3 py-2 text-sm font-medium ${person.tone}`}
+                    >
+                      {person.name}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-[1.3rem] border border-[var(--line)] px-4 py-4">
+                <p className="text-[0.68rem] uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                  Team tab
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[
+                    { name: "June", tone: "bg-white text-[var(--foreground)]" },
+                    {
+                      name: "Maya",
+                      tone: "bg-[var(--foreground)] text-[var(--background)]",
+                    },
+                    { name: "Kai", tone: "bg-white text-[var(--foreground)]" },
+                  ].map((person, index) => (
+                    <motion.span
+                      key={person.name}
+                      animate={{
+                        x: [0, index === 1 ? 6 : -4, 0],
+                        y: [0, index === 1 ? -2 : 2, 0],
+                      }}
+                      transition={{
+                        duration: 7.2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: index * 0.55,
+                      }}
+                      className={`rounded-full border border-[var(--foreground)] px-3 py-2 text-sm font-medium ${person.tone}`}
+                    >
+                      {person.name}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-3 md:w-36">
+              <div className="rounded-[1.2rem] bg-[var(--secondary)] px-4 py-4 text-[var(--secondary-foreground)]">
+                <p className="text-[0.68rem] uppercase tracking-[0.18em] opacity-70">
+                  Groups
+                </p>
+                <p className="mt-2 text-3xl font-semibold leading-none">2</p>
+              </div>
+              <div className="rounded-[1.2rem] bg-[var(--accent)] px-4 py-4 text-[var(--accent-foreground)]">
+                <p className="text-[0.68rem] uppercase tracking-[0.18em] opacity-70">
+                  People
+                </p>
+                <p className="mt-2 text-3xl font-semibold leading-none">5</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SavedSplitsFigure() {
+  return (
+    <div className="relative rounded-[2.4rem] border border-[var(--line)] bg-[#f8f8f3] px-6 py-8 shadow-[0_20px_44px_rgba(14,18,24,0.06)] sm:px-8 sm:py-10">
+      <div className="relative grid gap-10 lg:grid-cols-[0.56fr_1fr] lg:items-center">
+        <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-1">
+          <div>
+            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+              Unpaid
+            </p>
+            <p className="mt-3 text-6xl font-semibold leading-none text-[var(--foreground)] sm:text-7xl">
+              $125
+            </p>
+          </div>
+          <div>
+            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+              Paid
+            </p>
+            <p className="mt-3 text-6xl font-semibold leading-none text-[var(--foreground)] sm:text-7xl">
+              $63
+            </p>
+          </div>
+        </div>
+
+        <div className="relative mx-auto h-[23rem] w-full max-w-[28rem]">
+          <motion.div
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 7.2, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-x-10 top-2 rotate-[-5deg] transform-gpu rounded-[1.8rem] border border-[var(--line)] bg-white px-5 py-5 shadow-[0_14px_30px_rgba(14,18,24,0.04)]"
+          >
+            <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+              Paid stack
+            </p>
+            <p className="mt-3 text-2xl font-semibold leading-none text-[var(--foreground)]">
+              Late Lunch Club
+            </p>
+            <div className="mt-5 flex items-center justify-between">
+              <span className="rounded-full bg-[var(--accent)] px-3 py-2 text-sm font-medium text-[var(--accent-foreground)]">
+                Paid
+              </span>
+              <span className="text-xl font-medium text-[var(--foreground)]">
+                $63.18
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            animate={{ y: [0, 4, 0] }}
+            transition={{ duration: 7.8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-x-4 top-16 rotate-[3deg] transform-gpu rounded-[2rem] border border-[var(--line)] bg-white px-5 py-5 shadow-[0_18px_38px_rgba(14,18,24,0.05)]"
+          >
+            <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+              Open split
+            </p>
+            <p className="mt-3 text-2xl font-semibold leading-none text-[var(--foreground)]">
+              Cafe Orchard
+            </p>
+            <div className="mt-5 flex items-center justify-between">
+              <span className="rounded-full border border-[var(--line)] px-3 py-2 text-sm font-medium text-[var(--foreground)]">
+                Unpaid
+              </span>
+              <span className="text-xl font-medium text-[var(--foreground)]">
+                $41.65
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            animate={{ rotate: [0, 0.35, 0] }}
+            transition={{ duration: 8.2, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-x-0 top-28 transform-gpu rounded-[2.1rem] border border-[var(--line)] bg-white px-5 py-5 shadow-[0_22px_44px_rgba(14,18,24,0.07)]"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                  Saved splits
+                </p>
+                <p className="mt-3 text-3xl font-semibold leading-none text-[var(--foreground)]">
+                  Bar Clara
+                </p>
+              </div>
+              <div className="rounded-[1rem] bg-[var(--secondary)] px-4 py-4 text-[var(--secondary-foreground)]">
+                <p className="text-[0.68rem] uppercase tracking-[0.18em] opacity-70">
+                  Share
+                </p>
+                <p className="mt-2 text-2xl font-semibold leading-none">
+                  $84.20
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {savedSplitFigureRows.map((row) => (
+                <div
+                  key={row.title}
+                  className="flex items-center justify-between gap-4 rounded-[1.4rem] border border-[var(--line)] px-4 py-4"
+                >
+                  <div>
+                    <p className="text-lg font-semibold leading-none text-[var(--foreground)]">
+                      {row.title}
+                    </p>
+                    <p className="mt-2 text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                      {row.state}
+                    </p>
+                  </div>
+                  <p className="text-lg font-medium text-[var(--foreground)]">
+                    {row.amount}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const router = useRouter();
   const { status } = useAuth();
+  const { scrollY } = useScroll();
+  const learnMoreFadeProgress = useTransform(scrollY, [340, 460], [1, 0]);
+  const learnMoreOpacity = useSpring(learnMoreFadeProgress, {
+    stiffness: 120,
+    damping: 26,
+    mass: 0.8,
+  });
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -25,344 +495,177 @@ export default function Home() {
     return (
       <AuthSessionScreen
         title="Routing to your dashboard"
-        description="Authenticated users land on the receipt archive instead of the marketing page."
+        description="Authenticated users land on saved splits instead of marketing page."
       />
     );
   }
 
-  const marqueeItems = [
-    { text: "Late Night Pizza", icon: <Pizza className="w-6 h-6 stroke-[2.5]" /> },
-    { text: "Sunday Brunch", icon: <Coffee className="w-6 h-6 stroke-[2.5]" /> },
-    { text: "Happy Hour", icon: <Beer className="w-6 h-6 stroke-[2.5]" /> },
-    { text: "Parisian Bakery", icon: <Croissant className="w-6 h-6 stroke-[2.5]" /> },
-    { text: "Tapas Night", icon: <HandPlatter className="w-6 h-6 stroke-[2.5]" /> },
-  ];
-  
-  const marqueeContent = [...marqueeItems, ...marqueeItems];
-
   return (
-    <main className="-mt-28 flex flex-1 flex-col overflow-hidden bg-background relative">
-      {/* Playful Background Blobs & Grid */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-background" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-foreground)_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.03]" />
-        <AnimatedBlob
-          color="var(--color-blob-1)"
-          driftClassName="ambient-blob-drift-a"
-          morphClassName="ambient-blob-morph-a"
-          className="absolute -top-[10%] -left-[5%] h-[600px] w-[600px] opacity-20"
-        />
-        <AnimatedBlob
-          color="var(--color-blob-2)"
-          driftClassName="ambient-blob-drift-b"
-          morphClassName="ambient-blob-morph-b"
-          className="absolute top-[30%] -right-[10%] h-[500px] w-[500px] opacity-20"
-        />
-        <AnimatedBlob
-          color="var(--color-accent)"
-          driftClassName="ambient-blob-drift-c"
-          morphClassName="ambient-blob-morph-c"
-          className="absolute bottom-[20%] -left-[10%] h-[400px] w-[400px] opacity-10"
-        />
-      </div>
-
-      {/* 1. Split Hero Section */}
-      <section className="relative z-10 w-full pt-32 pb-12 md:pt-40 md:pb-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-        
-        {/* Left Side: Text */}
-        <div className="flex-1 text-center lg:text-left flex flex-col items-center lg:items-start w-full">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 100, damping: 15 }}
-            className="mb-8 rotate-[-2deg]"
-          >
-            <div className="inline-flex items-center justify-center p-3 bg-white rounded-full border-4 border-foreground shadow-[4px_4px_0px_0px_var(--color-accent)]">
-              <span className="text-xs sm:text-sm font-black uppercase tracking-wider px-2 sm:px-3 text-foreground flex items-center gap-2">
-                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-accent fill-accent" />
-                The Group Pay Revolution
-              </span>
-            </div>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, type: "spring", stiffness: 100 }}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-heading font-black text-foreground max-w-2xl tracking-tight leading-[1.05]"
-          >
-            Split the bill,  <div className="inline-block relative">
-              skip the math.
-              <svg className="absolute -bottom-3 w-full h-4 text-secondary -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0 5 Q 50 15 100 5 L 100 10 L 0 10 Z" fill="currentColor"/>
-              </svg>
-            </div>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-            className="mt-6 text-lg sm:text-xl md:text-2xl text-muted-foreground font-medium max-w-xl"
-          >
-            Just snap a photo of the receipt. We magically identify the items, you claim what you ate, and everyone pays their exact share.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, type: "spring", stiffness: 100, bounce: 0.5 }}
-            className="mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start w-full"
-          >
-            <Link href="/signup" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-xl sm:text-2xl font-black rounded-full group border-4 border-foreground bg-primary text-primary-foreground shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
-                Get Started
-                <span className="arrow-nudge gpu-loop inline-flex">
-                  <ArrowRight className="ml-3 w-6 h-6 sm:w-8 sm:h-8 stroke-[3]" />
-                </span>
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-
-        {/* Right Side: Interactive Abstract UI */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-          className="flex-1 w-full max-w-sm sm:max-w-md lg:max-w-lg relative h-[380px] sm:h-[450px] flex items-center justify-center"
-        >
-          <div className="relative flex items-center justify-center w-64 sm:w-72 h-80 sm:h-96">
-            {/* Main Floating Receipt */}
-            <motion.div
-              animate={{ y: [0, -10, 0], rotate: [2, 0, 2] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="gpu-loop relative z-20 h-full w-full"
-            >
-              <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[3rem] border-4 border-foreground bg-white p-6 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-                <div className="absolute top-0 left-0 right-0 h-3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxMiI+PHBhdGggZD0iTTEwIDEyTDAgMGgyMGwtMTAgMTJ6IiBmaWxsPSJyZ2JhKDAsMCwwLDAuMDUpIi8+PC9zdmc+')] opacity-20 repeat-x background-size-[24px]" />
-                
-                <div className="w-full text-center border-b-4 border-dashed border-muted pb-4 mb-5 pt-2">
-                  <h3 className="font-heading font-black text-3xl text-foreground">Bistro 77</h3>
-                  <p className="text-muted-foreground font-bold text-sm tracking-widest uppercase mt-1">Table 4, 8:45 PM</p>
-                </div>
-                
-                <div className="flex justify-between items-center mb-5">
-                  <div className="w-2/3 h-4 bg-muted rounded-full" />
-                  <div className="w-1/4 h-5 bg-primary rounded-full border-2 border-foreground" />
-                </div>
-                <div className="flex justify-between items-center mb-5">
-                  <div className="w-1/2 h-4 bg-muted rounded-full" />
-                  <div className="w-1/3 h-5 bg-secondary rounded-full border-2 border-foreground" />
-                </div>
-                <div className="flex justify-between items-center mb-5">
-                  <div className="w-3/4 h-4 bg-muted rounded-full" />
-                  <div className="w-1/5 h-5 bg-accent rounded-full border-2 border-foreground" />
-                </div>
-                
-                <div className="mt-auto flex justify-between items-end w-full pt-4 border-t-4 border-dashed border-foreground">
-                  <span className="font-black tracking-widest uppercase text-lg text-muted-foreground">Total</span>
-                  <span className="font-heading font-black text-4xl text-foreground">$104.50</span>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Floating Coral Decor */}
-            <motion.div
-              animate={{ y: [0, 15, 0], x: [0, -5, 0], rotate: [-20, 0, -20] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-              className="gpu-loop absolute -left-16 top-8 z-30 sm:-left-24 sm:top-14"
-            >
-              <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-foreground bg-secondary shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:h-28 sm:w-28">
-                <Users className="w-10 h-10 sm:w-12 sm:h-12 text-secondary-foreground" />
-              </div>
-            </motion.div>
-
-            {/* Floating Sunflower Decor */}
-            <motion.div
-              animate={{ y: [0, -15, 0], x: [0, 10, 0], rotate: [15, -10, 15] }}
-              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="gpu-loop absolute -right-16 bottom-8 z-10 sm:-right-24 sm:bottom-12"
-            >
-              <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] border-4 border-foreground bg-accent shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:h-24 sm:w-24">
-                <Coins className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-      </section>
-
-      {/* 2. Scrolling Marquee */}
-      <div className="relative z-10 w-full overflow-hidden bg-white border-y-4 border-foreground py-5 sm:py-7 mt-8 sm:mt-12">
+    <main className="flex-1 pb-28">
+      <section className="page-shell relative flex min-h-[calc(100svh-7rem)] items-center">
         <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 35, ease: "linear", repeat: Infinity }}
-          className="gpu-loop flex items-center whitespace-nowrap w-max"
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="grid w-full justify-items-center gap-12 py-8 sm:py-10 lg:-translate-y-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:gap-20"
         >
-          {marqueeContent.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-4 sm:gap-5 px-6 sm:px-8 text-2xl sm:text-3xl font-black font-heading text-foreground uppercase tracking-wide">
-              <span className="text-secondary bg-secondary/10 p-2 rounded-full border-2 border-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">{item.icon}</span>
-              {item.text}
-              <span className="mx-6 sm:mx-8 text-muted-foreground/30 font-black">•</span>
+          <div className="max-w-xl text-center lg:text-left">
+            <p className="text-[0.72rem] font-medium uppercase tracking-[0.28em] text-[var(--muted-foreground)]">
+              Receipt workspace
+            </p>
+            <h1 className="mt-5 text-5xl leading-[0.92] text-[var(--foreground)] sm:text-6xl lg:text-7xl">
+              Split receipt costs by group.
+            </h1>
+            <p className="mx-auto mt-5 max-w-md text-base leading-7 text-[var(--muted-foreground)] lg:mx-0">
+              Parse receipt data. Make groups. Save clean splits.
+            </p>
+
+            <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+              <Link href="/signup">
+                <Button className="h-12 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90">
+                  Get Started Now
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
-          ))}
+
+            <div className="mx-auto mt-8 hidden max-w-lg gap-4 border-t border-[var(--line)] pt-6 sm:grid sm:grid-cols-3 lg:mx-0">
+              <div>
+                <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                  Parse
+                </p>
+                <p className="mt-2 text-3xl font-semibold leading-none text-[var(--foreground)]">
+                  Fast
+                </p>
+              </div>
+              <div>
+                <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                  Groups
+                </p>
+                <p className="mt-2 text-3xl font-semibold leading-none text-[var(--foreground)]">
+                  Easy
+                </p>
+              </div>
+              <div>
+                <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                  Status
+                </p>
+                <p className="mt-2 text-3xl font-semibold leading-none text-[var(--foreground)]">
+                  Paid
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 22 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.08, duration: 0.35 }}
+            className="flex w-full items-center justify-center"
+          >
+            <AbstractReceiptHero />
+          </motion.div>
         </motion.div>
-      </div>
 
-      {/* 3. Steps Zig-Zag Narrative */}
-      <section className="relative z-10 py-20 md:py-32 px-4 sm:px-6 md:px-12 w-full max-w-6xl mx-auto flex flex-col gap-24 md:gap-32">
-        
-        <div className="text-center md:mb-12">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black px-2">Split it in three steps.</h2>
-        </div>
-
-        {/* Step 1: Snap */}
-        <div className="flex flex-col-reverse md:flex-row items-center gap-10 lg:gap-24">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="flex-1 w-full max-h-[400px] flex items-center justify-center relative p-6 md:p-8"
-          >
-            <div className="absolute inset-0 bg-primary/10 rounded-[4rem] -z-10" />
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: -4 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="bg-primary border-4 border-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-[3rem] w-full max-w-[250px] aspect-square flex items-center justify-center text-primary-foreground transform rotate-2"
-            >
-              <Camera className="w-24 h-24" />
-            </motion.div>
-          </motion.div>
-          
-          <div className="flex-1 text-center md:text-left">
-            <span className="inline-block py-2 px-5 rounded-full border-2 border-primary bg-primary/20 text-primary text-base font-black tracking-widest mb-6">STEP 1</span>
-            <h3 className="text-4xl lg:text-6xl font-heading font-black mb-6">Scan the receipt.</h3>
-            <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-relaxed">
-              Our super-smart AI reads the crumpled paper instantly. It extracts every line item, price, and tax perfectly. No manual entry needed.
-            </p>
-          </div>
-        </div>
-
-        {/* Step 2: Claim (Reversed) */}
-        <div className="flex flex-col md:flex-row items-center gap-10 lg:gap-24">
-          <div className="flex-1 text-center md:text-left">
-            <span className="inline-block py-2 px-5 rounded-full border-2 border-secondary bg-secondary/20 text-secondary text-base font-black tracking-widest mb-6">STEP 2</span>
-            <h3 className="text-4xl lg:text-6xl font-heading font-black mb-6">Select your bites.</h3>
-            <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-relaxed">
-              Send a link to the group. Everyone taps exactly what they ate. Did two people share the nachos? Tapping it splits it perfectly. 
-            </p>
-          </div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="flex-1 w-full max-h-[400px] flex items-center justify-center relative p-6 md:p-8"
-          >
-            <div className="absolute inset-0 bg-secondary/10 rounded-[4rem] -z-10" />
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: 4 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="bg-white border-4 border-foreground shadow-[8px_8px_0px_0px_var(--color-secondary)] rounded-[3rem] w-full max-w-[300px] p-6 flex flex-col gap-4 transform -rotate-2"
-            >
-               <div className="w-full flex justify-between items-center p-4 bg-muted/50 border-2 border-border rounded-2xl hover:border-foreground transition-colors cursor-pointer">
-                 <span className="font-bold text-lg">Nachos</span>
-                 <div className="flex -space-x-3">
-                    <div className="w-10 h-10 rounded-full border-2 border-white bg-primary shadow-sm flex items-center justify-center font-bold text-white text-xs">J</div>
-                    <div className="w-10 h-10 rounded-full border-2 border-white bg-accent shadow-sm flex items-center justify-center font-bold text-accent-foreground text-xs">A</div>
-                 </div>
-               </div>
-               <div className="w-full flex justify-between items-center p-4 bg-muted/50 border-2 border-border rounded-2xl hover:border-foreground transition-colors cursor-pointer">
-                 <span className="font-bold text-lg">Margarita</span>
-                 <div className="flex -space-x-3">
-                    <div className="w-10 h-10 rounded-full border-2 border-white bg-secondary shadow-sm flex items-center justify-center font-bold text-white text-xs">K</div>
-                 </div>
-               </div>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* Step 3: Math */}
-        <div className="flex flex-col-reverse md:flex-row items-center gap-10 lg:gap-24">
-          <motion.div 
-             initial={{ opacity: 0, y: 30 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true, margin: "-100px" }}
-             className="flex-1 w-full max-h-[400px] flex items-center justify-center relative p-6 md:p-8"
-           >
-             <div className="absolute inset-0 bg-accent/10 rounded-[4rem] -z-10" />
-             <motion.div
-               whileHover={{ scale: 1.05, rotate: -4 }}
-               transition={{ type: "spring", stiffness: 400, damping: 25 }}
-               className="bg-accent border-4 border-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-[3rem] w-full max-w-[250px] aspect-square flex flex-col items-center justify-center p-6 transform rotate-2 relative overflow-hidden"
-             >
-               <div className="absolute top-0 left-0 right-0 h-3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxMiI+PHBhdGggZD0iTTEwIDEyTDAgMGgyMGwtMTAgMTJ6IiBmaWxsPSJyZ2JhKDAsMCwwLDAuMDUpIi8+PC9zdmc+')] opacity-20 repeat-x background-size-[20px]" />
-               
-               <div className="text-center z-10">
-                 <div className="text-accent-foreground text-sm font-black tracking-widest uppercase mb-2">YOU OWE</div>
-                 <div className="text-5xl md:text-6xl font-heading font-black text-foreground bg-white border-4 border-foreground rounded-2xl px-4 py-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                   $24.<span className="text-4xl text-muted-foreground">00</span>
-                 </div>
-               </div>
-             </motion.div>
-           </motion.div>
-           
-           <div className="flex-1 text-center md:text-left">
-             <span className="inline-block py-2 px-5 rounded-full border-2 border-accent bg-accent/30 text-[color-mix(in_oklab,var(--color-accent),black_30%)] text-base font-black tracking-widest mb-6">STEP 3</span>
-             <h3 className="text-4xl lg:text-6xl font-heading font-black mb-6">Never do math again.</h3>
-             <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-relaxed">
-               Tax and tip are automatically proportioned perfectly based on exactly what you ate. You just hit &ldquo;Pay&rdquo; and the relationship survives.
-             </p>
-           </div>
-        </div>
-
+        <motion.a
+          href="#learn-more"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ y: 0 }}
+          transition={{ delay: 0.35, duration: 0.4 }}
+          style={{ opacity: learnMoreOpacity }}
+          className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)] lg:flex"
+        >
+          <span>Learn more</span>
+          <span className="flex flex-col items-center justify-center leading-none">
+            <ChevronDown className="h-4 w-4" />
+            <ChevronDown className="-mt-2 h-4 w-4" />
+          </span>
+        </motion.a>
       </section>
 
-      {/* Geometric Visual Divider */}
-      <div className="relative z-10 w-full flex justify-center items-center gap-4 py-16">
-        <div className="w-20 md:w-32 h-2 bg-foreground rounded-full"></div>
-        <div className="h-8 w-8 shrink-0 rounded-full border-2 border-foreground bg-primary"></div>
-        <div className="h-8 w-8 shrink-0 rounded-full border-2 border-foreground bg-secondary"></div>
-        <div className="h-8 w-8 shrink-0 rounded-full border-2 border-foreground bg-accent"></div>
-        <div className="w-20 md:w-32 h-2 bg-foreground rounded-full"></div>
-      </div>
-      
-      {/* 4. Homogenous CTA Section */}
-      <motion.section 
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="w-full relative z-10 py-24 md:py-40 px-6 max-w-5xl mx-auto flex flex-col items-center justify-center text-center"
-      >
-        <div className="w-full flex-1 bg-white border-4 border-foreground rounded-[3rem] px-8 py-16 md:py-24 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full blur-3xl -z-10" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
+      <section id="learn-more" className="page-shell mt-16 sm:mt-20">
+        <SectionReveal className="pt-12">
+          <div className="grid gap-12 lg:grid-cols-[0.42fr_1fr] lg:items-center">
+            <div className="max-w-sm">
+              <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+                Parse receipt
+              </p>
+              <h3 className="mt-4 text-4xl leading-[0.92] text-[var(--foreground)] sm:text-5xl">
+                Turn receipt into clean line items.
+              </h3>
+              <p className="mt-5 max-w-xs text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
+                Pull totals, tax, tip, and items into a format ready for
+                assigning.
+              </p>
+            </div>
 
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-foreground mb-8 leading-[1.1] tracking-tight">
-            Ready to skip the math?
-          </h2>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 font-medium max-w-2xl mx-auto leading-relaxed">
-            Join thousands of friends saving time, money, and their group chats. The easiest way to split the bill is here.
-          </p>
-          <Link href="/signup" className="group/cta relative inline-flex w-full sm:w-auto">
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 translate-x-2 translate-y-2 rounded-full bg-foreground"
-            />
-            <Button
-              size="lg"
-              className="relative z-10 h-20 w-full rounded-full border-4 border-foreground !bg-primary px-10 text-xl font-black !text-primary-foreground transition-all hover:translate-x-1 hover:translate-y-1 hover:!bg-primary/90 active:!bg-primary/90 md:px-16 md:text-2xl sm:w-auto"
-            >
-              Try CheckSplit now
-              <span className="arrow-nudge gpu-loop inline-flex">
-                <ArrowRight className="ml-4 w-6 h-6 md:w-8 md:h-8 stroke-[3]" />
-              </span>
-            </Button>
-          </Link>
-        </div>
-      </motion.section>
+            <ParseReceiptFigure />
+          </div>
+        </SectionReveal>
+      </section>
 
+      <section className="page-shell mt-32 lg:mt-40">
+        <SectionReveal className="pt-12">
+          <div className="grid gap-12 lg:grid-cols-[1fr_0.42fr] lg:items-center">
+            <div className="order-1 max-w-sm lg:order-2">
+              <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+                Make groups
+              </p>
+              <h3 className="mt-4 text-4xl leading-[0.92] text-[var(--foreground)] sm:text-5xl">
+                Split items by the people sharing them.
+              </h3>
+              <p className="mt-5 max-w-xs text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
+                Build groups for couples, friends, or a whole table before
+                saving final split.
+              </p>
+            </div>
+
+            <div className="order-2 lg:order-1">
+              <MakeGroupsFigure />
+            </div>
+          </div>
+        </SectionReveal>
+      </section>
+
+      <section className="page-shell mt-32 lg:mt-40">
+        <SectionReveal className="pt-12">
+          <div className="grid gap-12 lg:grid-cols-[0.42fr_1fr] lg:items-center">
+            <div className="max-w-sm">
+              <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+                Saved splits
+              </p>
+              <h3 className="mt-4 text-4xl leading-[0.92] text-[var(--foreground)] sm:text-5xl">
+                Keep every split in one place.
+              </h3>
+              <p className="mt-5 max-w-xs text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
+                Reopen unpaid receipts, check what is already settled, and keep
+                split totals readable.
+              </p>
+            </div>
+
+            <SavedSplitsFigure />
+          </div>
+        </SectionReveal>
+      </section>
+
+      <section className="page-shell mt-44 pb-16 sm:mt-52 sm:pb-24 lg:mt-60">
+        <SectionReveal className="py-16 sm:py-20">
+          <div className="flex flex-col items-center text-center">
+            <div className="max-w-3xl">
+              <h2 className="mt-4 text-4xl leading-[0.92] text-[var(--foreground)] sm:text-5xl lg:text-6xl">
+                Ready to skip the math?
+              </h2>
+            </div>
+            <div className="mt-8 flex justify-center">
+              <Link href="/signup">
+                <Button className="h-12 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90">
+                  Get started now
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </SectionReveal>
+      </section>
     </main>
   );
 }

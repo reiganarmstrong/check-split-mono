@@ -178,7 +178,7 @@ export async function signUpWithCredentials(
       case "DONE":
         return {
           status: "done",
-          message: "Account created successfully. You can sign in now.",
+          message: "Account created successfully. You can log in now.",
         }
       case "CONFIRM_SIGN_UP":
         return {
@@ -215,7 +215,7 @@ export async function confirmSignupWithCode(
       )
     }
 
-    return "Email verified. You can sign in now."
+    return "Email verified. You can log in now."
   } catch (error) {
     throw toAuthError(error)
   }
