@@ -903,9 +903,8 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
     setWarningMessage(null);
 
     try {
-      const summaryImageFile = await renderReceiptSummaryJpegFile(
-        summaryShareData,
-      );
+      const summaryImageFile =
+        await renderReceiptSummaryJpegFile(summaryShareData);
       const isSecureShareContext =
         typeof window !== "undefined" && window.isSecureContext;
       const supportsNativeShare = typeof navigator.share === "function";
@@ -1242,7 +1241,7 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
                   title="Split groups"
                   eyebrow="Participants"
                   icon={Users}
-                  tone="secondary"
+                  tone="primary"
                 >
                   <p className="mb-4 text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
                     Name each group
@@ -1347,7 +1346,7 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
                       >
                         <div className="flex flex-wrap items-center justify-between gap-3">
                           <div className="inline-flex items-center gap-2">
-                            <div className="rounded-full border border-[var(--line)] bg-[color-mix(in_oklab,var(--primary)_14%,transparent)] px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+                            <div className="rounded-full border border-[var(--line)] bg-[color-mix(in_oklab,var(--secondary)_14%,transparent)] px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
                               Item {index + 1}
                             </div>
                             <span className="text-sm font-medium text-[var(--muted-foreground)]">
@@ -1761,7 +1760,9 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
                                       </p>
                                       <p className="mt-1 text-xs text-[var(--muted-foreground)]">
                                         {detail.ratioLabel} share of{" "}
-                                        {formatCurrency(detail.lineSubtotalCents)}
+                                        {formatCurrency(
+                                          detail.lineSubtotalCents,
+                                        )}
                                       </p>
                                     </div>
                                     <p className="text-sm font-medium text-[var(--foreground)]">
@@ -1808,7 +1809,9 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
           <div
             className={cn(
               "page-shell topbar-surface flex max-w-7xl rounded-[1.4rem] px-4 md:flex-row md:items-center md:justify-between",
-              isCompactActionBar ? "flex-col gap-2 py-3" : "flex-col gap-3 py-4",
+              isCompactActionBar
+                ? "flex-col gap-2 py-3"
+                : "flex-col gap-3 py-4",
             )}
           >
             <div
@@ -1866,22 +1869,23 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
                   ? "Delete will permanently remove this saved receipt, its line items, and its split groups."
                   : validation.canSave
                     ? `Save ${savePlan.saveParticipantCount} groups, ${savePlan.saveItemCount} items, ${savePlan.setAllocationCount} allocations.`
-                    : (validation.issues[0] ?? "Finish required fields to save.")}
+                    : (validation.issues[0] ??
+                      "Finish required fields to save.")}
               </p>
             </div>
 
             {isMobileViewport ? (
               <motion.div
-              initial={false}
-              animate={
-                isMinimizedMobileActionBar
-                  ? { maxHeight: 0, opacity: 0, y: 8 }
-                  : { maxHeight: actionBarActionsHeight, opacity: 1, y: 0 }
-              }
-              transition={{
-                duration: isMinimizedMobileActionBar ? 0.22 : 0.28,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+                initial={false}
+                animate={
+                  isMinimizedMobileActionBar
+                    ? { maxHeight: 0, opacity: 0, y: 8 }
+                    : { maxHeight: actionBarActionsHeight, opacity: 1, y: 0 }
+                }
+                transition={{
+                  duration: isMinimizedMobileActionBar ? 0.22 : 0.28,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
                 className={cn(
                   "w-full overflow-hidden",
                   isMinimizedMobileActionBar && "pointer-events-none",
@@ -1913,39 +1917,39 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
                     Total {formatCurrency(totalCents)}
                   </span>
                   <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
-                    isCompactActionBar &&
-                      "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
-                  )}
-                  onClick={scrollToSummary}
-                >
-                  Jump to summary
-                </Button>
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
+                      isCompactActionBar &&
+                        "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
+                    )}
+                    onClick={scrollToSummary}
+                  >
+                    Jump to summary
+                  </Button>
                   <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
-                    isCompactActionBar &&
-                      "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
-                  )}
-                  onClick={() => void handleShareSummary()}
-                  disabled={isSharingSummary}
-                >
-                  {isSharingSummary ? (
-                    <LoaderCircle className="h-4 w-4 animate-spin shrink-0" />
-                  ) : (
-                    <Share2 className="h-4 w-4 shrink-0" />
-                  )}
-                  <span className="whitespace-nowrap text-center">
-                    {isSharingSummary ? "Exporting" : "Share receipt"}
-                  </span>
-                </Button>
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
+                      isCompactActionBar &&
+                        "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
+                    )}
+                    onClick={() => void handleShareSummary()}
+                    disabled={isSharingSummary}
+                  >
+                    {isSharingSummary ? (
+                      <LoaderCircle className="h-4 w-4 animate-spin shrink-0" />
+                    ) : (
+                      <Share2 className="h-4 w-4 shrink-0" />
+                    )}
+                    <span className="whitespace-nowrap text-center">
+                      {isSharingSummary ? "Exporting" : "Share receipt"}
+                    </span>
+                  </Button>
                   {hasSavedReceipt ? (
                     <>
                       {isDeleteConfirming ? (
@@ -1992,16 +1996,16 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
                     </>
                   ) : null}
                   <Button
-                type="button"
-                onClick={() => void handleSave()}
-                disabled={
-                    !validation.canSave || !isDirty || isSaving || isDeleting
-                  }
-                  className={cn(
-                    "h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
-                    isCompactActionBar &&
-                      "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
-                  )}
+                    type="button"
+                    onClick={() => void handleSave()}
+                    disabled={
+                      !validation.canSave || !isDirty || isSaving || isDeleting
+                    }
+                    className={cn(
+                      "h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
+                      isCompactActionBar &&
+                        "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
+                    )}
                   >
                     {isSaving ? (
                       <>
@@ -2019,125 +2023,127 @@ export function ReceiptWorkspace({ receiptId }: { receiptId?: string }) {
               </motion.div>
             ) : (
               <div
-              className={cn(
-                "flex items-center gap-3",
-                isCompactActionBar ? "w-full flex-wrap" : "flex-wrap",
-              )}
-              >
-              <span
                 className={cn(
-                  "rounded-full border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted-foreground)]",
-                  isCompactActionBar && "hidden",
+                  "flex items-center gap-3",
+                  isCompactActionBar ? "w-full flex-wrap" : "flex-wrap",
                 )}
               >
-                Total {formatCurrency(totalCents)}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
-                  isCompactActionBar &&
-                    "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
-                )}
-                onClick={scrollToSummary}
-              >
-                Jump to summary
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "h-10 min-w-40 justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
-                  isCompactActionBar &&
-                    "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
-                )}
-                onClick={() => void handleShareSummary()}
-                disabled={isSharingSummary}
-              >
-                {isSharingSummary ? (
-                  <LoaderCircle className="h-4 w-4 animate-spin shrink-0" />
-                ) : (
-                  <Share2 className="h-4 w-4 shrink-0" />
-                )}
-                <span className="whitespace-nowrap text-center">
-                  {isSharingSummary ? "Exporting" : "Share receipt"}
+                <span
+                  className={cn(
+                    "rounded-full border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted-foreground)]",
+                    isCompactActionBar && "hidden",
+                  )}
+                >
+                  Total {formatCurrency(totalCents)}
                 </span>
-              </Button>
-              {warningMessage && !isCompactActionBar ? (
-                <span className="rounded-full border border-[var(--line)] bg-[color-mix(in_oklab,var(--accent)_22%,transparent)] px-4 py-2 text-sm font-medium text-[var(--foreground)]">
-                  Review latest version before saving again
-                </span>
-              ) : null}
-              {hasSavedReceipt ? (
-                <>
-                  {isDeleteConfirming ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
+                    isCompactActionBar &&
+                      "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
+                  )}
+                  onClick={scrollToSummary}
+                >
+                  Jump to summary
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-10 min-w-40 justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
+                    isCompactActionBar &&
+                      "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
+                  )}
+                  onClick={() => void handleShareSummary()}
+                  disabled={isSharingSummary}
+                >
+                  {isSharingSummary ? (
+                    <LoaderCircle className="h-4 w-4 animate-spin shrink-0" />
+                  ) : (
+                    <Share2 className="h-4 w-4 shrink-0" />
+                  )}
+                  <span className="whitespace-nowrap text-center">
+                    {isSharingSummary ? "Exporting" : "Share receipt"}
+                  </span>
+                </Button>
+                {warningMessage && !isCompactActionBar ? (
+                  <span className="rounded-full border border-[var(--line)] bg-[color-mix(in_oklab,var(--accent)_22%,transparent)] px-4 py-2 text-sm font-medium text-[var(--foreground)]">
+                    Review latest version before saving again
+                  </span>
+                ) : null}
+                {hasSavedReceipt ? (
+                  <>
+                    {isDeleteConfirming ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className={cn(
+                          "h-11 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)]",
+                          isCompactActionBar &&
+                            "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
+                        )}
+                        onClick={() => setIsDeleteConfirming(false)}
+                        disabled={isDeleting}
+                      >
+                        Keep receipt
+                      </Button>
+                    ) : null}
                     <Button
                       type="button"
-                      variant="outline"
-                      size="sm"
+                      onClick={() => void handleDelete()}
+                      disabled={isSaving || isDeleting}
                       className={cn(
-                        "h-11 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)]",
+                        "h-11 rounded-full px-5 text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50",
                         isCompactActionBar &&
-                          "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
+                          "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
+                        isDeleteConfirming
+                          ? "bg-[#ff0000] text-[#fff8f6] hover:bg-[#cc0000] active:bg-[#cc0000]"
+                          : "bg-[#ff0000] text-[#fff8f6] hover:bg-[#cc0000] active:bg-[#cc0000]",
                       )}
-                      onClick={() => setIsDeleteConfirming(false)}
-                      disabled={isDeleting}
                     >
-                      Keep receipt
+                      {isDeleting ? (
+                        <>
+                          <LoaderCircle className="h-4 w-4 animate-spin" />
+                          Deleting
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="h-4 w-4" />
+                          {isDeleteConfirming
+                            ? "Confirm delete"
+                            : "Delete receipt"}
+                        </>
+                      )}
                     </Button>
-                  ) : null}
-                  <Button
-                    type="button"
-                    onClick={() => void handleDelete()}
-                    disabled={isSaving || isDeleting}
-                    className={cn(
-                      "h-11 rounded-full px-5 text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50",
-                      isCompactActionBar &&
-                        "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
-                      isDeleteConfirming
-                        ? "bg-[#ff0000] text-[#fff8f6] hover:bg-[#cc0000] active:bg-[#cc0000]"
-                        : "bg-[#ff0000] text-[#fff8f6] hover:bg-[#cc0000] active:bg-[#cc0000]",
-                    )}
-                  >
-                    {isDeleting ? (
-                      <>
-                        <LoaderCircle className="h-4 w-4 animate-spin" />
-                        Deleting
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 className="h-4 w-4" />
-                        {isDeleteConfirming ? "Confirm delete" : "Delete receipt"}
-                      </>
-                    )}
-                  </Button>
-                </>
-              ) : null}
-              <Button
-                type="button"
-                onClick={() => void handleSave()}
-                disabled={
-                  !validation.canSave || !isDirty || isSaving || isDeleting
-                }
-              className={cn(
-                "h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
-                isCompactActionBar &&
-                  "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
-              )}
-              >
-                {isSaving ? (
-                  <>
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                    {isCompactActionBar ? "Saving" : "Saving"}
                   </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    {isCompactActionBar ? "Save" : "Save receipt"}
-                  </>
+                ) : null}
+                <Button
+                  type="button"
+                  onClick={() => void handleSave()}
+                  disabled={
+                    !validation.canSave || !isDirty || isSaving || isDeleting
+                  }
+                  className={cn(
+                    "h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
+                    isCompactActionBar &&
+                      "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
+                  )}
+                >
+                  {isSaving ? (
+                    <>
+                      <LoaderCircle className="h-4 w-4 animate-spin" />
+                      {isCompactActionBar ? "Saving" : "Saving"}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      {isCompactActionBar ? "Save" : "Save receipt"}
+                    </>
                   )}
                 </Button>
               </div>
