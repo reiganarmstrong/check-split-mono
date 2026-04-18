@@ -567,20 +567,24 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        <motion.a
-          href="#learn-more"
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
-          animate={{ y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.4 }}
-          style={{ opacity: learnMoreOpacity }}
-          className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)] lg:flex"
+          className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 lg:flex"
         >
-          <span>Learn more</span>
-          <span className="flex flex-col items-center justify-center leading-none">
-            <ChevronDown className="h-4 w-4" />
-            <ChevronDown className="-mt-2 h-4 w-4" />
-          </span>
-        </motion.a>
+          <motion.a
+            href="#learn-more"
+            style={{ opacity: learnMoreOpacity }}
+            className="flex flex-col items-center gap-1 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)]"
+          >
+            <span>Learn more</span>
+            <span className="flex flex-col items-center justify-center leading-none">
+              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="-mt-2 h-4 w-4" />
+            </span>
+          </motion.a>
+        </motion.div>
       </section>
 
       <section id="learn-more" className="page-shell mt-16 sm:mt-20">

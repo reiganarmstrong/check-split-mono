@@ -173,8 +173,9 @@ export function Navbar() {
 
   return (
     <motion.header
+      initial={{ y: -24, opacity: 0 }}
       animate={{ y: isNavVisible ? 0 : -120, opacity: isNavVisible ? 1 : 0.92 }}
-      transition={{ duration: 0.22, ease: "easeOut" }}
+      transition={{ duration: 0.28, ease: "easeOut" }}
       className="sticky top-0 z-50 px-3 py-4 sm:px-6 lg:px-12"
     >
       <div className="mx-auto w-full max-w-[86rem]">
