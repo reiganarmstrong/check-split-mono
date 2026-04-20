@@ -33,11 +33,9 @@ variable "gemini_model_id" {
   default     = "gemini-3.1-flash-lite-preview"
 }
 
-variable "receipt_parse_allowed_origin" {
-  description = "Optional browser origin allowed to call the receipt parsing HTTP API."
-  type        = string
-  default     = null
-  nullable    = true
+variable "receipt_parse_allowed_origins" {
+  description = "Optional browser origins allowed to call the receipt parsing HTTP API."
+  type        = list(string)
 }
 
 variable "receipt_parse_max_upload_bytes" {

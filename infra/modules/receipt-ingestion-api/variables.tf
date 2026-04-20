@@ -41,9 +41,9 @@ variable "lambda_timeout_seconds" {
   default     = 30
 }
 
-variable "receipt_parse_allowed_origin" {
-  description = "Browser origin allowed to call the receipt parsing HTTP API."
-  type        = string
+variable "receipt_parse_allowed_origins" {
+  description = "Browser origins allowed to call the receipt parsing HTTP API."
+  type        = list(string)
 }
 
 variable "receipt_parse_max_upload_bytes" {

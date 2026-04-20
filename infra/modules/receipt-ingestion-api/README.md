@@ -56,7 +56,10 @@ module "receipt-ingestion-api" {
   environment                       = var.environment
   gemini_api_key_ssm_parameter_name = "/checksplit/dev/gemini/api-key"
   gemini_model_id                   = "gemini-3.1-flash-lite-preview"
-  receipt_parse_allowed_origin      = "https://dev.example.com"
+  receipt_parse_allowed_origins     = [
+    "http://localhost:3000",
+    "https://dev.example.com",
+  ]
   receipt_parse_max_upload_bytes    = 4194304
 }
 ```
@@ -73,7 +76,7 @@ module "receipt-ingestion-api" {
 | `gemini_model_id` | `string` | Gemini direct API model ID used for receipt parsing. |
 | `lambda_memory_size` | `number` | Memory size, in MB, for the receipt parsing Lambda. |
 | `lambda_timeout_seconds` | `number` | Lambda timeout, in seconds, for receipt parsing requests. |
-| `receipt_parse_allowed_origin` | `string` | Browser origin allowed to call the receipt parsing HTTP API. |
+| `receipt_parse_allowed_origins` | `list(string)` | Browser origins allowed to call the receipt parsing HTTP API. |
 | `receipt_parse_max_upload_bytes` | `number` | Maximum raw image upload size accepted by the API. |
 
 ## Outputs
@@ -87,5 +90,6 @@ module "receipt-ingestion-api" {
 ## Notes
 
 - This module intentionally does not create the Gemini API key parameter.
-- The Lambda source lives under `lambda/` and is expected to be built locally into `lambda/package` before deployment so the archive includes `dist/` plus runtime dependencies from `node_modules/`.
+- The Lambda source lives under `lambda/` and is expected to be built with `pnpm install --frozen-lockfile` and `pnpm run build` so `lambda/package` contains `dist/` plus runtime dependencies from `node_modules/`.
+- The Terraform CI workflows build the Lambda package before running `terraform plan` or `terraform apply`.
 - The API does not expose a Lambda Function URL.

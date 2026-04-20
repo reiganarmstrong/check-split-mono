@@ -51,7 +51,7 @@ resource "aws_apigatewayv2_api" "this" {
       "OPTIONS",
       "POST",
     ]
-    allow_origins = [var.receipt_parse_allowed_origin]
+    allow_origins = var.receipt_parse_allowed_origins
     max_age       = 300
   }
 }
@@ -123,7 +123,7 @@ resource "aws_lambda_function" "this" {
       GEMINI_API_KEY_PARAMETER_NAME = var.gemini_api_key_ssm_parameter_name
       GEMINI_MODEL_ID               = var.gemini_model_id
       MAX_UPLOAD_BYTES              = tostring(var.receipt_parse_max_upload_bytes)
-      RECEIPT_PARSE_ALLOWED_ORIGIN  = var.receipt_parse_allowed_origin
+      RECEIPT_PARSE_ALLOWED_ORIGINS = jsonencode(var.receipt_parse_allowed_origins)
     }
   }
 

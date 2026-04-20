@@ -1,11 +1,3 @@
-locals {
-  environment_domain_prefix       = var.environment == "prod" ? "" : "${var.environment}."
-  app_subdomain                   = "${local.environment_domain_prefix}${var.subdomain}"
-  auth_subdomain                  = "auth.${local.app_subdomain}"
-  cognito_user_pool_resource_name = "checksplit_user_pool_${var.environment}"
-  application_name                = "checksplit"
-}
-
 module "certificates" {
   source             = "../../modules/certificates"
   environment        = var.environment
@@ -51,6 +43,6 @@ module "receipt-ingestion-api" {
   environment                       = var.environment
   gemini_api_key_ssm_parameter_name = var.gemini_api_key_ssm_parameter_name
   gemini_model_id                   = var.gemini_model_id
-  receipt_parse_allowed_origin      = coalesce(var.receipt_parse_allowed_origin, "https://${local.app_subdomain}")
+  receipt_parse_allowed_origins     = var.receipt_parse_allowed_origins
   receipt_parse_max_upload_bytes    = var.receipt_parse_max_upload_bytes
 }

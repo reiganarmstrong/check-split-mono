@@ -52,6 +52,26 @@ jobs:
         with:
           terraform_version: "1.14.7"
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: ^10.32.1
+
+      - name: Install correct node version
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "pnpm"
+          cache-dependency-path: infra/modules/receipt-ingestion-api/lambda/pnpm-lock.yaml
+
+      - name: Install receipt-ingestion-api Lambda dependencies
+        working-directory: ./infra/modules/receipt-ingestion-api/lambda
+        run: pnpm install --frozen-lockfile
+
+      - name: Build receipt-ingestion-api Lambda package
+        working-directory: ./infra/modules/receipt-ingestion-api/lambda
+        run: pnpm run build
+
       - name: Terraform Init
         run: terraform init -input=false -backend-config=backend.hcl > /dev/null 2>&1
 

@@ -61,22 +61,59 @@ function getEnv(name: string, fallback?: string) {
   return process.env[name] ?? fallback
 }
 
-function getAllowedOrigin() {
-  return getEnv("RECEIPT_PARSE_ALLOWED_ORIGIN", DEFAULT_ALLOWED_ORIGIN) ?? DEFAULT_ALLOWED_ORIGIN
+function getAllowedOrigins() {
+  const serializedOrigins = getEnv("RECEIPT_PARSE_ALLOWED_ORIGINS")
+
+  if (!serializedOrigins) {
+    return [DEFAULT_ALLOWED_ORIGIN]
+  }
+
+  try {
+    const parsedOrigins = JSON.parse(serializedOrigins) as unknown
+
+    if (Array.isArray(parsedOrigins)) {
+      const validOrigins = parsedOrigins.filter((origin): origin is string => {
+        return typeof origin === "string" && origin.trim().length > 0
+      })
+
+      if (validOrigins.length > 0) {
+        return validOrigins
+      }
+    }
+  } catch {
+    // Fall through to the wildcard default.
+  }
+
+  return [DEFAULT_ALLOWED_ORIGIN]
 }
 
-function getResponseHeaders() {
+function getAllowedOriginForRequest(event: ApiGatewayEvent) {
+  const requestOrigin = getHeaderValue(event.headers, "origin")
+  const allowedOrigins = getAllowedOrigins()
+
+  if (allowedOrigins.includes(DEFAULT_ALLOWED_ORIGIN)) {
+    return DEFAULT_ALLOWED_ORIGIN
+  }
+
+  if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    return requestOrigin
+  }
+
+  return allowedOrigins[0] ?? DEFAULT_ALLOWED_ORIGIN
+}
+
+function getResponseHeaders(event: ApiGatewayEvent) {
   return {
-    "access-control-allow-origin": getAllowedOrigin(),
+    "access-control-allow-origin": getAllowedOriginForRequest(event),
     "content-type": "application/json",
     vary: "Origin",
   }
 }
 
-function jsonResponse(statusCode: number, payload: unknown): ApiGatewayResponse {
+function jsonResponse(event: ApiGatewayEvent, statusCode: number, payload: unknown): ApiGatewayResponse {
   return {
     body: JSON.stringify(payload),
-    headers: getResponseHeaders(),
+    headers: getResponseHeaders(event),
     statusCode,
   }
 }
@@ -270,7 +307,7 @@ export async function handler(event: ApiGatewayEvent): Promise<ApiGatewayRespons
     const mimeType = getMimeType(event)
 
     if (mimeType !== "image/jpeg" && mimeType !== "image/png") {
-      return jsonResponse(415, {
+      return jsonResponse(event, 415, {
         message: "Only image/jpeg and image/png requests are supported.",
       })
     }
@@ -278,7 +315,7 @@ export async function handler(event: ApiGatewayEvent): Promise<ApiGatewayRespons
     const body = decodeRequestBody(event)
 
     if (body.length > getMaxUploadBytes()) {
-      return jsonResponse(413, {
+      return jsonResponse(event, 413, {
         message: "Uploaded image exceeds the configured maximum size.",
       })
     }
@@ -287,31 +324,31 @@ export async function handler(event: ApiGatewayEvent): Promise<ApiGatewayRespons
     const modelId = getEnv("GEMINI_MODEL_ID", DEFAULT_MODEL_ID) ?? DEFAULT_MODEL_ID
     const response = await callGemini(apiKey, mimeType, modelId, body)
 
-    return jsonResponse(200, response)
+    return jsonResponse(event, 200, response)
   } catch (error) {
     if (error instanceof Error) {
       if (error.message.includes("Only Cognito access tokens")) {
-        return jsonResponse(401, { message: error.message })
+        return jsonResponse(event, 401, { message: error.message })
       }
 
       if (error.message.includes("Request body is required")) {
-        return jsonResponse(400, { message: error.message })
+        return jsonResponse(event, 400, { message: error.message })
       }
 
       if (error.name === "AbortError") {
-        return jsonResponse(504, { message: "Gemini request timed out." })
+        return jsonResponse(event, 504, { message: "Gemini request timed out." })
       }
 
       if (error.message.startsWith("Gemini returned an empty draft")) {
-        return jsonResponse(422, { message: error.message })
+        return jsonResponse(event, 422, { message: error.message })
       }
 
       if (error.message.startsWith("Gemini")) {
-        return jsonResponse(502, { message: error.message })
+        return jsonResponse(event, 502, { message: error.message })
       }
     }
 
-    return jsonResponse(502, {
+    return jsonResponse(event, 502, {
       message: "Receipt parsing failed unexpectedly.",
     })
   }
