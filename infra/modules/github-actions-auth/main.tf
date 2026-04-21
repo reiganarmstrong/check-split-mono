@@ -350,8 +350,10 @@ data "aws_iam_policy_document" "github_actions_receipt_ingestion_permissions" {
       "lambda:CreateFunction",
       "lambda:DeleteFunction",
       "lambda:GetFunction",
+      "lambda:GetFunctionCodeSigningConfig",
       "lambda:GetFunctionConfiguration",
       "lambda:GetPolicy",
+      "lambda:ListVersionsByFunction",
       "lambda:ListTags",
       "lambda:RemovePermission",
       "lambda:TagResource",
@@ -407,6 +409,7 @@ data "aws_iam_policy_document" "github_actions_receipt_ingestion_permissions" {
     actions = [
       "logs:CreateLogGroup",
       "logs:DeleteLogGroup",
+      "logs:ListTagsForResource",
       "logs:PutRetentionPolicy",
       "logs:TagResource",
       "logs:UntagResource"
