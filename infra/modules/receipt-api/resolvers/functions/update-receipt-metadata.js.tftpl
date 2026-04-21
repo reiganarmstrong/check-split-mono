@@ -12,7 +12,6 @@ const updatableFieldMap = {
   locationName: 'location_name',
   merchantName: 'merchant_name',
   receiptOccurredAt: 'receipt_occurred_at',
-  status: 'status',
   subtotalCents: 'subtotal_cents',
   taxCents: 'tax_cents',
   tipCents: 'tip_cents',
@@ -108,7 +107,6 @@ export function response(ctx) {
     itemCount: null,
     participantCount: null,
     receiptId: input.receiptId,
-    status: input.status ?? null,
     updatedAt: util.time.nowISO8601(),
     version: input.expectedVersion + 1,
   };

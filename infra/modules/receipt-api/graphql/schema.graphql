@@ -3,12 +3,6 @@ enum AllocationPolicy {
   PROPORTIONAL
 }
 
-enum ReceiptStatus {
-  DRAFT
-  OPEN
-  FINALIZED
-}
-
 type Query {
   getReceipt(receiptId: ID!): Receipt
   listReceipts(limit: Int, nextToken: String): ReceiptConnection!
@@ -18,7 +12,6 @@ type Mutation {
   addParticipant(input: AddParticipantInput!): ParticipantMutationResult!
   createReceipt(input: CreateReceiptInput!): Receipt!
   deleteReceipt(input: DeleteReceiptInput!): ReceiptMutationResult!
-  finalizeReceipt(input: FinalizeReceiptInput!): ReceiptMutationResult!
   removeParticipant(input: RemoveParticipantInput!): ParticipantMutationResult!
   removeReceiptItem(input: RemoveReceiptItemInput!): ItemMutationResult!
   setItemAllocations(input: SetItemAllocationsInput!): AllocationMutationResult!
@@ -48,7 +41,6 @@ input CreateReceiptInput {
   locationName: String
   merchantName: String!
   receiptOccurredAt: AWSDateTime!
-  status: ReceiptStatus
   subtotalCents: Int!
   taxCents: Int!
   tipCents: Int!
@@ -58,12 +50,6 @@ input CreateReceiptInput {
 input DeleteReceiptInput {
   expectedVersion: Int!
   receiptId: ID!
-}
-
-input FinalizeReceiptInput {
-  expectedVersion: Int!
-  receiptId: ID!
-  status: ReceiptStatus!
 }
 
 input ReceiptItemAllocationInput {
@@ -114,7 +100,6 @@ input UpdateReceiptMetadataInput {
   merchantName: String
   receiptId: ID!
   receiptOccurredAt: AWSDateTime
-  status: ReceiptStatus
   subtotalCents: Int
   taxCents: Int
   tipCents: Int
@@ -179,7 +164,6 @@ type Receipt {
   participants: [ReceiptParticipant!]!
   receiptId: ID!
   receiptOccurredAt: AWSDateTime!
-  status: ReceiptStatus!
   subtotalCents: Int!
   taxCents: Int!
   tipCents: Int!
@@ -223,7 +207,6 @@ type ReceiptListItem {
   participantCount: Int!
   receiptId: ID!
   receiptOccurredAt: AWSDateTime!
-  status: ReceiptStatus!
   totalCents: Int!
   updatedAt: AWSDateTime!
 }
@@ -232,7 +215,6 @@ type ReceiptMutationResult {
   itemCount: Int
   participantCount: Int
   receiptId: ID!
-  status: ReceiptStatus
   updatedAt: AWSDateTime!
   version: Int!
 }

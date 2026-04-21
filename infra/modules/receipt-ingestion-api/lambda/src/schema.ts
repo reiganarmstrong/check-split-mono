@@ -1,5 +1,4 @@
 export type AllocationPolicy = "EVEN"
-export type ReceiptStatus = "DRAFT"
 
 export type CreateReceiptInputDraft = {
   allocationPolicy: AllocationPolicy
@@ -13,7 +12,6 @@ export type CreateReceiptInputDraft = {
   locationName: string | null
   merchantName: string | null
   receiptOccurredAt: string | null
-  status: ReceiptStatus
   subtotalCents: number | null
   taxCents: number | null
   tipCents: number | null
@@ -100,11 +98,6 @@ export const receiptDraftResponseJsonSchema = {
           format: "date-time",
           type: ["string", "null"],
         },
-        status: {
-          description: "Always DRAFT for this workflow.",
-          enum: ["DRAFT"],
-          type: "string",
-        },
         subtotalCents: {
           description: "Subtotal in integer cents.",
           type: ["integer", "null"],
@@ -134,7 +127,6 @@ export const receiptDraftResponseJsonSchema = {
         "locationName",
         "merchantName",
         "receiptOccurredAt",
-        "status",
         "subtotalCents",
         "taxCents",
         "tipCents",

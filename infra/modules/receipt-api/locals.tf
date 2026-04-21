@@ -38,10 +38,6 @@ locals {
       name = "deleteReceipt"
       path = "${local.resolver_path}/functions/delete-receipt.js.tftpl"
     }
-    finalize_receipt = {
-      name = "finalizeReceipt"
-      path = "${local.resolver_path}/functions/finalize-receipt.js.tftpl"
-    }
     get_receipt = {
       name = "getReceipt"
       path = "${local.resolver_path}/functions/get-receipt.js.tftpl"
@@ -90,11 +86,6 @@ locals {
     delete_receipt = {
       field     = "deleteReceipt"
       functions = ["delete_receipt"]
-      type      = "Mutation"
-    }
-    finalize_receipt = {
-      field     = "finalizeReceipt"
-      functions = ["finalize_receipt"]
       type      = "Mutation"
     }
     get_receipt = {
