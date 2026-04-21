@@ -14,19 +14,59 @@ function receiptPk(receiptId) {
   return 'RECEIPT#' + receiptId;
 }
 
+function requireExistingParticipant(ctx) {
+  const participant = ctx.stash.existingParticipant ?? null;
+
+  if (!participant) {
+    util.error('Participant not found', 'NotFound');
+  }
+
+  return participant;
+}
+
 export function request(ctx) {
   const input = ctx.args.input;
   const userSub = requireUserSub(ctx);
   const now = util.time.nowISO8601();
+  const existingParticipant = requireExistingParticipant(ctx);
+  const previousIsPaid = existingParticipant.is_paid === true;
+  const isPaid = Object.hasOwn(input, 'isPaid') ? input.isPaid === true : previousIsPaid;
+  const paidCountChanged = previousIsPaid !== isPaid;
+  const paidAt = isPaid
+    ? (previousIsPaid ? (existingParticipant.paid_at ?? now) : now)
+    : null;
+  const receiptUpdateSetClauses = [
+    '#updated_at = :updated_at',
+    '#version = :version',
+  ];
+  const receiptUpdateExpressionNames = {
+    '#updated_at': 'updated_at',
+    '#version': 'version',
+  };
+  const receiptUpdateExpressionValues = {
+    ':updated_at': now,
+    ':version': input.expectedVersion + 1,
+  };
 
   ctx.stash.participant = {
-    createdAt: null,
+    createdAt: existingParticipant.created_at ?? null,
     displayName: input.displayName,
+    isPaid,
     notes: input.notes ?? null,
+    paidAt,
     participantId: input.participantId,
     sortOrder: input.sortOrder ?? null,
     updatedAt: now,
   };
+
+  if (paidCountChanged) {
+    receiptUpdateSetClauses.unshift(
+      '#paid_participant_count = if_not_exists(#paid_participant_count, :zero) + :paid_delta',
+    );
+    receiptUpdateExpressionNames['#paid_participant_count'] = 'paid_participant_count';
+    receiptUpdateExpressionValues[':paid_delta'] = isPaid ? 1 : -1;
+    receiptUpdateExpressionValues[':zero'] = 0;
+  }
 
   return {
     operation: 'TransactWriteItems',
@@ -46,16 +86,20 @@ export function request(ctx) {
         operation: 'UpdateItem',
         table: '${table_name}',
         update: {
-          expression: 'SET #display_name = :display_name, #notes = :notes, #sort_order = :sort_order, #updated_at = :updated_at',
+          expression: 'SET #display_name = :display_name, #is_paid = :is_paid, #notes = :notes, #paid_at = :paid_at, #sort_order = :sort_order, #updated_at = :updated_at',
           expressionNames: {
             '#display_name': 'display_name',
+            '#is_paid': 'is_paid',
             '#notes': 'notes',
+            '#paid_at': 'paid_at',
             '#sort_order': 'sort_order',
             '#updated_at': 'updated_at',
           },
           expressionValues: util.dynamodb.toMapValues({
             ':display_name': input.displayName,
+            ':is_paid': isPaid,
             ':notes': input.notes ?? null,
+            ':paid_at': paidAt,
             ':sort_order': input.sortOrder ?? null,
             ':updated_at': now,
           }),
@@ -80,15 +124,9 @@ export function request(ctx) {
         operation: 'UpdateItem',
         table: '${table_name}',
         update: {
-          expression: 'SET #updated_at = :updated_at, #version = :version',
-          expressionNames: {
-            '#updated_at': 'updated_at',
-            '#version': 'version',
-          },
-          expressionValues: util.dynamodb.toMapValues({
-            ':updated_at': now,
-            ':version': input.expectedVersion + 1,
-          }),
+          expression: 'SET ' + receiptUpdateSetClauses.join(', '),
+          expressionNames: receiptUpdateExpressionNames,
+          expressionValues: util.dynamodb.toMapValues(receiptUpdateExpressionValues),
         },
       },
     ],

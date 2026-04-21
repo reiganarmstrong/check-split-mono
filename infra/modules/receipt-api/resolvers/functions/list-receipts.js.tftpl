@@ -35,16 +35,19 @@ export function response(ctx) {
     util.error(ctx.error.message, ctx.error.type, ctx.result);
   }
 
-  return {
-    items: (ctx.result.items ?? []).map((item) => ({
-      locationName: item.location_name ?? null,
-      merchantName: item.merchant_name,
-      receiptId: item.receipt_id,
-      receiptOccurredAt: item.receipt_occurred_at,
-      status: item.status,
-      totalCents: item.total_cents,
-      updatedAt: item.updated_at,
-    })),
-    nextToken: ctx.result.nextToken ?? null,
-  };
+  const items = ctx.result.items ?? [];
+
+  ctx.stash.listReceiptsNextToken = ctx.result.nextToken ?? null;
+  ctx.stash.listReceiptOrder = items.map((item) => item.receipt_id);
+  ctx.stash.receiptRootKeys = items.length > 0
+    ? items.map((item) => util.dynamodb.toMapValues({
+      pk: 'RECEIPT#' + item.receipt_id,
+      sk: 'RECEIPT',
+    }))
+    : [util.dynamodb.toMapValues({
+      pk: '__NO_RECEIPTS__',
+      sk: 'RECEIPT',
+    })];
+
+  return ctx.result;
 }

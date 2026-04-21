@@ -3,12 +3,6 @@ enum AllocationPolicy {
   PROPORTIONAL
 }
 
-enum ReceiptStatus {
-  DRAFT
-  OPEN
-  FINALIZED
-}
-
 type Query {
   getReceipt(receiptId: ID!): Receipt
   listReceipts(limit: Int, nextToken: String): ReceiptConnection!
@@ -18,7 +12,6 @@ type Mutation {
   addParticipant(input: AddParticipantInput!): ParticipantMutationResult!
   createReceipt(input: CreateReceiptInput!): Receipt!
   deleteReceipt(input: DeleteReceiptInput!): ReceiptMutationResult!
-  finalizeReceipt(input: FinalizeReceiptInput!): ReceiptMutationResult!
   removeParticipant(input: RemoveParticipantInput!): ParticipantMutationResult!
   removeReceiptItem(input: RemoveReceiptItemInput!): ItemMutationResult!
   setItemAllocations(input: SetItemAllocationsInput!): AllocationMutationResult!
@@ -29,6 +22,7 @@ type Mutation {
 
 input AddParticipantInput {
   expectedVersion: Int!
+  isPaid: Boolean
   notes: String
   receiptId: ID!
   sortOrder: Int
@@ -47,7 +41,6 @@ input CreateReceiptInput {
   locationName: String
   merchantName: String!
   receiptOccurredAt: AWSDateTime!
-  status: ReceiptStatus
   subtotalCents: Int!
   taxCents: Int!
   tipCents: Int!
@@ -57,12 +50,6 @@ input CreateReceiptInput {
 input DeleteReceiptInput {
   expectedVersion: Int!
   receiptId: ID!
-}
-
-input FinalizeReceiptInput {
-  expectedVersion: Int!
-  receiptId: ID!
-  status: ReceiptStatus!
 }
 
 input ReceiptItemAllocationInput {
@@ -91,6 +78,7 @@ input SetItemAllocationsInput {
 
 input UpdateParticipantInput {
   expectedVersion: Int!
+  isPaid: Boolean
   notes: String
   participantId: ID!
   receiptId: ID!
@@ -112,7 +100,6 @@ input UpdateReceiptMetadataInput {
   merchantName: String
   receiptId: ID!
   receiptOccurredAt: AWSDateTime
-  status: ReceiptStatus
   subtotalCents: Int
   taxCents: Int
   tipCents: Int
@@ -172,11 +159,11 @@ type Receipt {
   locationName: String
   merchantName: String!
   ownerUserId: ID!
+  paidParticipantCount: Int!
   participantCount: Int!
   participants: [ReceiptParticipant!]!
   receiptId: ID!
   receiptOccurredAt: AWSDateTime!
-  status: ReceiptStatus!
   subtotalCents: Int!
   taxCents: Int!
   tipCents: Int!
@@ -216,9 +203,10 @@ type ReceiptItemAllocation {
 type ReceiptListItem {
   locationName: String
   merchantName: String!
+  paidParticipantCount: Int!
+  participantCount: Int!
   receiptId: ID!
   receiptOccurredAt: AWSDateTime!
-  status: ReceiptStatus!
   totalCents: Int!
   updatedAt: AWSDateTime!
 }
@@ -227,7 +215,6 @@ type ReceiptMutationResult {
   itemCount: Int
   participantCount: Int
   receiptId: ID!
-  status: ReceiptStatus
   updatedAt: AWSDateTime!
   version: Int!
 }
@@ -235,7 +222,9 @@ type ReceiptMutationResult {
 type ReceiptParticipant {
   createdAt: AWSDateTime
   displayName: String!
+  isPaid: Boolean!
   notes: String
+  paidAt: AWSDateTime
   participantId: ID!
   sortOrder: Int
   updatedAt: AWSDateTime!

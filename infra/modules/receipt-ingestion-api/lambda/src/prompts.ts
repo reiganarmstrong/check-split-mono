@@ -5,7 +5,6 @@ Follow these rules exactly:
 - Be conservative. If a value is unclear, omit it or set it to null according to the schema and add a short explanation to issues.
 - Never invent merchant names, dates, addresses, taxes, tips, totals, quantities, discounts, fees, or line items.
 - Interpret all money values as integer cents.
-- status must always be DRAFT.
 - allocationPolicy must always be EVEN.
 - needsReview should be true whenever any important field is missing, uncertain, low-confidence, or inferred from partial text.
 - Exclude payment card numbers, auth codes, loyalty IDs, and other non-receipt metadata unless needed to understand the receipt.

@@ -50,7 +50,6 @@ export function response(ctx) {
     itemCount: 0,
     participantCount: 0,
     receiptId: ctx.args.input.receiptId,
-    status: null,
     updatedAt: util.time.nowISO8601(),
     version: ctx.args.input.expectedVersion + 1,
   };

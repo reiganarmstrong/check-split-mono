@@ -45,7 +45,6 @@ function validateCreateReceiptInputDraft(value: unknown): value is CreateReceipt
     isNullableString(value.locationName) &&
     isNullableString(value.merchantName) &&
     isNullableString(value.receiptOccurredAt) &&
-    value.status === "DRAFT" &&
     isNullableInteger(value.subtotalCents) &&
     isNullableInteger(value.taxCents) &&
     isNullableInteger(value.tipCents) &&

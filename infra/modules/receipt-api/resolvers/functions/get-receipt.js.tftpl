@@ -18,7 +18,9 @@ function toParticipant(item) {
   return {
     createdAt: item.created_at,
     displayName: item.display_name,
+    isPaid: item.is_paid === true,
     notes: item.notes ?? null,
+    paidAt: item.paid_at ?? null,
     participantId: item.participant_id,
     sortOrder: item.sort_order ?? null,
     updatedAt: item.updated_at,
@@ -173,6 +175,10 @@ export function response(ctx) {
     }
   }
 
+  const paidParticipantCount = Object.hasOwn(root, 'paid_participant_count')
+    ? root.paid_participant_count
+    : participants.filter((participant) => participant.isPaid).length;
+
   return {
     allocationPolicy: root.allocation_policy,
     capturedAt: root.captured_at ?? null,
@@ -180,7 +186,7 @@ export function response(ctx) {
     currencyCode: root.currency_code,
     discountCents: root.discount_cents,
     feeCents: root.fee_cents,
-    itemCount: receiptItems.length,
+    itemCount: root.item_count ?? receiptItems.length,
     items: receiptItems,
     locationAddress: root.location_address ?? null,
     locationLat: root.location_lat ?? null,
@@ -188,11 +194,11 @@ export function response(ctx) {
     locationName: root.location_name ?? null,
     merchantName: root.merchant_name,
     ownerUserId: root.owner_user_id,
-    participantCount: participants.length,
+    paidParticipantCount,
+    participantCount: root.participant_count ?? participants.length,
     participants,
     receiptId: root.receipt_id,
     receiptOccurredAt: root.receipt_occurred_at,
-    status: root.status,
     subtotalCents: root.subtotal_cents,
     taxCents: root.tax_cents,
     tipCents: root.tip_cents,

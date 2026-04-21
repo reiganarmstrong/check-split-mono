@@ -14,11 +14,23 @@ function receiptPk(receiptId) {
   return 'RECEIPT#' + receiptId;
 }
 
+function requireExistingParticipant(ctx) {
+  const participant = ctx.stash.existingParticipant ?? null;
+
+  if (!participant) {
+    util.error('Participant not found', 'NotFound');
+  }
+
+  return participant;
+}
+
 export function request(ctx) {
   const input = ctx.args.input;
   const userSub = requireUserSub(ctx);
   const now = util.time.nowISO8601();
   const allocations = ctx.stash.participantAllocations ?? [];
+  const existingParticipant = requireExistingParticipant(ctx);
+  const paidDelta = existingParticipant.is_paid === true ? -1 : 0;
 
   if (allocations.length > 22) {
     util.error('Too many participant allocations to delete in one transaction', 'ValidationError');
@@ -69,14 +81,17 @@ export function request(ctx) {
         operation: 'UpdateItem',
         table: '${table_name}',
         update: {
-          expression: 'SET #participant_count = #participant_count - :one, #updated_at = :updated_at, #version = :version',
+          expression: 'SET #participant_count = #participant_count - :one, #paid_participant_count = if_not_exists(#paid_participant_count, :zero) + :paid_delta, #updated_at = :updated_at, #version = :version',
           expressionNames: {
+            '#paid_participant_count': 'paid_participant_count',
             '#participant_count': 'participant_count',
             '#updated_at': 'updated_at',
             '#version': 'version',
           },
           expressionValues: util.dynamodb.toMapValues({
+            ':paid_delta': paidDelta,
             ':one': 1,
+            ':zero': 0,
             ':updated_at': now,
             ':version': input.expectedVersion + 1,
           }),

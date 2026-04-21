@@ -36,7 +36,7 @@ The receipt domain is modeled around two dominant access patterns:
 
 A single-table design keeps those reads efficient without joins or scans:
 
-- `listReceipts` uses one GSI keyed by `USER#<owner_user_id>`
+- `listReceipts` queries one GSI keyed by `USER#<owner_user_id>`, then batch-gets receipt roots for archive-only counters such as payment progress
 - `getReceipt` queries one receipt partition keyed by `RECEIPT#<receipt_id>`
 
 That keeps the storage footprint small, limits index count to one, and makes the DynamoDB cost model predictable.
@@ -136,10 +136,14 @@ flowchart TB
 pk = RECEIPT#<receipt_id>
 sk = RECEIPT
 gsi1pk = USER#<owner_user_id>
-gsi1sk = RECEIPT_DATE#<receipt_occurred_at>#RECEIPT#<receipt_id>"]
+gsi1sk = RECEIPT_DATE#<receipt_occurred_at>#RECEIPT#<receipt_id>
+stores aggregate counters
+including paid_participant_count"]
     RP["Participant
 pk = RECEIPT#<receipt_id>
-sk = PARTICIPANT#<participant_id>"]
+sk = PARTICIPANT#<participant_id>
+stores group metadata
+including is_paid and paid_at"]
     RI["Item
 pk = RECEIPT#<receipt_id>
 sk = ITEM#<item_id>"]
@@ -180,7 +184,8 @@ config:
 ---
 flowchart LR
   L1["listReceipts"] --> Q1["Query GSI1 by USER#<ctx.identity.sub>"]
-  Q1 --> O1["Receipt summary rows"]
+  Q1 --> Q1B["BatchGet receipt roots by RECEIPT#<receipt_id>"]
+  Q1B --> O1["Receipt summary rows"]
 
   L2["getReceipt"] --> Q2["Query table by RECEIPT#<receipt_id>"]
   Q2 --> O2["Receipt aggregate"]
@@ -247,15 +252,22 @@ The resolver layout is declared in `locals.tf`.
 | `addParticipant` | `Mutation` | `add_participant` |
 | `createReceipt` | `Mutation` | `create_receipt` |
 | `deleteReceipt` | `Mutation` | `delete_receipt` |
-| `finalizeReceipt` | `Mutation` | `finalize_receipt` |
 | `getReceipt` | `Query` | `get_receipt` |
-| `listReceipts` | `Query` | `list_receipts` |
+| `listReceipts` | `Query` | `list_receipts`, `batch_get_receipt_roots` |
 | `removeReceiptItem` | `Mutation` | `query_item_allocations`, `commit_remove_item` |
-| `removeParticipant` | `Mutation` | `query_participant_allocations`, `commit_remove_participant` |
+| `removeParticipant` | `Mutation` | `lookup_participant`, `query_participant_allocations`, `commit_remove_participant` |
 | `setItemAllocations` | `Mutation` | `query_item_allocations`, `commit_set_item_allocations` |
-| `updateParticipant` | `Mutation` | `update_participant` |
+| `updateParticipant` | `Mutation` | `lookup_participant`, `update_participant` |
 | `updateReceiptMetadata` | `Mutation` | `update_receipt_metadata` |
 | `upsertReceiptItem` | `Mutation` | `lookup_item`, `commit_upsert_item` |
+
+## Payment Tracking
+
+- Payment state is stored on participant rows, not allocation rows.
+- `is_paid` marks whether group has paid its current share.
+- `paid_at` stores timestamp when group moved into paid state.
+- `paid_participant_count` lives on receipt root so archive/list views can show payment progress without querying full receipt partition.
+- Receipt persistence is binary: record exists in DynamoDB or it does not.
 
 ## Inputs
 
@@ -280,3 +292,4 @@ The resolver layout is declared in `locals.tf`.
 - The Cognito user owns the receipt through `owner_user_id`.
 - Receipt participants are receipt-scoped records and are not Cognito users.
 - Shared responsibility for an item is represented by allocation rows, not a separate group table.
+- Group payment status is participant-scoped state and rolls up to receipt root counters for archive reads.
