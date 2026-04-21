@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "github_actions_sts_policy" {
 }
 
 # allow github to modify aws resources as needed while following the principle of least privilege
-data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
+data "aws_iam_policy_document" "github_actions_foundation_permissions" {
   statement {
     sid     = "AllowListBucket"
     effect  = "Allow"
@@ -152,6 +152,7 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "cloudfront:GetCachePolicyConfig",
       "cloudfront:DeleteCachePolicy",
       "cloudfront:CreateDistribution",
+      "cloudfront:CreateInvalidation",
       "cloudfront:GetDistribution",
       "cloudfront:GetDistributionConfig",
       "cloudfront:UpdateDistribution",
@@ -187,6 +188,24 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
     ]
   }
 
+  statement {
+    sid     = "AllowListGithubOidcProviders"
+    effect  = "Allow"
+    actions = ["iam:ListOpenIDConnectProviders"]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid     = "AllowReadGithubOidcProvider"
+    effect  = "Allow"
+    actions = ["iam:GetOpenIDConnectProvider"]
+
+    resources = [data.aws_iam_openid_connect_provider.github.arn]
+  }
+}
+
+data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
   statement {
     sid     = "AllowCreateAppSyncApis"
     effect  = "Allow"
@@ -290,33 +309,146 @@ data "aws_iam_policy_document" "github_actions_aws_resource_permissions" {
       "*"
     ]
   }
+}
+
+data "aws_iam_policy_document" "github_actions_receipt_ingestion_permissions" {
+  statement {
+    sid    = "AllowManageReceiptIngestionHttpApi"
+    effect = "Allow"
+    actions = [
+      "apigateway:DELETE",
+      "apigateway:GET",
+      "apigateway:PATCH",
+      "apigateway:POST",
+      "apigateway:PUT",
+      "apigateway:TagResource",
+      "apigateway:UntagResource"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/authorizers",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/authorizers/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/cors",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/deployments",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/deployments/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/integrations",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/integrations/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/routes",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/routes/*",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/stages",
+      "arn:${data.aws_partition.current.partition}:apigateway:us-east-1::/apis/*/stages/*"
+    ]
+  }
 
   statement {
-    sid     = "AllowListGithubOidcProviders"
-    effect  = "Allow"
-    actions = ["iam:ListOpenIDConnectProviders"]
+    sid    = "AllowManageReceiptParsingLambda"
+    effect = "Allow"
+    actions = [
+      "lambda:AddPermission",
+      "lambda:CreateFunction",
+      "lambda:DeleteFunction",
+      "lambda:GetFunction",
+      "lambda:GetFunctionCodeSigningConfig",
+      "lambda:GetFunctionConfiguration",
+      "lambda:GetPolicy",
+      "lambda:ListVersionsByFunction",
+      "lambda:ListTags",
+      "lambda:RemovePermission",
+      "lambda:TagResource",
+      "lambda:UntagResource",
+      "lambda:UpdateFunctionCode",
+      "lambda:UpdateFunctionConfiguration"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:checksplit-receipt-parse-${var.environment}"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageReceiptParsingLambdaRoles"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:GetRole",
+      "iam:GetRolePolicy",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies",
+      "iam:ListRoleTags",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/checksplit-receipt-parse-${var.environment}-lambda"
+    ]
+  }
+
+  statement {
+    sid    = "AllowReadReceiptParsingLogGroups"
+    effect = "Allow"
+    actions = [
+      "logs:DescribeLogGroups"
+    ]
 
     resources = ["*"]
   }
 
   statement {
-    sid     = "AllowReadGithubOidcProvider"
-    effect  = "Allow"
-    actions = ["iam:GetOpenIDConnectProvider"]
+    sid    = "AllowManageReceiptParsingLogGroups"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:DeleteLogGroup",
+      "logs:ListTagsForResource",
+      "logs:PutRetentionPolicy",
+      "logs:TagResource",
+      "logs:UntagResource"
+    ]
 
-    resources = [data.aws_iam_openid_connect_provider.github.arn]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-receipt-parse-${var.environment}"
+    ]
   }
-
 }
 
-# create the policy resource from the definition above
-resource "aws_iam_policy" "github_actions_aws_resource_permissions" {
-  name   = "${var.repo_name}-${var.environment}-github-actions-aws-resource-permissions"
-  policy = data.aws_iam_policy_document.github_actions_aws_resource_permissions.json
+# create the policy resources from the definitions above
+resource "aws_iam_policy" "github_actions_foundation_permissions" {
+  name   = "${var.repo_name}-${var.environment}-github-actions-foundation-permissions"
+  policy = data.aws_iam_policy_document.github_actions_foundation_permissions.json
 }
 
-# attach the policy to the iam role
-resource "aws_iam_role_policy_attachment" "github_actions_aws_resource_permissions" {
+resource "aws_iam_policy" "github_actions_receipt_api_permissions" {
+  name   = "${var.repo_name}-${var.environment}-github-actions-receipt-api-permissions"
+  policy = data.aws_iam_policy_document.github_actions_receipt_api_permissions.json
+}
+
+resource "aws_iam_policy" "github_actions_receipt_ingestion_permissions" {
+  name   = "${var.repo_name}-${var.environment}-github-actions-receipt-ingestion-permissions"
+  policy = data.aws_iam_policy_document.github_actions_receipt_ingestion_permissions.json
+}
+
+# attach the policies to the iam role
+resource "aws_iam_role_policy_attachment" "github_actions_foundation_permissions" {
   role       = aws_iam_role.github_actions_role.name
-  policy_arn = aws_iam_policy.github_actions_aws_resource_permissions.arn
+  policy_arn = aws_iam_policy.github_actions_foundation_permissions.arn
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_receipt_api_permissions" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = aws_iam_policy.github_actions_receipt_api_permissions.arn
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_receipt_ingestion_permissions" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = aws_iam_policy.github_actions_receipt_ingestion_permissions.arn
 }

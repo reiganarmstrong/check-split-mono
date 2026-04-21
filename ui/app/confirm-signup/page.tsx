@@ -6,7 +6,6 @@ import { BadgeCheck } from "lucide-react"
 import { motion } from "motion/react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { AnimatedBlob } from "@/components/ambient/animated-blob"
 import { AuthCardShell } from "@/components/auth/auth-card-shell"
 import { AuthField } from "@/components/auth/auth-field"
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen"
@@ -111,40 +110,22 @@ function ConfirmSignupPageContent() {
   }
 
   return (
-    <div className="relative -mt-28 flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 pt-28 md:px-0">
-      {/* Playful Background Blobs & Grid */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[var(--color-background)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-foreground)_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.03]" />
-        <AnimatedBlob
-          color="var(--color-blob-1)"
-          driftClassName="ambient-blob-drift-a"
-          morphClassName="ambient-blob-morph-a"
-          className="absolute top-[5%] -left-[10%] h-[500px] w-[500px] opacity-20"
-        />
-        <AnimatedBlob
-          color="var(--color-blob-2)"
-          driftClassName="ambient-blob-drift-b"
-          morphClassName="ambient-blob-morph-b"
-          className="absolute -bottom-[10%] -right-[10%] h-[600px] w-[600px] opacity-20"
-        />
-      </div>
-
+    <div className="flex flex-1 items-center px-4 py-10 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
-        className="relative z-10 my-16 w-full"
+        className="page-shell my-8 w-full"
       >
         <AuthCardShell
           icon={<BadgeCheck className="h-8 w-8 text-primary" />}
-          iconWrapperClassName="bg-primary/20"
+          iconWrapperClassName="bg-[color-mix(in_oklab,var(--primary)_18%,transparent)]"
           title="Verify your email"
-          description="Enter the confirmation code Cognito sent to finish creating your account."
+          description="Enter confirmation code from Cognito, finish setup, then log in."
           footerPrompt="Already verified?"
           footerHref="/login"
-          footerLinkLabel="Sign in"
-          footerLinkClassName="text-primary"
+          footerLinkLabel="Log in"
+          footerLinkClassName="text-[var(--foreground)]"
         >
           <form
             className="space-y-6"
@@ -194,13 +175,13 @@ function ConfirmSignupPageContent() {
             </div>
 
             {authError ? (
-              <p className="rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+              <p className="rounded-[1rem] border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
                 {authError}
               </p>
             ) : null}
 
             {authMessage ? (
-              <p className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-medium text-primary">
+              <p className="rounded-[1rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
                 {authMessage}
               </p>
             ) : null}
@@ -216,7 +197,7 @@ function ConfirmSignupPageContent() {
                   <Button
                     type="submit"
                     disabled={!canSubmit || isSubmitting}
-                    className="h-14 w-full rounded-full text-lg font-black shadow-lg shadow-primary/20 transition-transform hover:scale-[1.03]"
+                    className="h-14 w-full rounded-[1rem] bg-[var(--foreground)] text-base font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
                   >
                     {isSubmitting ? "Verifying..." : "Verify email"}
                   </Button>
@@ -227,7 +208,7 @@ function ConfirmSignupPageContent() {
                     onClick={() => {
                       void handleResendCode()
                     }}
-                    className="h-12 w-full rounded-full font-bold"
+                    className="h-12 w-full rounded-[1rem] border border-[var(--line)] bg-[var(--panel)] font-medium text-[var(--foreground)] hover:bg-[var(--surface)]"
                   >
                     {isResending ? "Sending new code..." : "Resend code"}
                   </Button>

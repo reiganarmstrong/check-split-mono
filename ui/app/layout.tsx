@@ -1,24 +1,14 @@
 import type { Metadata } from "next";
-import { Quicksand, Fredoka } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
-
-const quicksand = Quicksand({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const fredoka = Fredoka({
-  subsets: ["latin"],
-  variable: "--font-heading",
-});
 
 export const metadata: Metadata = {
   title: "CheckSplit",
   description: "Snap your receipt, let AI extract the items, and easily assign who pays.",
   icons: {
-    icon: [{ url: "/favicon.svg?v=blue-restore-flat-v4", type: "image/svg+xml" }],
-    shortcut: ["/favicon.svg?v=blue-restore-flat-v4"],
+    icon: [{ url: "/favicon.svg?v=app-palette-v6", type: "image/svg+xml" }],
+    shortcut: ["/favicon.svg?v=app-palette-v6"],
   },
 };
 
@@ -31,14 +21,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${quicksand.variable} ${fredoka.variable}`}>
+    <html lang="en">
       <body
         className={`bg-background font-sans text-foreground antialiased selection:bg-primary/20`}
       >
         <AuthProvider>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <div className="flex-1 flex flex-col">{children}</div>
+          <div className="site-shell flex min-h-screen flex-col">
+            <Suspense fallback={null}>
+              <Navbar />
+            </Suspense>
+            <div className="site-main">{children}</div>
             <SiteFooter />
           </div>
         </AuthProvider>

@@ -1,12 +1,6 @@
 import Link from "next/link"
 import type { ReactNode } from "react"
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 type AuthCardShellProps = {
@@ -20,6 +14,7 @@ type AuthCardShellProps = {
   iconWrapperClassName?: string
   footerLinkClassName?: string
   cardShadowClassName?: string
+  bandClassName?: string
 }
 
 export function AuthCardShell({
@@ -33,49 +28,51 @@ export function AuthCardShell({
   iconWrapperClassName,
   footerLinkClassName,
   cardShadowClassName,
+  bandClassName,
 }: AuthCardShellProps) {
   return (
-    <Card
+    <section
       className={cn(
-        "relative mx-auto w-full max-w-md gap-0 overflow-hidden rounded-[3rem] border-4 border-foreground bg-white px-8 py-10 sm:px-10 sm:py-12",
-        cardShadowClassName ??
-          "shadow-[8px_8px_0px_0px_var(--color-primary)]",
+        "auth-shell mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem]",
+        cardShadowClassName,
       )}
     >
-      {/* Decorative Wavy Header */}
-      <div className="absolute top-0 left-0 right-0 h-3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxMiI+PHBhdGggZD0iTTEwIDEyTDAgMGgyMGwtMTAgMTJ6IiBmaWxsPSJyZ2JhKDAsMCwwLDAuMDUpIi8+PC9zdmc+')] opacity-20 repeat-x background-size-[20px]" />
-      
-      <CardHeader className="justify-items-center gap-0 p-0 text-center relative z-10">
-        <div
-          className={cn(
-            "mb-6 flex h-20 w-20 items-center justify-center rounded-[2rem] border-4 border-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white transform -rotate-3",
-            iconWrapperClassName,
-          )}
-        >
-          {icon}
-        </div>
-        <div className="space-y-3">
-          <h1 className="text-4xl font-heading font-black tracking-tight sm:text-5xl text-foreground">
+      <div className="grid md:grid-cols-[0.92fr_1.08fr]">
+        <div className={cn("auth-band px-6 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12", bandClassName)}>
+          <div
+            className={cn(
+              "inline-flex h-14 w-14 items-center justify-center rounded-[1.15rem] border border-[var(--line)] bg-[var(--panel-strong)] text-[var(--foreground)]",
+              iconWrapperClassName,
+            )}
+          >
+            {icon}
+          </div>
+
+          <p className="mt-8 text-[0.7rem] font-semibold uppercase tracking-[0.26em] text-[var(--muted-foreground)]">
+            Account access
+          </p>
+          <h1 className="mt-4 max-w-md text-4xl leading-[0.95] text-[var(--foreground)] sm:text-5xl">
             {title}
           </h1>
-          <p className="text-lg font-medium text-muted-foreground">{description}</p>
+          <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-foreground)]">
+            {description}
+          </p>
+
+          <div className="section-divider mt-8 pt-6 text-sm text-[var(--muted-foreground)]">
+            <span>{footerPrompt} </span>
+            <Link
+              href={footerHref}
+              className={cn("font-medium text-[var(--foreground)] underline-offset-4 hover:underline", footerLinkClassName)}
+            >
+              {footerLinkLabel}
+            </Link>
+          </div>
         </div>
-      </CardHeader>
-      
-      <CardContent className="p-0 pt-10 relative z-10">{children}</CardContent>
-      
-      <CardFooter className="justify-center gap-2 p-0 pt-10 text-center text-base relative z-10">
-        <span className="font-medium text-muted-foreground">{footerPrompt}</span>
-        <Link
-          href={footerHref}
-          className={cn(
-            "font-black hover:underline underline-offset-4 decoration-2",
-            footerLinkClassName,
-          )}
-        >
-          {footerLinkLabel}
-        </Link>
-      </CardFooter>
-    </Card>
+
+        <div className="section-divider border-t border-[var(--line)] bg-[var(--surface-strong)] px-6 py-8 sm:px-8 sm:py-10 md:border-l md:border-t-0 md:px-10 md:py-12">
+          {children}
+        </div>
+      </div>
+    </section>
   )
 }

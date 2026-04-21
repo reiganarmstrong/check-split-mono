@@ -26,3 +26,18 @@ output "receipt_api_table_name" {
   description = "The receipts DynamoDB table name for the dev environment."
   value       = module.receipt-api.dynamodb_table_name
 }
+
+output "receipt_parse_api_url" {
+  description = "The full receipt parsing HTTP API URL for the dev environment."
+  value       = module.receipt-ingestion-api.parse_api_url
+}
+
+output "receipt_parse_gemini_model_id" {
+  description = "The Gemini model configured for the receipt parsing Lambda."
+  value       = module.receipt-ingestion-api.gemini_model_id
+}
+
+output "receipt_parse_lambda_function_name" {
+  description = "The Lambda function name for the receipt parsing HTTP API."
+  value       = module.receipt-ingestion-api.lambda_function_name
+}

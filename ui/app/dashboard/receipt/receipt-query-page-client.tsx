@@ -21,7 +21,7 @@ export function ReceiptQueryPageClient() {
     return (
       <AuthSessionScreen
         title="Opening receipt workspace"
-        description="Missing receipt id. Returning to archive."
+        description="Missing receipt id. Returning to saved splits."
       />
     )
   }

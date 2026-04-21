@@ -57,6 +57,15 @@ export type ReceiptEditorValidation = {
   issues: string[]
 }
 
+export type GroupItemShareDetail = {
+  description: string
+  groupId: string
+  itemId: string
+  lineSubtotalCents: number
+  ratioLabel: string
+  shareCents: number
+}
+
 function makeLocalId(prefix: string) {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return `${prefix}-${crypto.randomUUID()}`
@@ -74,7 +83,7 @@ function normalizeOptionalMoneyInput(value: string) {
   return nextValue === "" ? "0.00" : nextValue
 }
 
-function normalizeDateTimeInput(value: string) {
+export function normalizeDateTimeInput(value: string) {
   if (!value) {
     return ""
   }
@@ -391,6 +400,38 @@ export function getGroupShareSummaries(
   }))
 }
 
+export function getGroupItemShareDetails(
+  state: ReceiptEditorState,
+): GroupItemShareDetail[] {
+  const details: GroupItemShareDetail[] = []
+
+  for (const item of state.items) {
+    if (item.selectedGroupIds.length === 0) {
+      continue
+    }
+
+    const lineSubtotalCents = getItemLineSubtotalCents(item)
+    const distributedLineSubtotal = distributeCentsAcrossRecipients(
+      lineSubtotalCents,
+      item.selectedGroupIds,
+    )
+    const ratioLabel = `1/${item.selectedGroupIds.length}`
+
+    for (const [groupId, shareCents] of distributedLineSubtotal.entries()) {
+      details.push({
+        description: item.description.trim() || "Untitled item",
+        groupId,
+        itemId: item.id,
+        lineSubtotalCents,
+        ratioLabel,
+        shareCents,
+      })
+    }
+  }
+
+  return details
+}
+
 export function getReceiptEditorValidation(
   state: ReceiptEditorState,
 ): ReceiptEditorValidation {
@@ -436,7 +477,7 @@ export function getReceiptEditorValidation(
     }
 
     if (issue.path[0] === "items") {
-      issues.add("Each item needs a name, a valid price, and at least one assigned group.")
+      issues.add("Complete the required item fields before saving.")
       continue
     }
 

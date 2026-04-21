@@ -1,0 +1,13 @@
+{
+  "name": "receipt-ingestion-api-lambda",
+  "packageManager": "pnpm@10.32.1",
+  "private": true,
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.914.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && rm -rf package && mkdir -p package && cp -R dist package/dist && cp package.json pnpm-lock.yaml package/ && cd package && pnpm install --prod --config.node-linker=hoisted --ignore-workspace --frozen-lockfile",
+    "clean": "rm -rf dist package",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

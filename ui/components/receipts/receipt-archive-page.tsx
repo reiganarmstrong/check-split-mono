@@ -4,131 +4,97 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { motion } from "motion/react"
-import {
-  ArrowRight,
-  Camera,
-  LayoutList,
-  PencilLine,
-  ReceiptText,
-} from "lucide-react"
+import { ArrowRight, Camera, PencilLine, ReceiptText } from "lucide-react"
 
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen"
 import { useAuth } from "@/components/auth/auth-provider"
 import { Button } from "@/components/ui/button"
-import {
-  ReceiptApiError,
-  listReceipts,
-} from "@/lib/receipt-api"
+import { ReceiptApiError, listReceipts } from "@/lib/receipt-api"
 import { formatCurrency, formatReceiptDate } from "@/lib/receipt-editor"
-import type { ReceiptListItem } from "@/lib/receipt-types"
+import type { ReceiptListItem, ReceiptStatus } from "@/lib/receipt-types"
 import { cn } from "@/lib/utils"
 
-function getArchiveTone(status: string) {
-  const normalizedStatus = status.toLowerCase()
+function getArchiveStatusLabel(status: ReceiptStatus) {
+  if (status === "DRAFT" || status === "OPEN") {
+    return "Saved"
+  }
+
+  if (status === "FINALIZED") {
+    return "Finalized"
+  }
+
+  return status
+}
+
+function getArchiveTone(status: ReceiptStatus) {
+  const normalizedStatus = getArchiveStatusLabel(status).toLowerCase()
 
   if (normalizedStatus.includes("draft")) {
-    return {
-      badge: "bg-primary text-primary-foreground",
-      surface: "bg-[color-mix(in_oklab,var(--color-primary)_11%,white)]",
-      edge: "bg-primary",
-      arrow: "bg-primary text-primary-foreground",
-    }
+    return "bg-[color-mix(in_oklab,var(--secondary)_28%,transparent)] text-[var(--secondary-foreground)]"
   }
 
   if (
+    normalizedStatus.includes("paid") ||
     normalizedStatus.includes("saved") ||
     normalizedStatus.includes("complete") ||
     normalizedStatus.includes("final")
   ) {
-    return {
-      badge: "bg-primary text-primary-foreground",
-      surface: "bg-[color-mix(in_oklab,var(--color-primary)_11%,white)]",
-      edge: "bg-primary",
-      arrow: "bg-primary text-primary-foreground",
-    }
+    return "bg-[color-mix(in_oklab,var(--accent)_28%,transparent)] text-[var(--accent-foreground)]"
   }
 
-  if (normalizedStatus.includes("open")) {
-    return {
-      badge: "bg-primary text-primary-foreground",
-      surface: "bg-[color-mix(in_oklab,var(--color-primary)_14%,white)]",
-      edge: "bg-primary",
-      arrow: "bg-primary text-primary-foreground",
-    }
-  }
-
-  return {
-    badge: "bg-[color-mix(in_oklab,var(--color-primary)_18%,white)] text-foreground",
-    surface: "bg-[color-mix(in_oklab,var(--color-primary)_10%,white)]",
-    edge: "bg-primary",
-    arrow: "bg-primary text-primary-foreground",
-  }
+  return "bg-[color-mix(in_oklab,var(--primary)_16%,transparent)] text-[var(--foreground)]"
 }
 
 function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
-  const tone = getArchiveTone(receipt.status)
-  const showStatusBadge = receipt.status !== "DRAFT"
+  const statusLabel = getArchiveStatusLabel(receipt.status)
 
   return (
-    <Link href={`/dashboard/receipt?receiptId=${encodeURIComponent(receipt.receiptId)}`} className="group block">
-      <article
-        className={cn(
-          "relative grid gap-4 overflow-hidden rounded-[2.25rem] border-4 border-foreground px-5 py-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:grid-cols-[minmax(0,1.2fr)_0.8fr_0.7fr_auto] sm:items-center sm:px-6",
-          tone.surface,
-        )}
-      >
-        <div className={cn("absolute inset-y-0 left-0 w-3 border-r-4 border-foreground", tone.edge)} />
+    <Link href={`/dashboard/receipt?receiptId=${encodeURIComponent(receipt.receiptId)}`} className="block">
+      <article className="table-row-surface grid gap-4 rounded-[1.4rem] px-5 py-5 transition-transform duration-200 hover:-translate-y-0.5 md:grid-cols-[1.15fr_0.8fr_0.7fr_auto] md:items-center">
         <div>
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.24em] text-muted-foreground">
+          <p className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
             Receipt
           </p>
-          <h2 className="mt-2 text-2xl font-heading font-black leading-tight text-foreground sm:text-[2rem]">
+          <h2 className="mt-2 text-2xl font-semibold text-[var(--foreground)] sm:text-3xl">
             {receipt.merchantName}
           </h2>
           {receipt.locationName ? (
-            <p className="mt-2 text-sm font-bold text-muted-foreground">
-              {receipt.locationName}
-            </p>
+            <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">{receipt.locationName}</p>
           ) : null}
         </div>
 
         <div>
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.24em] text-muted-foreground">
+          <p className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
             Occurred
           </p>
-          <p className="mt-2 text-base font-black text-foreground">
+          <p className="mt-2 text-sm text-[var(--foreground)]">
             {formatReceiptDate(receipt.receiptOccurredAt)}
           </p>
         </div>
 
         <div>
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.24em] text-muted-foreground">
+          <p className="text-[0.68rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
             Total
           </p>
-          <p className="mt-2 text-2xl font-heading font-black leading-none text-foreground">
+          <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
             {formatCurrency(receipt.totalCents)}
           </p>
         </div>
 
-        <div className="flex items-center justify-between gap-4 sm:justify-end">
-          {showStatusBadge ? (
-            <div
+        <div className="flex items-center justify-between gap-4 md:justify-end">
+          {statusLabel ? (
+            <span
               className={cn(
-                "rounded-full border-2 border-foreground px-4 py-2 text-xs font-black uppercase tracking-[0.24em]",
-                tone.badge,
+                "rounded-full px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.18em]",
+                getArchiveTone(receipt.status),
               )}
             >
-              {receipt.status}
-            </div>
+              {statusLabel}
+            </span>
           ) : null}
-          <div
-            className={cn(
-              "rounded-full border-2 border-foreground p-3 transition-transform group-hover:translate-x-1",
-              tone.arrow,
-            )}
-          >
-            <ArrowRight className="h-4 w-4" />
-          </div>
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
+            <ArrowRight className="h-4 w-4 text-[var(--foreground)]" />
+          </span>
         </div>
       </article>
     </Link>
@@ -174,7 +140,7 @@ export function ReceiptArchivePage() {
         if (error instanceof ReceiptApiError) {
           setErrorMessage(error.message)
         } else {
-          setErrorMessage("Unable to load your receipt archive right now.")
+          setErrorMessage("Unable to load your saved splits right now.")
         }
       } finally {
         if (isActive) {
@@ -193,13 +159,13 @@ export function ReceiptArchivePage() {
   if (status !== "authenticated" || isLoading) {
     return (
       <AuthSessionScreen
-        title="Opening your receipt archive"
-        description="Loading the latest receipts in your account."
+        title="Opening your saved splits"
+        description="Loading your saved split receipts."
       />
     )
   }
 
-  const draftCount = receipts.filter((receipt) => receipt.status === "DRAFT").length
+  const savedCount = receipts.filter((receipt) => receipt.status === "DRAFT" || receipt.status === "OPEN").length
   const recentCount = receipts.filter((receipt) => {
     const occurredAt = new Date(receipt.receiptOccurredAt)
     const now = new Date()
@@ -210,151 +176,132 @@ export function ReceiptArchivePage() {
   }).length
 
   return (
-    <main className="relative -mt-28 flex-1 overflow-hidden bg-background pb-24 pt-28">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-foreground)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-foreground)_1px,transparent_1px)] bg-[size:42px_42px] opacity-[0.06]" />
-      </div>
-
-      <section className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+    <main className="flex-1 pb-20 pt-4">
+      <section className="page-shell">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_360px]"
+          className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr]"
         >
-          <div className="relative overflow-hidden rounded-[3rem] border-4 border-foreground bg-white px-6 py-6 sm:px-8 sm:py-8 xl:col-span-2">
-            <h1 className="max-w-4xl text-4xl font-heading font-black leading-[0.95] tracking-tight text-foreground sm:text-6xl xl:text-[4.5rem]">
-              Your receipt archive.
+          <div className="workspace-panel rounded-[2rem] px-5 py-6 sm:px-6">
+            <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+              Saved splits
+            </p>
+            <h1 className="mt-4 text-4xl leading-[0.95] text-[var(--foreground)] sm:text-5xl">
+              Saved splits.
             </h1>
-            <p className="mt-5 max-w-2xl text-base font-medium leading-7 text-muted-foreground sm:text-lg">
-              Open drafts, check totals, and keep moving.
+            <p className="mt-4 max-w-sm text-sm leading-6 text-[var(--muted-foreground)]">
+              View later. Mark paid.
             </p>
 
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+            <div className="section-divider mt-6 flex flex-wrap gap-3 pt-6">
               <Button
                 asChild
-                className="-translate-y-[2px] h-14 rounded-full border-4 border-foreground bg-primary px-6 text-base font-black text-primary-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ease-out hover:translate-x-[2px] hover:translate-y-0 hover:bg-primary/90 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                className="h-12 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
               >
                 <Link href="/dashboard/new">
                   <PencilLine className="h-4 w-4" />
                   Create custom receipt
                 </Link>
               </Button>
-              <button
-                type="button"
-                disabled
-                className="flex h-14 items-center gap-3 rounded-full border-4 border-dashed border-foreground bg-muted/60 px-5 text-sm font-black text-muted-foreground"
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
               >
-                <Camera className="h-4 w-4" />
-                Upload receipt scan
-              </button>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08, duration: 0.35 }}
-          className="mt-6"
-        >
-          <div className="grid gap-px overflow-hidden rounded-[2rem] border-4 border-foreground bg-foreground sm:grid-cols-3">
-            <div className="bg-[color-mix(in_oklab,var(--color-primary)_14%,white)] px-5 py-4">
-              <p className="text-[0.68rem] font-black uppercase tracking-[0.24em] text-muted-foreground">
-                Saved receipts
-              </p>
-              <p className="mt-2 text-3xl font-heading font-black leading-none text-foreground">
-                {receipts.length}
-              </p>
-            </div>
-            <div className="bg-[color-mix(in_oklab,var(--color-secondary)_14%,white)] px-5 py-4">
-              <p className="text-[0.68rem] font-black uppercase tracking-[0.24em] text-muted-foreground">
-                Draft receipts
-              </p>
-              <p className="mt-2 text-3xl font-heading font-black leading-none text-foreground">
-                {draftCount}
-              </p>
-            </div>
-            <div className="bg-[color-mix(in_oklab,var(--color-accent)_24%,white)] px-5 py-4">
-              <p className="text-[0.68rem] font-black uppercase tracking-[0.24em] text-muted-foreground">
-                Updated this month
-              </p>
-              <p className="mt-2 text-3xl font-heading font-black leading-none text-foreground">
-                {recentCount}
-              </p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.16, duration: 0.35 }}
-          className="mt-8 rounded-[3rem] border-4 border-foreground bg-white px-5 py-5 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] sm:px-6"
-        >
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-[0.68rem] font-black uppercase tracking-[0.24em] text-muted-foreground">
-                Receipt workspace
-              </p>
-              <h2 className="mt-2 text-3xl font-heading font-black leading-none text-foreground sm:text-4xl">
-                Recent receipts
-              </h2>
+                <Link href="/dashboard/new?prompt=upload">
+                  <Camera className="h-4 w-4" />
+                  Upload receipt
+                </Link>
+              </Button>
             </div>
 
-            <div className="inline-flex items-center gap-2 rounded-full border-2 border-foreground bg-accent/30 px-4 py-2 text-sm font-black text-foreground">
-              <LayoutList className="h-4 w-4" />
-              Sorted newest first
-            </div>
-          </div>
-
-          {errorMessage ? (
-            <div className="mt-6 rounded-[1.8rem] border-4 border-foreground bg-destructive/10 px-5 py-4 text-sm font-medium text-destructive">
-              {errorMessage}
-            </div>
-          ) : null}
-
-          {receipts.length === 0 ? (
-            <div className="mt-6 rounded-[2.5rem] border-4 border-dashed border-foreground bg-muted/60 px-6 py-14 text-center">
-              <div className="mx-auto flex h-18 w-18 items-center justify-center rounded-full border-4 border-foreground bg-secondary/15">
-                <ReceiptText className="h-8 w-8 text-foreground" />
+            <div className="section-divider mt-6 grid gap-4 pt-6">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[var(--muted-foreground)]">Saved splits</span>
+                <span className="font-medium text-[var(--foreground)]">{receipts.length}</span>
               </div>
-              <h3 className="mt-6 text-3xl font-heading font-black leading-none text-foreground">
-                No receipts saved yet
-              </h3>
-              <p className="mx-auto mt-4 max-w-xl text-base font-medium leading-7 text-muted-foreground">
-                Create one, assign groups, and save it here.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <Button
-                  asChild
-                  className="-translate-y-[2px] rounded-full border-4 border-foreground bg-primary px-5 font-black text-primary-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 ease-out hover:translate-x-[2px] hover:translate-y-0 hover:bg-primary/90 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                >
-                  <Link href="/dashboard/new">Create custom receipt</Link>
-                </Button>
-                <button
-                  type="button"
-                  disabled
-                  className="rounded-full border-4 border-dashed border-foreground bg-white px-5 py-2.5 text-sm font-black text-muted-foreground"
-                >
-                  Upload parsing in progress
-                </button>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[var(--muted-foreground)]">Saved and open</span>
+                <span className="font-medium text-[var(--foreground)]">{savedCount}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-[var(--muted-foreground)]">Updated this month</span>
+                <span className="font-medium text-[var(--foreground)]">{recentCount}</span>
               </div>
             </div>
-          ) : (
-            <div className="mt-6 space-y-4">
-              {receipts.map((receipt, index) => (
-                <motion.div
-                  key={receipt.receiptId}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.04 * index, duration: 0.25 }}
-                >
-                  <ReceiptArchiveRow receipt={receipt} />
-                </motion.div>
-              ))}
+          </div>
+
+          <div className="workspace-panel rounded-[2rem] px-5 py-6 sm:px-6">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+                  Receipts
+                </p>
+                <h2 className="mt-3 text-3xl leading-none text-[var(--foreground)]">
+                  Recent splits
+                </h2>
+              </div>
+              <span className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                Sorted newest first
+              </span>
             </div>
-          )}
+
+            {errorMessage ? (
+              <div className="section-divider mt-5 pt-5">
+                <div className="rounded-[1.25rem] border border-destructive/25 bg-destructive/10 px-4 py-4 text-sm text-destructive">
+                  {errorMessage}
+                </div>
+              </div>
+            ) : null}
+
+            {receipts.length === 0 ? (
+              <div className="section-divider mt-5 pt-5">
+                <div className="rounded-[1.6rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
+                    <ReceiptText className="h-6 w-6 text-[var(--foreground)]" />
+                  </div>
+                  <h3 className="mt-6 text-3xl leading-none text-[var(--foreground)]">
+                    No saved splits yet
+                  </h3>
+                  <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[var(--muted-foreground)]">
+                    Create one, split it by group, and it will appear here.
+                  </p>
+                  <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                    <Button
+                      asChild
+                      className="h-12 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+                    >
+                      <Link href="/dashboard/new">Create custom receipt</Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
+                    >
+                      <Link href="/dashboard/new?prompt=upload">
+                        Upload receipt
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="section-divider mt-5 space-y-3 pt-5">
+                {receipts.map((receipt, index) => (
+                  <motion.div
+                    key={receipt.receiptId}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.04 * index, duration: 0.25 }}
+                  >
+                    <ReceiptArchiveRow receipt={receipt} />
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
         </motion.div>
       </section>
     </main>
