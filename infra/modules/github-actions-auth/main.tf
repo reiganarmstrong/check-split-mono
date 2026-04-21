@@ -152,6 +152,7 @@ data "aws_iam_policy_document" "github_actions_foundation_permissions" {
       "cloudfront:GetCachePolicyConfig",
       "cloudfront:DeleteCachePolicy",
       "cloudfront:CreateDistribution",
+      "cloudfront:CreateInvalidation",
       "cloudfront:GetDistribution",
       "cloudfront:GetDistributionConfig",
       "cloudfront:UpdateDistribution",
