@@ -2,11 +2,12 @@
 
 import type { RefObject } from "react";
 import { motion } from "motion/react";
-import { LoaderCircle, Share2 } from "lucide-react";
+import { CheckCircle2, CircleDashed, LoaderCircle, Share2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { formatCurrency, parseMoneyInputToCents } from "@/lib/receipt-editor";
 import type { EditableGroup, ReceiptEditorState } from "@/lib/receipt-types";
+import { cn } from "@/lib/utils";
 
 import { SummaryRow } from "./shared";
 import type {
@@ -22,6 +23,7 @@ export function SummaryAside({
   totalCents,
   groupSharesById,
   groupItemShareDetailsByGroupId,
+  toggleGroupPaid,
   isSharingSummary,
   handleShareSummary,
   scrollToFullSummary,
@@ -36,6 +38,7 @@ export function SummaryAside({
     string,
     ReceiptWorkspaceGroupItemShareDetail[]
   >;
+  toggleGroupPaid: (groupId: string) => void;
   isSharingSummary: boolean;
   handleShareSummary: () => Promise<void>;
   scrollToFullSummary: () => void;
@@ -122,17 +125,46 @@ export function SummaryAside({
             return (
               <div
                 key={group.id}
-                className="rounded-[1.1rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3"
+                className={cn(
+                  "rounded-[1.1rem] border bg-[var(--surface)] px-4 py-3",
+                  group.isPaid
+                    ? "border-[color-mix(in_oklab,var(--accent)_45%,var(--line))]"
+                    : "border-[var(--line)]",
+                )}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="font-medium text-[var(--foreground)]">
                       {group.displayName || "Untitled group"}
                     </p>
+                    <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+                      {group.isPaid ? "Marked paid" : "Not paid yet"}
+                    </p>
                   </div>
-                  <p className="text-xl font-medium text-[var(--foreground)]">
-                    {formatCurrency(share.amountCents)}
-                  </p>
+                  <div className="flex flex-col items-end gap-2">
+                    <p className="text-xl font-medium text-[var(--foreground)]">
+                      {formatCurrency(share.amountCents)}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      className={cn(
+                        "rounded-full border px-3",
+                        group.isPaid
+                          ? "border-[color-mix(in_oklab,var(--accent)_40%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent-foreground)]"
+                          : "border-[var(--line)] bg-[var(--panel)] text-[var(--foreground)]",
+                      )}
+                      onClick={() => toggleGroupPaid(group.id)}
+                    >
+                      {group.isPaid ? (
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                      ) : (
+                        <CircleDashed className="h-3.5 w-3.5" />
+                      )}
+                      {group.isPaid ? "Paid" : "Unpaid"}
+                    </Button>
+                  </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-[var(--muted-foreground)]">
                   <span>Items</span>

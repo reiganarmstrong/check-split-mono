@@ -140,6 +140,17 @@ export function useReceiptWorkspaceData({
     }));
   }
 
+  function toggleGroupPaid(groupId: string) {
+    clearTransientMessages();
+    clearParseIssues();
+    setEditorState((current) => ({
+      ...current,
+      groups: current.groups.map((group) =>
+        group.id === groupId ? { ...group, isPaid: !group.isPaid } : group,
+      ),
+    }));
+  }
+
   function addGroup() {
     clearTransientMessages();
     clearParseIssues();
@@ -269,6 +280,7 @@ export function useReceiptWorkspaceData({
     beginManualEntry,
     updateField,
     updateGroup,
+    toggleGroupPaid,
     addGroup,
     removeGroup,
     addItem,

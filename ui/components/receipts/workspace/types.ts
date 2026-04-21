@@ -91,6 +91,7 @@ export type ReceiptWorkspaceController = {
     value: ReceiptEditorState[K],
   ) => void;
   updateGroup: (groupId: string, updates: Partial<EditableGroup>) => void;
+  toggleGroupPaid: (groupId: string) => void;
   addGroup: () => void;
   removeGroup: (groupId: string) => void;
   addItem: () => void;

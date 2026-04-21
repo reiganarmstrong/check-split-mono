@@ -43,7 +43,9 @@ const receiptItemAllocationSchema = z.object({
 const receiptParticipantSchema = z.object({
   createdAt: z.string().nullable(),
   displayName: z.string(),
+  isPaid: z.boolean(),
   notes: z.string().nullable(),
+  paidAt: z.string().nullable(),
   participantId: z.string(),
   sortOrder: z.number().nullable(),
   updatedAt: z.string(),
@@ -79,6 +81,7 @@ const receiptSchema = z.object({
   locationName: z.string().nullable(),
   merchantName: z.string(),
   ownerUserId: z.string(),
+  paidParticipantCount: z.number(),
   participantCount: z.number(),
   participants: z.array(receiptParticipantSchema),
   receiptId: z.string(),
@@ -95,6 +98,8 @@ const receiptSchema = z.object({
 const receiptListItemSchema = z.object({
   locationName: z.string().nullable(),
   merchantName: z.string(),
+  paidParticipantCount: z.number(),
+  participantCount: z.number(),
   receiptId: z.string(),
   receiptOccurredAt: z.string(),
   status: receiptStatusSchema,
@@ -295,6 +300,7 @@ function didParticipantChange(
 
   return (
     serverParticipant.displayName !== group.displayName.trim() ||
+    serverParticipant.isPaid !== group.isPaid ||
     (serverParticipant.notes ?? "") !== group.notes.trim() ||
     (serverParticipant.sortOrder ?? index) !== index
   )
@@ -336,6 +342,8 @@ const listReceiptsQuery = /* GraphQL */ `
       items {
         locationName
         merchantName
+        paidParticipantCount
+        participantCount
         receiptId
         receiptOccurredAt
         status
@@ -383,11 +391,14 @@ const getReceiptQuery = /* GraphQL */ `
       locationName
       merchantName
       ownerUserId
+      paidParticipantCount
       participantCount
       participants {
         createdAt
         displayName
+        isPaid
         notes
+        paidAt
         participantId
         sortOrder
         updatedAt
@@ -441,11 +452,14 @@ const createReceiptMutation = /* GraphQL */ `
       locationName
       merchantName
       ownerUserId
+      paidParticipantCount
       participantCount
       participants {
         createdAt
         displayName
+        isPaid
         notes
+        paidAt
         participantId
         sortOrder
         updatedAt
@@ -492,7 +506,9 @@ const addParticipantMutation = /* GraphQL */ `
       participant {
         createdAt
         displayName
+        isPaid
         notes
+        paidAt
         participantId
         sortOrder
         updatedAt
@@ -510,7 +526,9 @@ const updateParticipantMutation = /* GraphQL */ `
       participant {
         createdAt
         displayName
+        isPaid
         notes
+        paidAt
         participantId
         sortOrder
         updatedAt
@@ -760,6 +778,7 @@ async function persistGroups(
       const result = await addParticipant({
         displayName: group.displayName.trim(),
         expectedVersion: nextVersion,
+        isPaid: group.isPaid,
         notes: trimToNull(group.notes),
         receiptId,
         sortOrder: index,
@@ -783,6 +802,7 @@ async function persistGroups(
     const result = await updateParticipant({
       displayName: group.displayName.trim(),
       expectedVersion: nextVersion,
+      isPaid: group.isPaid,
       notes: trimToNull(group.notes),
       participantId: group.participantId,
       receiptId,

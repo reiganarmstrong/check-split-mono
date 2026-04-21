@@ -45,8 +45,21 @@ function getArchiveTone(status: ReceiptStatus) {
   return "bg-[color-mix(in_oklab,var(--primary)_16%,transparent)] text-[var(--foreground)]"
 }
 
+function getPaymentProgressLabel(receipt: ReceiptListItem) {
+  if (receipt.participantCount === 0) {
+    return "No groups"
+  }
+
+  if (receipt.paidParticipantCount === receipt.participantCount) {
+    return "All groups paid"
+  }
+
+  return `${receipt.paidParticipantCount} of ${receipt.participantCount} paid`
+}
+
 function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
   const statusLabel = getArchiveStatusLabel(receipt.status)
+  const paymentProgressLabel = getPaymentProgressLabel(receipt)
 
   return (
     <Link href={`/dashboard/receipt?receiptId=${encodeURIComponent(receipt.receiptId)}`} className="block">
@@ -78,6 +91,9 @@ function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
           </p>
           <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
             {formatCurrency(receipt.totalCents)}
+          </p>
+          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+            {paymentProgressLabel}
           </p>
         </div>
 

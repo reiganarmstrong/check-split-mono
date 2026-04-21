@@ -115,6 +115,7 @@ export function createEditableGroup(group?: Partial<EditableGroup>): EditableGro
   return {
     displayName: group?.displayName ?? "",
     id: group?.id ?? makeLocalId("group"),
+    isPaid: group?.isPaid ?? false,
     notes: group?.notes ?? "",
     participantId: group?.participantId ?? null,
   }
@@ -495,6 +496,7 @@ export function mapReceiptToEditorState(receipt: Receipt): ReceiptEditorState {
     createEditableGroup({
       displayName: participant.displayName,
       id: participant.participantId,
+      isPaid: participant.isPaid,
       notes: participant.notes ?? "",
       participantId: participant.participantId,
     }),
@@ -592,6 +594,7 @@ export function buildReceiptSavePlan(
 
     return (
       existing.displayName !== group.displayName.trim() ||
+      existing.isPaid !== group.isPaid ||
       (existing.notes ?? "") !== group.notes.trim() ||
       (existing.sortOrder ?? index) !== index
     )

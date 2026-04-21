@@ -204,6 +204,7 @@ export function ReceiptWorkspace({
                 groupItemShareDetailsByGroupId={
                   workspace.groupItemShareDetailsByGroupId
                 }
+                toggleGroupPaid={workspace.toggleGroupPaid}
                 isSharingSummary={workspace.isSharingSummary}
                 handleShareSummary={workspace.handleShareSummary}
                 scrollToFullSummary={workspace.scrollToFullSummary}

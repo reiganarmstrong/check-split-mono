@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest"
 
-import type { ReceiptEditorState } from "./receipt-types"
+import type { Receipt, ReceiptEditorState } from "./receipt-types"
 import {
+  buildReceiptSavePlan,
   getGroupItemShareDetails,
   getGroupShareSummaries,
   getReceiptTotalCents,
+  mapReceiptToEditorState,
 } from "./receipt-editor"
 
 function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorState {
@@ -18,12 +20,14 @@ function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorStat
       {
         displayName: "Alex",
         id: "group-a",
+        isPaid: false,
         notes: "",
         participantId: null,
       },
       {
         displayName: "Blair",
         id: "group-b",
+        isPaid: false,
         notes: "",
         participantId: null,
       },
@@ -59,6 +63,72 @@ function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorStat
     tax: "0.00",
     tip: "0.00",
     version: null,
+    ...overrides,
+  }
+}
+
+function createReceipt(overrides?: Partial<Receipt>): Receipt {
+  return {
+    allocationPolicy: "PROPORTIONAL",
+    capturedAt: "2025-01-01T00:00:00.000Z",
+    createdAt: "2025-01-01T00:00:00.000Z",
+    currencyCode: "USD",
+    discountCents: 0,
+    feeCents: 0,
+    itemCount: 1,
+    items: [
+      {
+        allocations: [
+          {
+            createdAt: "2025-01-01T00:00:00.000Z",
+            itemId: "item-a",
+            participantId: "participant-a",
+            shareWeight: 1,
+            updatedAt: "2025-01-01T00:00:00.000Z",
+          },
+        ],
+        category: null,
+        createdAt: "2025-01-01T00:00:00.000Z",
+        description: "Item A",
+        discountCents: 0,
+        itemId: "item-a",
+        lineSubtotalCents: 1000,
+        quantity: 1,
+        scanConfidence: null,
+        sourceLineNumber: null,
+        unitPriceCents: 1000,
+        updatedAt: "2025-01-01T00:00:00.000Z",
+      },
+    ],
+    locationAddress: null,
+    locationLat: null,
+    locationLng: null,
+    locationName: null,
+    merchantName: "Test Receipt",
+    ownerUserId: "user-1",
+    paidParticipantCount: 0,
+    participantCount: 1,
+    participants: [
+      {
+        createdAt: "2025-01-01T00:00:00.000Z",
+        displayName: "Alex",
+        isPaid: false,
+        notes: null,
+        paidAt: null,
+        participantId: "participant-a",
+        sortOrder: 0,
+        updatedAt: "2025-01-01T00:00:00.000Z",
+      },
+    ],
+    receiptId: "receipt-1",
+    receiptOccurredAt: "2025-01-01T00:00:00.000Z",
+    status: "DRAFT",
+    subtotalCents: 1000,
+    taxCents: 0,
+    tipCents: 0,
+    totalCents: 1000,
+    updatedAt: "2025-01-01T00:00:00.000Z",
+    version: 1,
     ...overrides,
   }
 }
@@ -302,6 +372,55 @@ describe("getGroupShareSummaries", () => {
         tipShareCents: 0,
       },
     ])
+  })
+})
+
+describe("payment state editor mapping", () => {
+  it("maps receipt participant paid state into editable groups", () => {
+    const editorState = mapReceiptToEditorState(
+      createReceipt({
+        paidParticipantCount: 1,
+        participants: [
+          {
+            createdAt: "2025-01-01T00:00:00.000Z",
+            displayName: "Alex",
+            isPaid: true,
+            notes: null,
+            paidAt: "2025-01-01T01:00:00.000Z",
+            participantId: "participant-a",
+            sortOrder: 0,
+            updatedAt: "2025-01-01T01:00:00.000Z",
+          },
+        ],
+      }),
+    )
+
+    expect(editorState.groups).toEqual([
+      {
+        displayName: "Alex",
+        id: "participant-a",
+        isPaid: true,
+        notes: "",
+        participantId: "participant-a",
+      },
+    ])
+  })
+})
+
+describe("buildReceiptSavePlan", () => {
+  it("marks participant save when paid state changes", () => {
+    const receipt = createReceipt()
+    const state = mapReceiptToEditorState(receipt)
+
+    state.groups = state.groups.map((group) =>
+      group.participantId === "participant-a"
+        ? { ...group, isPaid: true }
+        : group,
+    )
+
+    expect(buildReceiptSavePlan(state, receipt)).toMatchObject({
+      saveParticipantCount: 1,
+    })
   })
 })
 

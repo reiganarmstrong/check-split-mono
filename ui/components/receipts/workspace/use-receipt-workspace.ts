@@ -136,6 +136,7 @@ export function useReceiptWorkspace({
     handleReceiptUpload: actions.handleReceiptUpload,
     updateField: data.updateField,
     updateGroup: data.updateGroup,
+    toggleGroupPaid: data.toggleGroupPaid,
     addGroup: data.addGroup,
     removeGroup: data.removeGroup,
     addItem: data.addItem,
