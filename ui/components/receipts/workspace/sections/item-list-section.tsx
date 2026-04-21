@@ -50,7 +50,7 @@ export function ItemListSection({
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2">
-                  <div className="rounded-full border border-[var(--line)] bg-[color-mix(in_oklab,var(--secondary)_14%,transparent)] px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+                  <div className="rounded-full border border-black bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[color-mix(in_oklab,var(--foreground)_74%,black)]">
                     Item {index + 1}
                   </div>
                   <span className="text-sm font-medium text-[var(--muted-foreground)]">

@@ -38,7 +38,7 @@ export function GroupListSection({
             className="rounded-[1.4rem] border border-[var(--line)] bg-[var(--panel-strong)] p-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="rounded-full border border-[var(--line)] bg-[color-mix(in_oklab,var(--secondary)_20%,transparent)] px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+              <div className="rounded-full border border-black bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[color-mix(in_oklab,var(--foreground)_74%,black)]">
                 Group {index + 1}
               </div>
               <div className="flex items-center gap-2">

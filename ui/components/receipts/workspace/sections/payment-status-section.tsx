@@ -20,6 +20,7 @@ export function PaymentStatusSection({
   toggleGroupPaid: (groupId: string) => void;
 }) {
   const paidGroupCount = groups.filter((group) => group.isPaid).length;
+  const unpaidGroupCount = Math.max(groups.length - paidGroupCount, 0);
   const allGroupsPaid = groups.length > 0 && paidGroupCount === groups.length;
 
   return (
@@ -33,9 +34,7 @@ export function PaymentStatusSection({
         <div
           className={cn(
             "flex flex-wrap items-center justify-between gap-3 rounded-[1.2rem] border px-4 py-3",
-            allGroupsPaid
-              ? "border-[color-mix(in_oklab,var(--accent)_35%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_12%,white)]"
-              : "border-[color-mix(in_oklab,#d84b39_35%,var(--line))] bg-[color-mix(in_oklab,#d84b39_10%,white)]",
+            "border-[var(--line)] bg-white",
           )}
         >
           <div>
@@ -54,7 +53,7 @@ export function PaymentStatusSection({
                 : "border-[color-mix(in_oklab,#d84b39_42%,var(--line))] bg-[color-mix(in_oklab,#d84b39_18%,white)] text-[#8f2f22]",
             )}
           >
-            {paidGroupCount}/{groups.length} paid
+            {allGroupsPaid ? "Everyone paid" : `${unpaidGroupCount} unpaid`}
           </span>
         </div>
 
@@ -69,25 +68,13 @@ export function PaymentStatusSection({
                   "flex flex-col gap-4 rounded-[1.25rem] border px-4 py-4 sm:flex-row sm:items-center sm:justify-between",
                   group.isPaid
                     ? "border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_10%,white)]"
-                    : "border-[var(--line)] bg-[var(--panel-strong)]",
+                    : "border-[color-mix(in_oklab,#d84b39_42%,var(--line))] bg-[color-mix(in_oklab,#d84b39_10%,white)]",
                 )}
               >
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-base font-medium text-[var(--foreground)]">
-                      {group.displayName || "Untitled group"}
-                    </p>
-                    <span
-                      className={cn(
-                        "rounded-full border px-2.5 py-1 text-[0.68rem] font-medium uppercase tracking-[0.18em]",
-                        group.isPaid
-                          ? "border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_20%,transparent)] text-[var(--foreground)]"
-                          : "border-[color-mix(in_oklab,#d84b39_40%,var(--line))] bg-[color-mix(in_oklab,#d84b39_12%,white)] text-[#b43b2b]",
-                      )}
-                    >
-                      {group.isPaid ? "Paid" : "Unpaid"}
-                    </span>
-                  </div>
+                  <p className="text-base font-medium text-[var(--foreground)]">
+                    {group.displayName || "Untitled group"}
+                  </p>
                   <p className="mt-2 text-sm text-[var(--muted-foreground)]">
                     Amount due{" "}
                     <span className="font-medium text-[var(--foreground)]">
@@ -100,11 +87,12 @@ export function PaymentStatusSection({
                   type="button"
                   variant="outline"
                   size="sm"
+                  aria-label={group.isPaid ? "Mark group unpaid" : "Mark group paid"}
                   className={cn(
                     "h-10 rounded-full border px-4 text-sm font-medium",
                     group.isPaid
-                      ? "border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_20%,transparent)] text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--accent)_26%,transparent)]"
-                      : "border-[var(--line)] bg-[var(--panel)] text-[var(--foreground)] hover:bg-[var(--surface)]",
+                      ? "border-[color-mix(in_oklab,var(--accent)_40%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent-foreground)] hover:border-[color-mix(in_oklab,#d84b39_42%,var(--line))] hover:bg-[color-mix(in_oklab,#d84b39_14%,white)] hover:text-[#b43b2b]"
+                      : "border-[color-mix(in_oklab,#d84b39_52%,var(--line))] bg-[color-mix(in_oklab,#d84b39_18%,white)] text-[#8f2f22] hover:border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] hover:bg-[color-mix(in_oklab,var(--accent)_18%,white)] hover:text-[var(--accent-foreground)]",
                   )}
                   onClick={() => toggleGroupPaid(group.id)}
                 >
@@ -113,7 +101,12 @@ export function PaymentStatusSection({
                   ) : (
                     <CircleDashed className="h-4 w-4" />
                   )}
-                  {group.isPaid ? "Mark unpaid" : "Mark paid"}
+                  <span className="group-hover/button:hidden">
+                    {group.isPaid ? "Paid" : "Unpaid"}
+                  </span>
+                  <span className="hidden group-hover/button:inline">
+                    {group.isPaid ? "Mark unpaid" : "Mark paid"}
+                  </span>
                 </Button>
               </div>
             );

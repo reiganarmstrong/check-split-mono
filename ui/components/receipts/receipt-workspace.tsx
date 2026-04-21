@@ -143,9 +143,6 @@ export function ReceiptWorkspace({
                       editorState={workspace.editorState}
                       merchantNameMissing={workspace.merchantNameMissing}
                       receiptDateMissing={workspace.receiptDateMissing}
-                      isParsingReceipt={workspace.isParsingReceipt}
-                      requestReceiptUpload={workspace.requestReceiptUpload}
-                      handleReceiptUpload={workspace.handleReceiptUpload}
                       updateField={workspace.updateField}
                     />
                   </motion.div>
