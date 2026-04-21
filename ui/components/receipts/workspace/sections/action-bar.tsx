@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import type {
   ReceiptWorkspaceSavePlan,
   ReceiptWorkspaceValidation,
-} from "./use-receipt-workspace";
+} from "../hooks/use-receipt-workspace";
 
 export function ReceiptActionBar({
   actionBarRef,

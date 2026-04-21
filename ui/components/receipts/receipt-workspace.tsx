@@ -7,16 +7,17 @@ import { AlertCircle } from "lucide-react";
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { Button } from "@/components/ui/button";
 
-import { ReceiptActionBar } from "./workspace/action-bar";
-import { AdjustmentsSection } from "./workspace/adjustments-section";
-import { GroupListSection } from "./workspace/group-list-section";
-import { ItemListSection } from "./workspace/item-list-section";
-import { ReceiptDetailsSection } from "./workspace/receipt-details-section";
-import { ReceiptUploadGate } from "./workspace/receipt-upload-gate";
-import { SummaryAside } from "./workspace/summary-aside";
-import { useReceiptWorkspace } from "./workspace/use-receipt-workspace";
-import { WorkspaceHeader } from "./workspace/workspace-header";
-import { EditorNotice } from "./workspace/shared";
+import { useReceiptWorkspace } from "./workspace/hooks/use-receipt-workspace";
+import { EditorNotice } from "./workspace/lib/shared";
+import { ReceiptActionBar } from "./workspace/sections/action-bar";
+import { AdjustmentsSection } from "./workspace/sections/adjustments-section";
+import { GroupListSection } from "./workspace/sections/group-list-section";
+import { ItemListSection } from "./workspace/sections/item-list-section";
+import { PaymentStatusSection } from "./workspace/sections/payment-status-section";
+import { ReceiptDetailsSection } from "./workspace/sections/receipt-details-section";
+import { ReceiptUploadGate } from "./workspace/sections/receipt-upload-gate";
+import { SummaryAside } from "./workspace/sections/summary-aside";
+import { WorkspaceHeader } from "./workspace/sections/workspace-header";
 
 export function ReceiptWorkspace({
   receiptId,
@@ -166,6 +167,18 @@ export function ReceiptWorkspace({
                   <motion.div
                     initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.125, duration: 0.3 }}
+                  >
+                    <PaymentStatusSection
+                      groups={workspace.editorState.groups}
+                      groupSharesById={workspace.groupSharesById}
+                      toggleGroupPaid={workspace.toggleGroupPaid}
+                    />
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15, duration: 0.3 }}
                   >
                     <ItemListSection
@@ -189,6 +202,7 @@ export function ReceiptWorkspace({
                       updateField={workspace.updateField}
                     />
                   </motion.div>
+
                 </>
               )}
             </div>
@@ -208,6 +222,8 @@ export function ReceiptWorkspace({
                 isSharingSummary={workspace.isSharingSummary}
                 handleShareSummary={workspace.handleShareSummary}
                 scrollToFullSummary={workspace.scrollToFullSummary}
+                actionBarHeight={workspace.actionBarHeight}
+                footerOffset={workspace.footerOffset}
               />
             )}
           </div>

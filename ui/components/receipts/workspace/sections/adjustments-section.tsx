@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import type { ReceiptEditorState } from "@/lib/receipt-types";
 
-import { SectionShell } from "./shared";
+import { SectionShell } from "../lib/shared";
 
 type UpdateField = <K extends keyof ReceiptEditorState>(
   field: K,
@@ -18,7 +18,7 @@ export function AdjustmentsSection({
   updateField: UpdateField;
 }) {
   return (
-    <SectionShell title="Adjustments" eyebrow="Totals">
+    <SectionShell title="Adjustments" eyebrow="Receipt totals">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <label className="space-y-2">
           <span className="text-sm font-medium text-[var(--foreground)]">

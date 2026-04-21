@@ -4,10 +4,6 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/auth/auth-provider";
 
-import { getReceiptWorkspaceDerivedState } from "./workspace-selectors";
-import { useReceiptWorkspaceActions } from "./use-receipt-workspace-actions";
-import { useReceiptWorkspaceData } from "./use-receipt-workspace-data";
-import { useReceiptWorkspaceLayout } from "./use-receipt-workspace-layout";
 import type {
   ReceiptWorkspaceAuthStatus,
   ReceiptWorkspaceController,
@@ -16,7 +12,11 @@ import type {
   ReceiptWorkspaceItemValidation,
   ReceiptWorkspaceSavePlan,
   ReceiptWorkspaceValidation,
-} from "./types";
+} from "../lib/types";
+import { getReceiptWorkspaceDerivedState } from "../lib/workspace-selectors";
+import { useReceiptWorkspaceActions } from "./use-receipt-workspace-actions";
+import { useReceiptWorkspaceData } from "./use-receipt-workspace-data";
+import { useReceiptWorkspaceLayout } from "./use-receipt-workspace-layout";
 
 export type {
   ReceiptWorkspaceAuthStatus,
@@ -26,7 +26,7 @@ export type {
   ReceiptWorkspaceItemValidation,
   ReceiptWorkspaceSavePlan,
   ReceiptWorkspaceValidation,
-} from "./types";
+} from "../lib/types";
 
 export function useReceiptWorkspace({
   receiptId,

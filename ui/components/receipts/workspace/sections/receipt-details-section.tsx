@@ -9,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import type { ReceiptEditorState } from "@/lib/receipt-types";
 import { cn } from "@/lib/utils";
 
-import { requiredHighlightSoftStyle } from "./constants";
-import { FieldLabel, SectionShell } from "./shared";
+import { requiredHighlightSoftStyle } from "../lib/constants";
+import { FieldLabel, SectionShell } from "../lib/shared";
 
 type UpdateField = <K extends keyof ReceiptEditorState>(
   field: K,
@@ -59,7 +59,7 @@ export function ReceiptDetailsSection({
   return (
     <SectionShell
       title="Receipt details"
-      eyebrow="Metadata"
+      eyebrow="Receipt info"
       icon={ReceiptText}
       tone="primary"
     >

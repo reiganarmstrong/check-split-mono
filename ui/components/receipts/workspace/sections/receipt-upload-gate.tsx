@@ -6,7 +6,7 @@ import { Camera, LoaderCircle, ScanSearch } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-import { SectionShell } from "./shared";
+import { SectionShell } from "../lib/shared";
 
 export function ReceiptUploadGate({
   autoOpenOnMount,
@@ -50,7 +50,7 @@ export function ReceiptUploadGate({
   return (
     <SectionShell
       title="Start from a receipt image"
-      eyebrow="New receipt"
+      eyebrow="Getting started"
       icon={ScanSearch}
       tone="accent"
     >

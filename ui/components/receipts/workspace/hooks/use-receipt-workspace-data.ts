@@ -10,8 +10,8 @@ import type {
   ReceiptEditorState,
 } from "@/lib/receipt-types";
 
-import { logWorkspaceError } from "./workspace-helpers";
-import type { ReceiptWorkspaceAuthStatus } from "./types";
+import type { ReceiptWorkspaceAuthStatus } from "../lib/types";
+import { logWorkspaceError } from "../lib/workspace-helpers";
 import { getReceipt } from "@/lib/receipt-api";
 
 export function useReceiptWorkspaceData({

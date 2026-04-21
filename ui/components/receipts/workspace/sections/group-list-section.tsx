@@ -5,8 +5,8 @@ import { Plus, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { EditableGroup } from "@/lib/receipt-types";
 
-import { requiredHighlightSoftStyle } from "./constants";
-import { FieldLabel, SectionShell } from "./shared";
+import { requiredHighlightSoftStyle } from "../lib/constants";
+import { FieldLabel, SectionShell } from "../lib/shared";
 
 export function GroupListSection({
   groups,
@@ -24,7 +24,7 @@ export function GroupListSection({
   return (
     <SectionShell
       title="Split groups"
-      eyebrow="Participants"
+      eyebrow="Who pays"
       icon={Users}
       tone="primary"
     >

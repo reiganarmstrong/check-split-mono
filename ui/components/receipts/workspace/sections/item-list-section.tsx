@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
 import {
   requiredHighlightFillStyle,
   requiredHighlightSoftStyle,
-} from "./constants";
-import type { ReceiptWorkspaceItemValidation } from "./use-receipt-workspace";
-import { FieldLabel, GroupChip, SectionShell } from "./shared";
+} from "../lib/constants";
+import { FieldLabel, GroupChip, SectionShell } from "../lib/shared";
+import type { ReceiptWorkspaceItemValidation } from "../hooks/use-receipt-workspace";
 
 export function ItemListSection({
   items,
@@ -35,7 +35,7 @@ export function ItemListSection({
   return (
     <SectionShell
       title="Items and assignment"
-      eyebrow="Line items"
+      eyebrow="Assigned items"
       icon={MapPin}
       tone="primary"
     >
