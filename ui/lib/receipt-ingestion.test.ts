@@ -27,7 +27,6 @@ function createParsePayload(
       locationName: "Downtown",
       merchantName: "Bodega Club",
       receiptOccurredAt: "2026-04-19T22:30:00.000Z",
-      status: "DRAFT",
       subtotalCents: 2_150,
       taxCents: 180,
       tipCents: 420,
@@ -148,7 +147,6 @@ describe("mapReceiptParseResponseToEditorState", () => {
     expect(editorState.receiptId).toBeNull()
     expect(editorState.version).toBeNull()
     expect(editorState.allocationPolicy).toBe("EVEN")
-    expect(editorState.status).toBe("DRAFT")
     expect(editorState.merchantName).toBe("Bodega Club")
     expect(editorState.currencyCode).toBe("USD")
     expect(editorState.locationName).toBe("Downtown")
@@ -180,7 +178,6 @@ describe("mapReceiptParseResponseToEditorState", () => {
           locationName: null,
           merchantName: null,
           receiptOccurredAt: null,
-          status: "DRAFT",
           subtotalCents: null,
           taxCents: null,
           tipCents: null,

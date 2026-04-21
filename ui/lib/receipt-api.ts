@@ -29,7 +29,6 @@ import type {
   ReceiptSavePlan,
 } from "@/lib/receipt-types"
 
-const receiptStatusSchema = z.enum(["DRAFT", "OPEN", "FINALIZED"])
 const allocationPolicySchema = z.enum(["EVEN", "PROPORTIONAL"])
 
 const receiptItemAllocationSchema = z.object({
@@ -86,7 +85,6 @@ const receiptSchema = z.object({
   participants: z.array(receiptParticipantSchema),
   receiptId: z.string(),
   receiptOccurredAt: z.string(),
-  status: receiptStatusSchema,
   subtotalCents: z.number(),
   taxCents: z.number(),
   tipCents: z.number(),
@@ -102,7 +100,6 @@ const receiptListItemSchema = z.object({
   participantCount: z.number(),
   receiptId: z.string(),
   receiptOccurredAt: z.string(),
-  status: receiptStatusSchema,
   totalCents: z.number(),
   updatedAt: z.string(),
 })
@@ -116,7 +113,6 @@ const receiptMutationResultSchema = z.object({
   itemCount: z.number().nullable().optional(),
   participantCount: z.number().nullable().optional(),
   receiptId: z.string(),
-  status: receiptStatusSchema.nullable().optional(),
   updatedAt: z.string(),
   version: z.number(),
 })
@@ -281,7 +277,6 @@ function buildMetadataInput(state: ReceiptEditorState, receiptId: string, versio
     merchantName: state.merchantName.trim(),
     receiptId,
     receiptOccurredAt: toAwsDateTime(state.receiptOccurredAt),
-    status: state.status,
     subtotalCents: getReceiptSubtotalCents(state),
     taxCents: parseMoneyInputToCents(state.tax),
     tipCents: parseMoneyInputToCents(state.tip),
@@ -346,7 +341,6 @@ const listReceiptsQuery = /* GraphQL */ `
         participantCount
         receiptId
         receiptOccurredAt
-        status
         totalCents
         updatedAt
       }
@@ -405,7 +399,6 @@ const getReceiptQuery = /* GraphQL */ `
       }
       receiptId
       receiptOccurredAt
-      status
       subtotalCents
       taxCents
       tipCents
@@ -466,7 +459,6 @@ const createReceiptMutation = /* GraphQL */ `
       }
       receiptId
       receiptOccurredAt
-      status
       subtotalCents
       taxCents
       tipCents
@@ -493,7 +485,6 @@ const updateReceiptMetadataMutation = /* GraphQL */ `
   mutation UpdateReceiptMetadata($input: UpdateReceiptMetadataInput!) {
     updateReceiptMetadata(input: $input) {
       receiptId
-      status
       updatedAt
       version
     }
@@ -989,7 +980,6 @@ export async function saveReceiptEditorState(
       locationName: trimToNull(state.locationName),
       merchantName: state.merchantName.trim(),
       receiptOccurredAt: toAwsDateTime(state.receiptOccurredAt),
-      status: "DRAFT",
       subtotalCents: getReceiptSubtotalCents(state),
       taxCents: parseMoneyInputToCents(state.tax),
       tipCents: parseMoneyInputToCents(state.tip),

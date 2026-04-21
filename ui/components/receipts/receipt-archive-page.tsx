@@ -11,39 +11,7 @@ import { useAuth } from "@/components/auth/auth-provider"
 import { Button } from "@/components/ui/button"
 import { ReceiptApiError, listReceipts } from "@/lib/receipt-api"
 import { formatCurrency, formatReceiptDate } from "@/lib/receipt-editor"
-import type { ReceiptListItem, ReceiptStatus } from "@/lib/receipt-types"
-import { cn } from "@/lib/utils"
-
-function getArchiveStatusLabel(status: ReceiptStatus) {
-  if (status === "DRAFT" || status === "OPEN") {
-    return "Saved"
-  }
-
-  if (status === "FINALIZED") {
-    return "Finalized"
-  }
-
-  return status
-}
-
-function getArchiveTone(status: ReceiptStatus) {
-  const normalizedStatus = getArchiveStatusLabel(status).toLowerCase()
-
-  if (normalizedStatus.includes("draft")) {
-    return "bg-[color-mix(in_oklab,var(--secondary)_28%,transparent)] text-[var(--secondary-foreground)]"
-  }
-
-  if (
-    normalizedStatus.includes("paid") ||
-    normalizedStatus.includes("saved") ||
-    normalizedStatus.includes("complete") ||
-    normalizedStatus.includes("final")
-  ) {
-    return "bg-[color-mix(in_oklab,var(--accent)_28%,transparent)] text-[var(--accent-foreground)]"
-  }
-
-  return "bg-[color-mix(in_oklab,var(--primary)_16%,transparent)] text-[var(--foreground)]"
-}
+import type { ReceiptListItem } from "@/lib/receipt-types"
 
 function getPaymentProgressLabel(receipt: ReceiptListItem) {
   if (receipt.participantCount === 0) {
@@ -58,7 +26,6 @@ function getPaymentProgressLabel(receipt: ReceiptListItem) {
 }
 
 function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
-  const statusLabel = getArchiveStatusLabel(receipt.status)
   const paymentProgressLabel = getPaymentProgressLabel(receipt)
 
   return (
@@ -98,16 +65,6 @@ function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
         </div>
 
         <div className="flex items-center justify-between gap-4 md:justify-end">
-          {statusLabel ? (
-            <span
-              className={cn(
-                "rounded-full px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.18em]",
-                getArchiveTone(receipt.status),
-              )}
-            >
-              {statusLabel}
-            </span>
-          ) : null}
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
             <ArrowRight className="h-4 w-4 text-[var(--foreground)]" />
           </span>
@@ -181,7 +138,6 @@ export function ReceiptArchivePage() {
     )
   }
 
-  const savedCount = receipts.filter((receipt) => receipt.status === "DRAFT" || receipt.status === "OPEN").length
   const recentCount = receipts.filter((receipt) => {
     const occurredAt = new Date(receipt.receiptOccurredAt)
     const now = new Date()
@@ -239,8 +195,8 @@ export function ReceiptArchivePage() {
                 <span className="font-medium text-[var(--foreground)]">{receipts.length}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-[var(--muted-foreground)]">Saved and open</span>
-                <span className="font-medium text-[var(--foreground)]">{savedCount}</span>
+                <span className="text-[var(--muted-foreground)]">Receipts in account</span>
+                <span className="font-medium text-[var(--foreground)]">{receipts.length}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[var(--muted-foreground)]">Updated this month</span>

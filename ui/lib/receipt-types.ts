@@ -1,7 +1,5 @@
 export type AllocationPolicy = "EVEN" | "PROPORTIONAL"
 
-export type ReceiptStatus = "DRAFT" | "OPEN" | "FINALIZED"
-
 export type ReceiptListItem = {
   locationName: string | null
   merchantName: string
@@ -9,7 +7,6 @@ export type ReceiptListItem = {
   participantCount: number
   receiptId: string
   receiptOccurredAt: string
-  status: ReceiptStatus
   totalCents: number
   updatedAt: string
 }
@@ -68,7 +65,6 @@ export type Receipt = {
   participants: ReceiptParticipant[]
   receiptId: string
   receiptOccurredAt: string
-  status: ReceiptStatus
   subtotalCents: number
   taxCents: number
   tipCents: number
@@ -109,7 +105,6 @@ export type ReceiptEditorState = {
   merchantName: string
   receiptId: string | null
   receiptOccurredAt: string
-  status: ReceiptStatus
   tax: string
   tip: string
   version: number | null
