@@ -31,6 +31,7 @@ export function ReceiptActionBar({
   isDeleting,
   isSaving,
   isSharingSummary,
+  isParsingReceipt,
   isDirty,
   hasSavedReceipt,
   warningMessage,
@@ -57,6 +58,7 @@ export function ReceiptActionBar({
   isDeleting: boolean;
   isSaving: boolean;
   isSharingSummary: boolean;
+  isParsingReceipt: boolean;
   isDirty: boolean;
   hasSavedReceipt: boolean;
   warningMessage: string | null;
@@ -251,7 +253,7 @@ export function ReceiptActionBar({
                     <Button
                       type="button"
                       onClick={() => void handleDelete()}
-                      disabled={isSaving || isDeleting}
+                      disabled={isSaving || isDeleting || isParsingReceipt}
                       className={cn(
                         "h-11 rounded-full bg-[#ff0000] px-5 text-sm font-medium text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
                         isCompactActionBar &&
@@ -278,7 +280,11 @@ export function ReceiptActionBar({
                   type="button"
                   onClick={() => void handleSave()}
                   disabled={
-                    !validation.canSave || !isDirty || isSaving || isDeleting
+                    !validation.canSave ||
+                    !isDirty ||
+                    isSaving ||
+                    isDeleting ||
+                    isParsingReceipt
                   }
                   className={cn(
                     "h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
@@ -375,7 +381,7 @@ export function ReceiptActionBar({
                   <Button
                     type="button"
                     onClick={() => void handleDelete()}
-                    disabled={isSaving || isDeleting}
+                    disabled={isSaving || isDeleting || isParsingReceipt}
                     className={cn(
                       "h-11 rounded-full bg-[#ff0000] px-5 text-sm font-medium text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
                       isCompactActionBar &&
@@ -402,7 +408,11 @@ export function ReceiptActionBar({
                 type="button"
                 onClick={() => void handleSave()}
                 disabled={
-                  !validation.canSave || !isDirty || isSaving || isDeleting
+                  !validation.canSave ||
+                  !isDirty ||
+                  isSaving ||
+                  isDeleting ||
+                  isParsingReceipt
                 }
                 className={cn(
                   "h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",

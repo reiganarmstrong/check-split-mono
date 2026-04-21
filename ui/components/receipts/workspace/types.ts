@@ -39,14 +39,19 @@ export type ReceiptWorkspaceController = {
   actionBarActionsRef: RefObject<HTMLDivElement | null>;
   editorState: ReceiptEditorState;
   sourceReceipt: Receipt | null;
+  hasStartedDraft: boolean;
+  shouldShowUploadGate: boolean;
   isLoading: boolean;
   isMissing: boolean;
   isSaving: boolean;
   isDeleting: boolean;
   isDeleteConfirming: boolean;
   isSharingSummary: boolean;
+  isParsingReceipt: boolean;
   saveMessage: string | null;
   shareMessage: string | null;
+  parseMessage: string | null;
+  parseIssues: string[];
   warningMessage: string | null;
   footerOffset: number;
   actionBarHeight: number;
@@ -78,6 +83,9 @@ export type ReceiptWorkspaceController = {
   isMinimizedMobileActionBar: boolean;
   setIsDeleteConfirming: (value: boolean) => void;
   toggleMobileActionBarMinimized: () => void;
+  beginManualEntry: () => void;
+  requestReceiptUpload: () => boolean;
+  handleReceiptUpload: (file: File) => Promise<void>;
   updateField: <K extends keyof ReceiptEditorState>(
     field: K,
     value: ReceiptEditorState[K],

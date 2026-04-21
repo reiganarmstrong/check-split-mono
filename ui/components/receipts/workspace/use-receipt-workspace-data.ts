@@ -21,16 +21,19 @@ export function useReceiptWorkspaceData({
 }: {
   receiptId?: string;
   status: ReceiptWorkspaceAuthStatus;
-  router: { replace: (href: string) => void };
+  router: { push: (href: string) => void; replace: (href: string) => void };
 }) {
   const [editorState, setEditorState] = useState<ReceiptEditorState>(() =>
     createEmptyReceiptEditorState(),
   );
   const [sourceReceipt, setSourceReceipt] = useState<Receipt | null>(null);
+  const [hasStartedDraft, setHasStartedDraft] = useState(Boolean(receiptId));
   const [isLoading, setIsLoading] = useState(Boolean(receiptId));
   const [isMissing, setIsMissing] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [shareMessage, setShareMessage] = useState<string | null>(null);
+  const [parseMessage, setParseMessage] = useState<string | null>(null);
+  const [parseIssues, setParseIssues] = useState<string[]>([]);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,6 +51,7 @@ export function useReceiptWorkspaceData({
     if (!currentReceiptId) {
       setSourceReceipt(null);
       setEditorState(createEmptyReceiptEditorState());
+      setHasStartedDraft(false);
       setIsLoading(false);
       setIsMissing(false);
       return;
@@ -77,6 +81,7 @@ export function useReceiptWorkspaceData({
         setIsMissing(false);
         setSourceReceipt(receipt);
         setEditorState(mapReceiptToEditorState(receipt));
+        setHasStartedDraft(true);
       } catch (error) {
         if (!isActive) {
           return;
@@ -104,6 +109,11 @@ export function useReceiptWorkspaceData({
   function clearTransientMessages() {
     setSaveMessage(null);
     setShareMessage(null);
+    setParseMessage(null);
+  }
+
+  function clearParseIssues() {
+    setParseIssues([]);
   }
 
   function updateField<K extends keyof ReceiptEditorState>(
@@ -111,6 +121,7 @@ export function useReceiptWorkspaceData({
     value: ReceiptEditorState[K],
   ) {
     clearTransientMessages();
+    clearParseIssues();
     setWarningMessage(null);
     setEditorState((current) => ({
       ...current,
@@ -120,6 +131,7 @@ export function useReceiptWorkspaceData({
 
   function updateGroup(groupId: string, updates: Partial<EditableGroup>) {
     clearTransientMessages();
+    clearParseIssues();
     setEditorState((current) => ({
       ...current,
       groups: current.groups.map((group) =>
@@ -130,6 +142,7 @@ export function useReceiptWorkspaceData({
 
   function addGroup() {
     clearTransientMessages();
+    clearParseIssues();
     setEditorState((current) => ({
       ...current,
       groups: [...current.groups, createEditableGroup()],
@@ -138,6 +151,7 @@ export function useReceiptWorkspaceData({
 
   function removeGroup(groupId: string) {
     clearTransientMessages();
+    clearParseIssues();
     setEditorState((current) => {
       if (current.groups.length === 1) {
         return current;
@@ -158,6 +172,7 @@ export function useReceiptWorkspaceData({
 
   function addItem() {
     clearTransientMessages();
+    clearParseIssues();
     setEditorState((current) => ({
       ...current,
       items: [
@@ -171,6 +186,7 @@ export function useReceiptWorkspaceData({
 
   function updateItem(itemId: string, updates: Partial<EditableItem>) {
     clearTransientMessages();
+    clearParseIssues();
     setEditorState((current) => ({
       ...current,
       items: current.items.map((item) =>
@@ -181,6 +197,7 @@ export function useReceiptWorkspaceData({
 
   function removeItem(itemId: string) {
     clearTransientMessages();
+    clearParseIssues();
     setEditorState((current) => ({
       ...current,
       items:
@@ -198,6 +215,7 @@ export function useReceiptWorkspaceData({
 
   function toggleGroupAssignment(itemId: string, groupId: string) {
     clearTransientMessages();
+    clearParseIssues();
     setEditorState((current) => ({
       ...current,
       items: current.items.map((item) => {
@@ -219,19 +237,36 @@ export function useReceiptWorkspaceData({
     }));
   }
 
+  function beginManualEntry() {
+    clearTransientMessages();
+    setSourceReceipt(null);
+    setEditorState(createEmptyReceiptEditorState());
+    setHasStartedDraft(true);
+    setIsMissing(false);
+    setWarningMessage(null);
+    clearParseIssues();
+  }
+
   return {
     editorState,
     setEditorState,
     sourceReceipt,
     setSourceReceipt,
+    hasStartedDraft,
+    setHasStartedDraft,
     isLoading,
     isMissing,
     saveMessage,
     setSaveMessage,
     shareMessage,
     setShareMessage,
+    parseMessage,
+    setParseMessage,
+    parseIssues,
+    setParseIssues,
     warningMessage,
     setWarningMessage,
+    beginManualEntry,
     updateField,
     updateGroup,
     addGroup,

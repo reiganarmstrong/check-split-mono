@@ -11,6 +11,7 @@ NEXT_PUBLIC_COGNITO_USER_POOL_ID=...
 NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID=...
 NEXT_PUBLIC_AWS_REGION=us-east-1
 NEXT_PUBLIC_RECEIPT_API_GRAPHQL_URL=https://...
+NEXT_PUBLIC_RECEIPT_PARSE_API_URL=https://...
 ```
 
 Start the app with `pnpm dev`.
@@ -23,11 +24,19 @@ The dashboard and manual receipt editor now talk directly to the AppSync receipt
 
 - `NEXT_PUBLIC_AWS_REGION` for the Cognito/AppSync region
 - `NEXT_PUBLIC_RECEIPT_API_GRAPHQL_URL` for the AppSync GraphQL endpoint
+- `NEXT_PUBLIC_RECEIPT_PARSE_API_URL` for the Cognito-protected receipt parsing HTTP API
 
 Those values come from `../infra/environments/dev/outputs.tf`:
 
 - `receipt_api_graphql_api_url`
+- `receipt_parse_api_url`
 - the shared AWS region (`us-east-1` in the current dev environment)
+
+## Receipt Upload Flow
+
+The new receipt flow starts with an upload-first prompt. The browser compresses
+receipt images to `<= 4 MB` before calling the ingestion API, and the parsed
+draft stays local in the editor until the user explicitly saves it.
 
 ## Getting Started
 

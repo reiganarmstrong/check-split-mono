@@ -1,6 +1,6 @@
 import { Amplify } from "aws-amplify"
 
-import { cognitoPasswordPolicy } from "@/lib/password-policy"
+import { cognitoPasswordPolicy } from "./password-policy"
 
 let isAmplifyConfigured = false
 
@@ -9,6 +9,7 @@ const cognitoUserPoolClientId =
   process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID
 const awsRegion = process.env.NEXT_PUBLIC_AWS_REGION
 const receiptApiGraphqlUrl = process.env.NEXT_PUBLIC_RECEIPT_API_GRAPHQL_URL
+const receiptParseApiUrl = process.env.NEXT_PUBLIC_RECEIPT_PARSE_API_URL
 
 export function hasAmplifyAuthConfig() {
   return Boolean(cognitoUserPoolId && cognitoUserPoolClientId)
@@ -25,6 +26,14 @@ export function hasAmplifyDataConfig() {
 
 export function getReceiptApiGraphqlUrl() {
   return receiptApiGraphqlUrl
+}
+
+export function hasReceiptParseConfig() {
+  return Boolean(receiptParseApiUrl)
+}
+
+export function getReceiptParseApiUrl() {
+  return receiptParseApiUrl
 }
 
 export function getAwsRegion() {

@@ -205,14 +205,16 @@ export function ReceiptArchivePage() {
                   Create custom receipt
                 </Link>
               </Button>
-              <button
-                type="button"
-                disabled
-                className="inline-flex h-12 items-center gap-2 rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-medium text-[var(--muted-foreground)]"
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
               >
-                <Camera className="h-4 w-4" />
-                Upload parsing soon
-              </button>
+                <Link href="/dashboard/new?prompt=upload">
+                  <Camera className="h-4 w-4" />
+                  Upload receipt
+                </Link>
+              </Button>
             </div>
 
             <div className="section-divider mt-6 grid gap-4 pt-6">
@@ -273,13 +275,15 @@ export function ReceiptArchivePage() {
                     >
                       <Link href="/dashboard/new">Create custom receipt</Link>
                     </Button>
-                    <button
-                      type="button"
-                      disabled
-                      className="rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--muted-foreground)]"
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
                     >
-                      Upload parsing in progress
-                    </button>
+                      <Link href="/dashboard/new?prompt=upload">
+                        Upload receipt
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </div>

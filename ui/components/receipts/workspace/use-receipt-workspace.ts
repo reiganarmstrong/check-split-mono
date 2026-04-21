@@ -52,13 +52,18 @@ export function useReceiptWorkspace({
     receiptId,
     editorState: data.editorState,
     sourceReceipt: data.sourceReceipt,
+    hasStartedDraft: data.hasStartedDraft,
+    isDirty: derived.isDirty,
     canSave: derived.validation.canSave,
     summaryShareData: derived.summaryShareData,
     router,
     setEditorState: data.setEditorState,
     setSourceReceipt: data.setSourceReceipt,
+    setHasStartedDraft: data.setHasStartedDraft,
     setSaveMessage: data.setSaveMessage,
     setShareMessage: data.setShareMessage,
+    setParseMessage: data.setParseMessage,
+    setParseIssues: data.setParseIssues,
     setWarningMessage: data.setWarningMessage,
   });
 
@@ -69,6 +74,12 @@ export function useReceiptWorkspace({
     sourceReceiptId: data.sourceReceipt?.receiptId,
   });
 
+  const shouldShowUploadGate = !receiptId && !data.hasStartedDraft;
+  const heading = shouldShowUploadGate ? "New receipt" : derived.heading;
+  const workspaceDescription = shouldShowUploadGate
+    ? "Upload to parse, or start manually."
+    : derived.workspaceDescription;
+
   return {
     status: status as ReceiptWorkspaceAuthStatus,
     receiptId,
@@ -77,14 +88,19 @@ export function useReceiptWorkspace({
     actionBarActionsRef: layout.actionBarActionsRef,
     editorState: data.editorState,
     sourceReceipt: data.sourceReceipt,
+    hasStartedDraft: data.hasStartedDraft,
+    shouldShowUploadGate,
     isLoading: data.isLoading,
     isMissing: data.isMissing,
     isSaving: actions.isSaving,
     isDeleting: actions.isDeleting,
     isDeleteConfirming: actions.isDeleteConfirming,
     isSharingSummary: actions.isSharingSummary,
+    isParsingReceipt: actions.isParsingReceipt,
     saveMessage: data.saveMessage,
     shareMessage: data.shareMessage,
+    parseMessage: data.parseMessage,
+    parseIssues: data.parseIssues,
     warningMessage: data.warningMessage,
     footerOffset: layout.footerOffset,
     actionBarHeight: layout.actionBarHeight,
@@ -109,12 +125,15 @@ export function useReceiptWorkspace({
     itemValidationById:
       derived.itemValidationById as Map<string, ReceiptWorkspaceItemValidation>,
     hasSavedReceipt: derived.hasSavedReceipt,
-    heading: derived.heading,
-    workspaceDescription: derived.workspaceDescription,
+    heading,
+    workspaceDescription,
     isCompactActionBar: layout.isCompactActionBar,
     isMinimizedMobileActionBar: layout.isMinimizedMobileActionBar,
     setIsDeleteConfirming: actions.setIsDeleteConfirming,
     toggleMobileActionBarMinimized: layout.toggleMobileActionBarMinimized,
+    beginManualEntry: data.beginManualEntry,
+    requestReceiptUpload: actions.requestReceiptUpload,
+    handleReceiptUpload: actions.handleReceiptUpload,
     updateField: data.updateField,
     updateGroup: data.updateGroup,
     addGroup: data.addGroup,

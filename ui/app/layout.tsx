@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
 
@@ -26,7 +27,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <div className="site-shell flex min-h-screen flex-col">
-            <Navbar />
+            <Suspense fallback={null}>
+              <Navbar />
+            </Suspense>
             <div className="site-main">{children}</div>
             <SiteFooter />
           </div>

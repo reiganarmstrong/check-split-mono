@@ -3,6 +3,12 @@
 import { startTransition, useEffect, useRef, useState } from "react";
 
 import {
+  buildReceiptParseMessage,
+  mapReceiptParseResponseToEditorState,
+  parseReceiptImage,
+  ReceiptIngestionError,
+} from "@/lib/receipt-ingestion";
+import {
   ReceiptApiError,
   deleteReceipt,
   getReceipt,
@@ -18,25 +24,35 @@ export function useReceiptWorkspaceActions({
   receiptId,
   editorState,
   sourceReceipt,
+  hasStartedDraft,
+  isDirty,
   canSave,
   summaryShareData,
   router,
   setEditorState,
   setSourceReceipt,
+  setHasStartedDraft,
   setSaveMessage,
   setShareMessage,
+  setParseMessage,
+  setParseIssues,
   setWarningMessage,
 }: {
   receiptId?: string;
   editorState: ReceiptEditorState;
   sourceReceipt: Receipt | null;
+  hasStartedDraft: boolean;
+  isDirty: boolean;
   canSave: boolean;
   summaryShareData: ReturnType<typeof buildReceiptSummaryShareData>;
-  router: { replace: (href: string) => void };
+  router: { push: (href: string) => void; replace: (href: string) => void };
   setEditorState: React.Dispatch<React.SetStateAction<ReceiptEditorState>>;
   setSourceReceipt: React.Dispatch<React.SetStateAction<Receipt | null>>;
+  setHasStartedDraft: React.Dispatch<React.SetStateAction<boolean>>;
   setSaveMessage: React.Dispatch<React.SetStateAction<string | null>>;
   setShareMessage: React.Dispatch<React.SetStateAction<string | null>>;
+  setParseMessage: React.Dispatch<React.SetStateAction<string | null>>;
+  setParseIssues: React.Dispatch<React.SetStateAction<string[]>>;
   setWarningMessage: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
   const shareMessageTimeoutRef = useRef<number | null>(null);
@@ -44,6 +60,7 @@ export function useReceiptWorkspaceActions({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
   const [isSharingSummary, setIsSharingSummary] = useState(false);
+  const [isParsingReceipt, setIsParsingReceipt] = useState(false);
 
   useEffect(() => {
     setIsDeleteConfirming(false);
@@ -113,7 +130,7 @@ export function useReceiptWorkspaceActions({
   }
 
   async function handleSave() {
-    if (isSaving || isDeleting || !canSave) {
+    if (isSaving || isDeleting || isParsingReceipt || !canSave) {
       return;
     }
 
@@ -173,8 +190,75 @@ export function useReceiptWorkspaceActions({
     }
   }
 
+  function requestReceiptUpload() {
+    if (isSaving || isDeleting || isParsingReceipt) {
+      return false;
+    }
+
+    if (sourceReceipt?.receiptId) {
+      startTransition(() => {
+        router.push("/dashboard/new?prompt=upload");
+      });
+      return false;
+    }
+
+    if (hasStartedDraft && isDirty) {
+      const shouldReplaceDraft = window.confirm(
+        "Replace the current draft with a parsed receipt image? Unsaved manual edits will be lost.",
+      );
+
+      if (!shouldReplaceDraft) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  async function handleReceiptUpload(file: File) {
+    if (isSaving || isDeleting || isParsingReceipt) {
+      return;
+    }
+
+    setIsParsingReceipt(true);
+    setSaveMessage(null);
+    setShareMessage(null);
+    setParseMessage(null);
+    setParseIssues([]);
+    setWarningMessage(null);
+
+    try {
+      const parsedReceipt = await parseReceiptImage(file);
+
+      setSourceReceipt(null);
+      setEditorState(mapReceiptParseResponseToEditorState(parsedReceipt));
+      setHasStartedDraft(true);
+      setParseMessage(buildReceiptParseMessage(parsedReceipt));
+      setParseIssues(parsedReceipt.issues);
+
+      if (!receiptId) {
+        startTransition(() => {
+          router.replace("/dashboard/new");
+        });
+      }
+    } catch (error) {
+      if (error instanceof ReceiptIngestionError) {
+        setWarningMessage(error.message);
+      } else {
+        logWorkspaceError(
+          "parse receipt",
+          error,
+          "Unable to parse that receipt image right now.",
+        );
+        setWarningMessage("Unable to parse that receipt image right now.");
+      }
+    } finally {
+      setIsParsingReceipt(false);
+    }
+  }
+
   async function handleDelete() {
-    if (!sourceReceipt || isSaving || isDeleting) {
+    if (!sourceReceipt || isSaving || isDeleting || isParsingReceipt) {
       return;
     }
 
@@ -301,7 +385,10 @@ export function useReceiptWorkspaceActions({
     isDeleting,
     isDeleteConfirming,
     isSharingSummary,
+    isParsingReceipt,
     setIsDeleteConfirming,
+    requestReceiptUpload,
+    handleReceiptUpload,
     handleSave,
     handleDelete,
     handleShareSummary,

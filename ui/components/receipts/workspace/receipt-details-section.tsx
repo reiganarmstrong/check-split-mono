@@ -1,7 +1,9 @@
 "use client";
 
+import { useRef, type ChangeEvent } from "react";
 import { Camera, ReceiptText } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { ReceiptEditorState } from "@/lib/receipt-types";
@@ -19,13 +21,41 @@ export function ReceiptDetailsSection({
   editorState,
   merchantNameMissing,
   receiptDateMissing,
+  isParsingReceipt,
+  requestReceiptUpload,
+  handleReceiptUpload,
   updateField,
 }: {
   editorState: ReceiptEditorState;
   merchantNameMissing: boolean;
   receiptDateMissing: boolean;
+  isParsingReceipt: boolean;
+  requestReceiptUpload: () => boolean;
+  handleReceiptUpload: (file: File) => Promise<void>;
   updateField: UpdateField;
 }) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  function openUploadPicker() {
+    if (!requestReceiptUpload()) {
+      return;
+    }
+
+    inputRef.current?.click();
+  }
+
+  async function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    await handleReceiptUpload(file);
+  }
+
   return (
     <SectionShell
       title="Receipt details"
@@ -122,19 +152,29 @@ export function ReceiptDetailsSection({
             Upload-based parsing
           </p>
           <p className="mt-1 text-sm leading-6 text-[var(--muted-foreground)]">
-            Not available yet.
+            Replace this draft with a parsed receipt image, or start a fresh
+            parsed receipt from a saved split.
           </p>
         </div>
-        <button
+        <Button
           type="button"
-          disabled
-          className="rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted-foreground)]"
+          variant="outline"
+          onClick={openUploadPicker}
+          disabled={isParsingReceipt}
+          className="rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
         >
           <span className="inline-flex items-center gap-2">
-            <Camera className="h-4 w-4" />
-            Upload receipt
+            <Camera className={cn("h-4 w-4", isParsingReceipt && "animate-pulse")} />
+            {isParsingReceipt ? "Parsing receipt" : "Upload receipt"}
           </span>
-        </button>
+        </Button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={(event) => void handleInputChange(event)}
+        />
       </div>
     </SectionShell>
   );

@@ -83,7 +83,7 @@ function normalizeOptionalMoneyInput(value: string) {
   return nextValue === "" ? "0.00" : nextValue
 }
 
-function normalizeDateTimeInput(value: string) {
+export function normalizeDateTimeInput(value: string) {
   if (!value) {
     return ""
   }
