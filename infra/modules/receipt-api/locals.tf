@@ -10,6 +10,10 @@ locals {
       name = "addParticipant"
       path = "${local.resolver_path}/functions/add-participant.js.tftpl"
     }
+    batch_get_receipt_roots = {
+      name = "batchGetReceiptRoots"
+      path = "${local.resolver_path}/functions/batch-get-receipt-roots.js.tftpl"
+    }
     commit_remove_item = {
       name = "commitRemoveReceiptItem"
       path = "${local.resolver_path}/functions/commit-remove-item.js.tftpl"
@@ -49,6 +53,10 @@ locals {
     lookup_item = {
       name = "lookupReceiptItem"
       path = "${local.resolver_path}/functions/lookup-item.js.tftpl"
+    }
+    lookup_participant = {
+      name = "lookupParticipant"
+      path = "${local.resolver_path}/functions/lookup-participant.js.tftpl"
     }
     query_item_allocations = {
       name = "queryItemAllocations"
@@ -96,7 +104,7 @@ locals {
     }
     list_receipts = {
       field     = "listReceipts"
-      functions = ["list_receipts"]
+      functions = ["list_receipts", "batch_get_receipt_roots"]
       type      = "Query"
     }
     remove_receipt_item = {
@@ -106,7 +114,7 @@ locals {
     }
     remove_participant = {
       field     = "removeParticipant"
-      functions = ["query_participant_allocations", "commit_remove_participant"]
+      functions = ["lookup_participant", "query_participant_allocations", "commit_remove_participant"]
       type      = "Mutation"
     }
     set_item_allocations = {
@@ -116,7 +124,7 @@ locals {
     }
     update_participant = {
       field     = "updateParticipant"
-      functions = ["update_participant"]
+      functions = ["lookup_participant", "update_participant"]
       type      = "Mutation"
     }
     update_receipt_metadata = {

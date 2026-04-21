@@ -29,6 +29,7 @@ type Mutation {
 
 input AddParticipantInput {
   expectedVersion: Int!
+  isPaid: Boolean
   notes: String
   receiptId: ID!
   sortOrder: Int
@@ -91,6 +92,7 @@ input SetItemAllocationsInput {
 
 input UpdateParticipantInput {
   expectedVersion: Int!
+  isPaid: Boolean
   notes: String
   participantId: ID!
   receiptId: ID!
@@ -172,6 +174,7 @@ type Receipt {
   locationName: String
   merchantName: String!
   ownerUserId: ID!
+  paidParticipantCount: Int!
   participantCount: Int!
   participants: [ReceiptParticipant!]!
   receiptId: ID!
@@ -216,6 +219,8 @@ type ReceiptItemAllocation {
 type ReceiptListItem {
   locationName: String
   merchantName: String!
+  paidParticipantCount: Int!
+  participantCount: Int!
   receiptId: ID!
   receiptOccurredAt: AWSDateTime!
   status: ReceiptStatus!
@@ -235,7 +240,9 @@ type ReceiptMutationResult {
 type ReceiptParticipant {
   createdAt: AWSDateTime
   displayName: String!
+  isPaid: Boolean!
   notes: String
+  paidAt: AWSDateTime
   participantId: ID!
   sortOrder: Int
   updatedAt: AWSDateTime!

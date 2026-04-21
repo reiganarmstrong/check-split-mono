@@ -18,13 +18,17 @@ export function request(ctx) {
   const input = ctx.args.input;
   const userSub = requireUserSub(ctx);
   const now = util.time.nowISO8601();
+  const isPaid = input.isPaid === true;
+  const paidAt = isPaid ? now : null;
   const participantId = util.autoId();
   const nextVersion = input.expectedVersion + 1;
 
   ctx.stash.participant = {
     createdAt: now,
     displayName: input.displayName,
+    isPaid,
     notes: input.notes ?? null,
+    paidAt,
     participantId,
     sortOrder: input.sortOrder ?? null,
     updatedAt: now,
@@ -37,7 +41,9 @@ export function request(ctx) {
         attributeValues: util.dynamodb.toMapValues({
           created_at: now,
           display_name: input.displayName,
+          is_paid: isPaid,
           notes: input.notes ?? null,
+          paid_at: paidAt,
           participant_id: participantId,
           sort_order: input.sortOrder ?? null,
           updated_at: now,
@@ -75,14 +81,17 @@ export function request(ctx) {
         operation: 'UpdateItem',
         table: '${table_name}',
         update: {
-          expression: 'SET #participant_count = #participant_count + :one, #updated_at = :updated_at, #version = :version',
+          expression: 'SET #participant_count = #participant_count + :one, #paid_participant_count = if_not_exists(#paid_participant_count, :zero) + :paid_delta, #updated_at = :updated_at, #version = :version',
           expressionNames: {
+            '#paid_participant_count': 'paid_participant_count',
             '#participant_count': 'participant_count',
             '#updated_at': 'updated_at',
             '#version': 'version',
           },
           expressionValues: util.dynamodb.toMapValues({
+            ':paid_delta': isPaid ? 1 : 0,
             ':one': 1,
+            ':zero': 0,
             ':updated_at': now,
             ':version': nextVersion,
           }),

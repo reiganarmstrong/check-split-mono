@@ -1,0 +1,66 @@
+import { util } from '@aws-appsync/utils';
+
+function requireUserSub(ctx) {
+  const userSub = ctx.identity?.sub;
+
+  if (!userSub) {
+    util.error('Unauthorized', 'Unauthorized');
+  }
+
+  return userSub;
+}
+
+function mapReceiptListItem(root) {
+  return {
+    locationName: root.location_name ?? null,
+    merchantName: root.merchant_name,
+    paidParticipantCount: root.paid_participant_count ?? 0,
+    participantCount: root.participant_count ?? 0,
+    receiptId: root.receipt_id,
+    receiptOccurredAt: root.receipt_occurred_at,
+    status: root.status,
+    totalCents: root.total_cents,
+    updatedAt: root.updated_at,
+  };
+}
+
+export function request(ctx) {
+  const keys = ctx.stash.receiptRootKeys ?? [];
+
+  return {
+    operation: 'BatchGetItem',
+    tables: {
+      '${table_name}': {
+        consistentRead: true,
+        keys,
+      },
+    },
+  };
+}
+
+export function response(ctx) {
+  if (ctx.error) {
+    util.error(ctx.error.message, ctx.error.type, ctx.result);
+  }
+
+  const userSub = requireUserSub(ctx);
+  const roots = ctx.result.data?.['${table_name}'] ?? [];
+  const orderedReceiptIds = ctx.stash.listReceiptOrder ?? [];
+  const rootsByReceiptId = {};
+
+  for (const root of roots) {
+    if (root.owner_user_id !== userSub) {
+      util.error('Unauthorized', 'Unauthorized');
+    }
+
+    rootsByReceiptId[root.receipt_id] = root;
+  }
+
+  return {
+    items: orderedReceiptIds
+      .map((receiptId) => rootsByReceiptId[receiptId] ?? null)
+      .filter((root) => root !== null)
+      .map((root) => mapReceiptListItem(root)),
+    nextToken: ctx.stash.listReceiptsNextToken ?? null,
+  };
+}
