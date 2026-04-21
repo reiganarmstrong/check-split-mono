@@ -7,9 +7,11 @@ type ReceiptSummaryShareItemDetail = {
 
 type ReceiptSummaryShareGroup = {
   amountLabel: string
+  amountValue: number
   discountLabel: string
   feeLabel: string
   groupName: string
+  isPaid: boolean
   itemDetails: ReceiptSummaryShareItemDetail[]
   itemsLabel: string
   taxLabel: string
@@ -22,11 +24,13 @@ export type ReceiptSummaryShareData = {
   groups: ReceiptSummaryShareGroup[]
   locationName: string
   merchantName: string
+  paidGroupCount: number
   receiptOccurredAt: string
   subtotalLabel: string
   taxLabel: string
   tipLabel: string
   totalLabel: string
+  unpaidGroupCount: number
 }
 
 type SummaryMetricRow = {
@@ -34,53 +38,54 @@ type SummaryMetricRow = {
   value: string
 }
 
+type StatusPalette = {
+  accent: string
+  fill: string
+  stroke: string
+  text: string
+}
+
 const SHARE_IMAGE_WIDTH = 1200
-const CANVAS_SIDE_PADDING = 72
-const SURFACE_RADIUS = 36
-const HEADER_FONT = "700 70px 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif"
-const HEADING_FONT = "600 24px ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-const LABEL_FONT = "500 24px ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-const VALUE_FONT = "600 28px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
-const TOTAL_FONT = "700 38px 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif"
-const BODY_FONT = "500 22px ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-const SMALL_FONT = "500 18px ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-const ITEM_META_FONT = "500 17px ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-const GROUP_TITLE_FONT =
-  "600 32px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const CANVAS_SIDE_PADDING = 56
+const SURFACE_RADIUS = 34
+const HEADER_FONT =
+  "700 74px 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif"
 const GROUP_VALUE_FONT =
-  "700 30px 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif"
+  "700 36px 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif"
+const BRAND_FONT =
+  "700 22px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const SECTION_LABEL_FONT =
+  "600 22px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const LABEL_FONT =
+  "500 21px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const VALUE_FONT =
+  "600 26px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const BODY_FONT =
+  "500 22px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const SMALL_FONT =
+  "500 18px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const MICRO_FONT =
+  "600 16px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const ITEM_META_FONT =
+  "500 17px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
+const GROUP_TITLE_FONT =
+  "600 34px 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif"
 const APP_BACKGROUND = "#f5f6f0"
 const APP_FOREGROUND = "#13181f"
 const APP_MUTED = "rgba(19, 24, 31, 0.62)"
 const APP_LINE = "rgba(19, 24, 31, 0.12)"
+const APP_LINE_STRONG = "rgba(19, 24, 31, 0.18)"
 const APP_PANEL = "#fbfbf8"
 const APP_SURFACE = "#ffffff"
-const APP_TOPBAR = "#f8f8f3"
 const APP_PRIMARY = "#2337d7"
-const APP_PRIMARY_SOFT = "rgba(35, 55, 215, 0.1)"
-const APP_SECONDARY_SOFT = "rgba(191, 208, 255, 0.22)"
-
-function drawSurface(
-  context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  options?: {
-    fill?: string
-    radius?: number
-    stroke?: string
-  },
-) {
-  const fill = options?.fill ?? APP_PANEL
-  const stroke = options?.stroke ?? APP_LINE
-  const radius = options?.radius ?? SURFACE_RADIUS
-
-  drawRoundedRect(context, x, y, width, height, radius, fill)
-  context.strokeStyle = stroke
-  context.lineWidth = 1
-  context.stroke()
-}
+const APP_ACCENT = "#79d2bc"
+const APP_ACCENT_SOFT = "rgba(121, 210, 188, 0.16)"
+const APP_ACCENT_STROKE = "rgba(48, 126, 108, 0.18)"
+const APP_ACCENT_FOREGROUND = "#10211b"
+const APP_UNPAID = "#d84b39"
+const APP_UNPAID_SOFT = "rgba(216, 75, 57, 0.11)"
+const APP_UNPAID_STROKE = "rgba(143, 47, 34, 0.18)"
+const APP_UNPAID_FOREGROUND = "#8f2f22"
 
 function sanitizeSegment(value: string) {
   return value
@@ -89,18 +94,35 @@ function sanitizeSegment(value: string) {
     .replace(/^-+|-+$/g, "")
 }
 
-function formatShareDate(value: string) {
+function formatShareDateTime(value: string) {
   const parsedDate = new Date(value)
 
   if (Number.isNaN(parsedDate.getTime())) {
-    return "Receipt summary"
+    return "Date not available"
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  const dateLabel = new Intl.DateTimeFormat(undefined, {
     day: "numeric",
     month: "long",
     year: "numeric",
   }).format(parsedDate)
+
+  const hasExplicitTime =
+    /T\d{2}:\d{2}/.test(value) ||
+    /\d{1,2}:\d{2}/.test(value) ||
+    parsedDate.getHours() !== 0 ||
+    parsedDate.getMinutes() !== 0
+
+  if (!hasExplicitTime) {
+    return dateLabel
+  }
+
+  const timeLabel = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(parsedDate)
+
+  return `${dateLabel} • ${timeLabel}`
 }
 
 function waitForFonts() {
@@ -125,21 +147,60 @@ function drawRoundedRect(
   width: number,
   height: number,
   radius: number,
-  fill: string,
+  fill: CanvasFillStrokeStyles["fillStyle"],
 ) {
+  const clampedRadius = Math.max(0, Math.min(radius, width / 2, height / 2))
+
   context.beginPath()
-  context.moveTo(x + radius, y)
-  context.lineTo(x + width - radius, y)
-  context.quadraticCurveTo(x + width, y, x + width, y + radius)
-  context.lineTo(x + width, y + height - radius)
-  context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
-  context.lineTo(x + radius, y + height)
-  context.quadraticCurveTo(x, y + height, x, y + height - radius)
-  context.lineTo(x, y + radius)
-  context.quadraticCurveTo(x, y, x + radius, y)
+  context.moveTo(x + clampedRadius, y)
+  context.lineTo(x + width - clampedRadius, y)
+  context.quadraticCurveTo(x + width, y, x + width, y + clampedRadius)
+  context.lineTo(x + width, y + height - clampedRadius)
+  context.quadraticCurveTo(
+    x + width,
+    y + height,
+    x + width - clampedRadius,
+    y + height,
+  )
+  context.lineTo(x + clampedRadius, y + height)
+  context.quadraticCurveTo(x, y + height, x, y + height - clampedRadius)
+  context.lineTo(x, y + clampedRadius)
+  context.quadraticCurveTo(x, y, x + clampedRadius, y)
   context.closePath()
   context.fillStyle = fill
   context.fill()
+}
+
+function drawSurface(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  options?: {
+    fill?: CanvasFillStrokeStyles["fillStyle"]
+    radius?: number
+    stroke?: string
+  },
+) {
+  const fill = options?.fill ?? APP_PANEL
+  const stroke = options?.stroke ?? APP_LINE
+  const radius = options?.radius ?? SURFACE_RADIUS
+
+  drawRoundedRect(context, x, y, width, height, radius, fill)
+  context.strokeStyle = stroke
+  context.lineWidth = 1
+  context.stroke()
+}
+
+function drawDivider(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+) {
+  context.fillStyle = APP_LINE
+  context.fillRect(x, y, width, 1)
 }
 
 function wrapText(
@@ -223,6 +284,59 @@ function drawWrappedText(
   return lines.length
 }
 
+function drawPill(
+  context: CanvasRenderingContext2D,
+  label: string,
+  x: number,
+  y: number,
+  options: {
+    fill: string
+    minWidth?: number
+    stroke?: string
+    textColor: string
+  },
+) {
+  context.font = MICRO_FONT
+  const width = Math.max(
+    options.minWidth ?? 0,
+    context.measureText(label).width + 30,
+  )
+
+  drawSurface(context, x, y, width, 38, {
+    fill: options.fill,
+    radius: 999,
+    stroke: options.stroke ?? "transparent",
+  })
+
+  context.fillStyle = options.textColor
+  context.textAlign = "center"
+  context.fillText(label, x + width / 2, y + 24)
+  context.textAlign = "left"
+
+  return width
+}
+
+function getPillWidth(
+  context: CanvasRenderingContext2D,
+  label: string,
+  minWidth?: number,
+) {
+  context.font = MICRO_FONT
+  return Math.max(minWidth ?? 0, context.measureText(label).width + 30)
+}
+
+function getRightAlignedPillX(
+  context: CanvasRenderingContext2D,
+  label: string,
+  textRightX: number,
+  minWidth?: number,
+) {
+  context.font = MICRO_FONT
+  const textWidth = context.measureText(label).width
+  const pillWidth = getPillWidth(context, label, minWidth)
+  return textRightX - textWidth / 2 - pillWidth / 2
+}
+
 function drawMetricRows(
   context: CanvasRenderingContext2D,
   rows: SummaryMetricRow[],
@@ -249,19 +363,18 @@ function drawMetricRows(
     context.textAlign = "left"
 
     if (index < rows.length - 1) {
-      context.fillStyle = APP_LINE
-      context.fillRect(
+      drawDivider(
+        context,
         options.labelX,
-        rowY + 18,
+        rowY + 20,
         options.width,
-        1,
       )
     }
   })
 }
 
 function getItemRowHeight() {
-  return 60
+  return 58
 }
 
 function getSummaryRows(data: ReceiptSummaryShareData): SummaryMetricRow[] {
@@ -274,25 +387,39 @@ function getSummaryRows(data: ReceiptSummaryShareData): SummaryMetricRow[] {
   ]
 }
 
-function getGroupCardHeight(
-  context: CanvasRenderingContext2D,
-  group: ReceiptSummaryShareGroup,
-  cardWidth: number,
-) {
-  context.font = GROUP_TITLE_FONT
-  const titleLines = wrapText(context, group.groupName, cardWidth - 320)
-  const titleBlockHeight = Math.max(titleLines.length, 1) * 38
-  const headerBlockHeight = Math.max(titleBlockHeight, 82)
-  const itemDetailsHeight =
-    group.itemDetails.length > 0
-      ? 28 + group.itemDetails.length * getItemRowHeight()
-      : 52
-  const totalsHeight = 28 + 5 * 38
-
-  return 72 + headerBlockHeight + 28 + itemDetailsHeight + 20 + totalsHeight + 28
+function getStatusPalette(isPaid: boolean): StatusPalette {
+  return isPaid
+    ? {
+        accent: APP_ACCENT,
+        fill: APP_ACCENT_SOFT,
+        stroke: APP_ACCENT_STROKE,
+        text: APP_ACCENT_FOREGROUND,
+      }
+    : {
+        accent: APP_UNPAID,
+        fill: APP_UNPAID_SOFT,
+        stroke: APP_UNPAID_STROKE,
+        text: APP_UNPAID_FOREGROUND,
+      }
 }
 
-function getCanvasHeight(
+function getPaymentStatusHeadline(data: ReceiptSummaryShareData) {
+  if (data.groups.length === 0) {
+    return "No shares yet"
+  }
+
+  if (data.unpaidGroupCount === 0) {
+    return "Everyone paid"
+  }
+
+  if (data.paidGroupCount === 0) {
+    return "Nobody paid yet"
+  }
+
+  return `${data.unpaidGroupCount} unpaid`
+}
+
+function getHeaderHeight(
   context: CanvasRenderingContext2D,
   data: ReceiptSummaryShareData,
 ) {
@@ -300,106 +427,509 @@ function getCanvasHeight(
   const merchantLines = wrapText(
     context,
     data.merchantName.trim() || "Receipt summary",
-    SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2 - 280,
+    SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2 - 68,
   )
 
-  const headerHeight = 260 + Math.max(0, merchantLines.length - 1) * 74
-  const summaryHeight = 462
+  return Math.max(286, 132 + Math.min(merchantLines.length, 3) * 70 + 94)
+}
+
+function getPaymentOverviewHeight(data: ReceiptSummaryShareData) {
+  const rosterRows = Math.max(1, Math.ceil(data.groups.length / 2))
+  return Math.max(332, 184 + rosterRows * 112 + Math.max(0, rosterRows - 1) * 16)
+}
+
+function getSummaryPanelHeight(data: ReceiptSummaryShareData) {
+  const rowCount = getSummaryRows(data).length
+  const metricsBottom = 186 + Math.max(0, rowCount - 1) * 48 + 20
+  const noteHeight = 80
+  const noteGap = 28
+  const bottomPadding = 28
+
+  return metricsBottom + noteGap + noteHeight + bottomPadding
+}
+
+function getGroupCardHeight(
+  context: CanvasRenderingContext2D,
+  group: ReceiptSummaryShareGroup,
+  cardWidth: number,
+) {
+  context.font = GROUP_TITLE_FONT
+  const titleLines = wrapText(context, group.groupName, cardWidth - 360)
+  const headerHeight = Math.max(104, Math.min(titleLines.length, 2) * 42 + 34)
+  const itemDetailsHeight =
+    group.itemDetails.length > 0
+      ? 34 + group.itemDetails.length * getItemRowHeight()
+      : 82
+
+  return 48 + headerHeight + 24 + 104 + 28 + itemDetailsHeight + 26
+}
+
+function getCanvasHeight(
+  context: CanvasRenderingContext2D,
+  data: ReceiptSummaryShareData,
+) {
+  const headerHeight = getHeaderHeight(context, data)
+  const overviewHeight = getPaymentOverviewHeight(data)
   const groupCardWidth = SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2
   const groupsHeight =
-    88 +
+    94 +
     data.groups.reduce(
       (height, group, index) =>
         height +
         getGroupCardHeight(context, group, groupCardWidth) +
-        (index === data.groups.length - 1 ? 0 : 20),
+        (index === data.groups.length - 1 ? 0 : 18),
       0,
     )
 
-  return Math.max(1080, headerHeight + summaryHeight + groupsHeight + 124)
+  return Math.max(
+    1200,
+    56 + headerHeight + 24 + overviewHeight + 28 + groupsHeight + 88,
+  )
 }
 
-function drawSummarySection(
+function drawBackdrop(
+  context: CanvasRenderingContext2D,
+  canvasHeight: number,
+) {
+  context.fillStyle = APP_BACKGROUND
+  context.fillRect(0, 0, SHARE_IMAGE_WIDTH, canvasHeight)
+}
+
+function drawHeaderSection(
   context: CanvasRenderingContext2D,
   data: ReceiptSummaryShareData,
   y: number,
 ) {
-  const surfaceWidth = SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2
-  const rows = getSummaryRows(data)
-  const sectionHeight = 462
+  const cardWidth = SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2
+  const headerHeight = getHeaderHeight(context, data)
   const cardX = CANVAS_SIDE_PADDING
-  const cardRight = SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING
-  const contentWidth = surfaceWidth - 72
+  const contentWidth = cardWidth - 68
 
-  drawSurface(context, cardX, y, surfaceWidth, sectionHeight, {
+  drawSurface(context, cardX, y, cardWidth, headerHeight, {
+    fill: APP_SURFACE,
+    stroke: APP_LINE_STRONG,
+  })
+
+  context.fillStyle = APP_PRIMARY
+  context.font = BRAND_FONT
+  context.fillText("CHECK SPLIT", cardX + 34, y + 48)
+
+  context.fillStyle = APP_FOREGROUND
+  context.font = HEADER_FONT
+  const merchantTop = y + 116
+  drawWrappedText(
+    context,
+    data.merchantName.trim() || "Receipt summary",
+    cardX + 34,
+    merchantTop,
+    contentWidth,
+    70,
+    3,
+  )
+
+  const detailCardY = y + headerHeight - 98
+  const detailGap = 18
+  const detailWidth = (cardWidth - 68 - detailGap) / 2
+  const detailHeight = 70
+  const detailDateX = cardX + 34
+  const detailLocationX = detailDateX + detailWidth + detailGap
+
+  drawSurface(context, detailDateX, detailCardY, detailWidth, detailHeight, {
     fill: APP_PANEL,
+    radius: 24,
+  })
+  drawSurface(context, detailLocationX, detailCardY, detailWidth, detailHeight, {
+    fill: APP_PANEL,
+    radius: 24,
   })
 
   context.fillStyle = APP_MUTED
-  context.font = HEADING_FONT
-  context.fillText("Receipt summary", cardX + 36, y + 58)
+  context.font = SMALL_FONT
+  context.fillText("Date & time", detailDateX + 18, detailCardY + 27)
+  context.fillText("Location", detailLocationX + 18, detailCardY + 27)
 
-  const totalPillWidth = 236
-  drawSurface(
+  context.fillStyle = APP_FOREGROUND
+  context.font = BODY_FONT
+  drawWrappedText(
     context,
-    cardRight - totalPillWidth - 36,
-    y + 30,
-    totalPillWidth,
-    102,
-    {
-      fill: APP_SURFACE,
-      radius: 28,
-    },
+    formatShareDateTime(data.receiptOccurredAt),
+    detailDateX + 18,
+    detailCardY + 55,
+    detailWidth - 36,
+    22,
+    1,
+  )
+  drawWrappedText(
+    context,
+    data.locationName.trim() || "No location added",
+    detailLocationX + 18,
+    detailCardY + 55,
+    detailWidth - 36,
+    22,
+    1,
+  )
+
+  return y + headerHeight + 24
+}
+
+function drawSummaryPanel(
+  context: CanvasRenderingContext2D,
+  data: ReceiptSummaryShareData,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
+  drawSurface(context, x, y, width, height, {
+    fill: APP_SURFACE,
+    stroke: APP_LINE_STRONG,
+  })
+
+  context.fillStyle = APP_MUTED
+  context.font = SECTION_LABEL_FONT
+  context.fillText("Receipt summary", x + 28, y + 44)
+
+  context.fillStyle = APP_FOREGROUND
+  context.font = GROUP_VALUE_FONT
+  context.fillText(data.totalLabel, x + 28, y + 98)
+
+  context.fillStyle = APP_MUTED
+  context.font = SMALL_FONT
+  context.fillText("Current draft total", x + 28, y + 124)
+
+  drawDivider(context, x + 28, y + 150, width - 56)
+
+  drawMetricRows(context, getSummaryRows(data), {
+    labelX: x + 28,
+    rowHeight: 48,
+    valueX: x + width - 28,
+    width: width - 56,
+    y: y + 186,
+  })
+
+  const noteX = x + 20
+  const noteWidth = width - 40
+  const metricsBottom =
+    y + 186 + Math.max(0, getSummaryRows(data).length - 1) * 48 + 20
+  const noteY = Math.max(y + height - 108, metricsBottom + 28)
+
+  drawSurface(context, noteX, noteY, noteWidth, 80, {
+    fill: APP_PANEL,
+    radius: 22,
+  })
+
+  context.fillStyle = APP_MUTED
+  context.font = SMALL_FONT
+  drawWrappedText(
+    context,
+    "Adjustments distributed proportionally by item subtotal.",
+    noteX + 16,
+    noteY + 31,
+    noteWidth - 32,
+    22,
+    2,
+  )
+}
+
+function drawPaymentRosterTile(
+  context: CanvasRenderingContext2D,
+  group: ReceiptSummaryShareGroup,
+  x: number,
+  y: number,
+  width: number,
+) {
+  const palette = getStatusPalette(group.isPaid)
+  const pillLabel = group.isPaid ? "Paid" : "Unpaid"
+  const pillWidth = getPillWidth(context, pillLabel, 92)
+  const amountRightX = x + width - 18
+  const pillX = getRightAlignedPillX(context, pillLabel, amountRightX, 92)
+
+  drawSurface(context, x, y, width, 112, {
+    fill: group.isPaid ? APP_SURFACE : "#fff8f7",
+    radius: 24,
+    stroke: palette.stroke,
+  })
+
+  drawRoundedRect(context, x + 16, y + 24, 8, 42, 4, palette.accent)
+
+  drawPill(context, pillLabel, pillX, y + 16, {
+    fill: palette.fill,
+    stroke: palette.stroke,
+    textColor: palette.text,
+  })
+
+  context.fillStyle = APP_FOREGROUND
+  context.font = VALUE_FONT
+  drawWrappedText(
+    context,
+    group.groupName,
+    x + 38,
+    y + 44,
+    width - pillWidth - 96,
+    26,
+    2,
   )
 
   context.fillStyle = APP_MUTED
   context.font = SMALL_FONT
   context.fillText(
-    "Total due",
-    cardRight - totalPillWidth,
-    y + 72,
+    group.isPaid ? "Marked settled" : "Still owes",
+    x + 38,
+    y + 82,
   )
+
   context.fillStyle = APP_FOREGROUND
-  context.font = TOTAL_FONT
-  context.fillText(
-    data.totalLabel,
-    cardRight - totalPillWidth,
-    y + 112,
-  )
+  context.font = VALUE_FONT
+  context.textAlign = "right"
+  context.fillText(group.amountLabel, amountRightX, y + 84)
+  context.textAlign = "left"
+}
 
-  context.fillStyle = APP_LINE
-  context.fillRect(
-    cardX + 36,
-    y + 162,
-    contentWidth,
-    1,
-  )
-
-  drawMetricRows(context, rows, {
-    labelX: cardX + 36,
-    rowHeight: 46,
-    valueX: cardRight - 36,
-    width: contentWidth,
-    y: y + 202,
+function drawPaymentPanel(
+  context: CanvasRenderingContext2D,
+  data: ReceiptSummaryShareData,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
+  drawSurface(context, x, y, width, height, {
+    fill: APP_SURFACE,
+    stroke: APP_LINE_STRONG,
   })
 
-  context.fillStyle = APP_LINE
-  context.fillRect(
-    cardX + 36,
-    y + 398,
-    contentWidth,
-    1,
+  context.fillStyle = APP_MUTED
+  context.font = SECTION_LABEL_FONT
+  context.fillText("Who paid", x + 28, y + 44)
+
+  context.fillStyle = APP_FOREGROUND
+  context.font = GROUP_VALUE_FONT
+  context.fillText(getPaymentStatusHeadline(data), x + 28, y + 98)
+
+  context.fillStyle = APP_MUTED
+  context.font = SMALL_FONT
+  context.fillText(
+    `${data.paidGroupCount} paid  •  ${data.unpaidGroupCount} open`,
+    x + 28,
+    y + 126,
+  )
+
+  if (data.groups.length === 0) {
+    drawSurface(context, x + 20, y + 154, width - 40, 110, {
+      fill: APP_SURFACE,
+      radius: 24,
+    })
+    context.fillStyle = APP_MUTED
+    context.font = BODY_FONT
+    context.fillText("Create groups to generate a share image.", x + 40, y + 216)
+    return
+  }
+
+  const tileGap = 16
+  const innerWidth = width - 56
+  const tileWidth = (innerWidth - tileGap) / 2
+  const baseY = y + 154
+
+  data.groups.forEach((group, index) => {
+    const row = Math.floor(index / 2)
+    const isOddLastTile =
+      data.groups.length % 2 === 1 && index === data.groups.length - 1
+    const tileX =
+      x + 28 + (isOddLastTile ? 0 : (index % 2) * (tileWidth + tileGap))
+    const drawWidth = isOddLastTile ? innerWidth : tileWidth
+    const tileY = baseY + row * (112 + tileGap)
+
+    drawPaymentRosterTile(context, group, tileX, tileY, drawWidth)
+  })
+}
+
+function drawOverviewSection(
+  context: CanvasRenderingContext2D,
+  data: ReceiptSummaryShareData,
+  y: number,
+) {
+  const sectionHeight = Math.max(
+    getPaymentOverviewHeight(data),
+    getSummaryPanelHeight(data),
+  )
+  const leftWidth = 346
+  const gap = 18
+  const rightWidth =
+    SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2 - leftWidth - gap
+
+  drawSummaryPanel(
+    context,
+    data,
+    CANVAS_SIDE_PADDING,
+    y,
+    leftWidth,
+    sectionHeight,
+  )
+  drawPaymentPanel(
+    context,
+    data,
+    CANVAS_SIDE_PADDING + leftWidth + gap,
+    y,
+    rightWidth,
+    sectionHeight,
+  )
+
+  return y + sectionHeight + 28
+}
+
+function drawGroupMetricStrip(
+  context: CanvasRenderingContext2D,
+  group: ReceiptSummaryShareGroup,
+  x: number,
+  y: number,
+  width: number,
+) {
+  const palette = getStatusPalette(group.isPaid)
+  const metrics = [
+    { label: "Items", value: group.itemsLabel },
+    { label: "Tax", value: group.taxLabel },
+    { label: "Tip", value: group.tipLabel },
+    { label: "Fees", value: group.feeLabel },
+    { label: "Discount", value: group.discountLabel },
+  ]
+
+  drawSurface(context, x, y, width, 104, {
+    fill: palette.fill,
+    radius: 24,
+    stroke: palette.stroke,
+  })
+
+  const columnWidth = width / metrics.length
+
+  metrics.forEach((metric, index) => {
+    const columnX = x + index * columnWidth
+
+    if (index > 0) {
+      context.fillStyle = APP_LINE
+      context.fillRect(columnX, y + 18, 1, 68)
+    }
+
+    context.fillStyle = APP_MUTED
+    context.font = MICRO_FONT
+    context.fillText(metric.label, columnX + 18, y + 36)
+
+    context.fillStyle = APP_FOREGROUND
+    context.font = VALUE_FONT
+    context.fillText(metric.value, columnX + 18, y + 72)
+  })
+}
+
+function drawGroupCard(
+  context: CanvasRenderingContext2D,
+  group: ReceiptSummaryShareGroup,
+  x: number,
+  y: number,
+  width: number,
+) {
+  const cardHeight = getGroupCardHeight(context, group, width)
+  const palette = getStatusPalette(group.isPaid)
+  const statusLabel = group.isPaid ? "Paid" : "Unpaid"
+  const amountRightX = x + width - 24
+  const pillX = getRightAlignedPillX(context, statusLabel, amountRightX, 110)
+
+  drawSurface(context, x, y, width, cardHeight, {
+    fill: APP_SURFACE,
+  })
+
+  drawRoundedRect(context, x + 20, y + 28, 10, 88, 5, palette.accent)
+
+  context.fillStyle = APP_FOREGROUND
+  context.font = GROUP_TITLE_FONT
+  const nameLineCount = drawWrappedText(
+    context,
+    group.groupName,
+    x + 48,
+    y + 62,
+    width - 360,
+    40,
+    2,
   )
 
   context.fillStyle = APP_MUTED
-  context.font = LABEL_FONT
+  context.font = SMALL_FONT
   context.fillText(
-    "Current draft totals. Adjustments distributed by item subtotal.",
-    cardX + 36,
-    y + 430,
+    group.isPaid ? "Marked paid in workspace" : "Still waiting on payment",
+    x + 48,
+    y + 62 + nameLineCount * 40 + 10,
   )
 
-  return y + sectionHeight + 40
+  drawPill(context, statusLabel, pillX, y + 28, {
+    fill: palette.fill,
+    stroke: palette.stroke,
+    textColor: palette.text,
+  })
+
+  context.fillStyle = APP_MUTED
+  context.font = SMALL_FONT
+  context.textAlign = "right"
+  context.fillText("Amount due", amountRightX, y + 88)
+  context.fillStyle = APP_FOREGROUND
+  context.font = GROUP_VALUE_FONT
+  context.fillText(group.amountLabel, amountRightX, y + 128)
+  context.textAlign = "left"
+
+  const metricY = y + 146
+  drawGroupMetricStrip(context, group, x + 24, metricY, width - 48)
+
+  const itemsY = metricY + 134
+  context.fillStyle = APP_MUTED
+  context.font = MICRO_FONT
+  context.fillText("Items in share", x + 24, itemsY)
+
+  if (group.itemDetails.length === 0) {
+    drawSurface(context, x + 24, itemsY + 18, width - 48, 64, {
+      fill: APP_PANEL,
+      radius: 22,
+    })
+    context.fillStyle = APP_MUTED
+    context.font = ITEM_META_FONT
+    context.fillText("No assigned items yet.", x + 42, itemsY + 58)
+    return cardHeight
+  }
+
+  const rowStartY = itemsY + 36
+
+  group.itemDetails.forEach((detail, index) => {
+    const rowY = rowStartY + index * getItemRowHeight()
+    const itemTextWidth = width - 280
+
+    context.fillStyle = APP_FOREGROUND
+    context.font = BODY_FONT
+    drawWrappedText(
+      context,
+      detail.description,
+      x + 24,
+      rowY,
+      itemTextWidth,
+      24,
+      1,
+    )
+
+    context.fillStyle = APP_MUTED
+    context.font = ITEM_META_FONT
+    context.fillText(
+      `${detail.ratioLabel} share of ${detail.subtotalLabel}`,
+      x + 24,
+      rowY + 24,
+    )
+
+    context.fillStyle = APP_FOREGROUND
+    context.font = VALUE_FONT
+    context.textAlign = "right"
+    context.fillText(detail.amountLabel, x + width - 24, rowY + 10)
+    context.textAlign = "left"
+
+    if (index < group.itemDetails.length - 1) {
+      drawDivider(context, x + 24, rowY + 36, width - 48)
+    }
+  })
+
+  return cardHeight
 }
 
 function drawGroupSection(
@@ -408,154 +938,31 @@ function drawGroupSection(
   y: number,
 ) {
   context.fillStyle = APP_MUTED
-  context.font = HEADING_FONT
-  context.fillText("Group share preview", CANVAS_SIDE_PADDING, y + 28)
+  context.font = SECTION_LABEL_FONT
+  context.fillText("Per-person details", CANVAS_SIDE_PADDING, y + 22)
 
-  let currentY = y + 64
+  context.textAlign = "right"
+  context.font = SMALL_FONT
+  context.fillText(
+    `${data.groups.length} share${data.groups.length === 1 ? "" : "s"}`,
+    SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING,
+    y + 22,
+  )
+  context.textAlign = "left"
+
+  let currentY = y + 48
   const cardWidth = SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2
 
   for (const group of data.groups) {
-    const cardHeight = getGroupCardHeight(context, group, cardWidth)
-    const cardX = CANVAS_SIDE_PADDING
-    const cardRight = SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING
-
-    drawSurface(context, cardX, currentY, cardWidth, cardHeight, {
-      fill: APP_SURFACE,
-    })
-
-    context.fillStyle = APP_FOREGROUND
-    context.font = GROUP_TITLE_FONT
-    const groupTitleLineCount = drawWrappedText(
+    const cardHeight = drawGroupCard(
       context,
-      group.groupName,
-      cardX + 32,
-      currentY + 56,
-      cardWidth - 320,
-      38,
-      2,
-    )
-    const titleBlockHeight = Math.max(groupTitleLineCount, 1) * 38
-    const headerBlockHeight = Math.max(titleBlockHeight, 82)
-
-    const sharePillWidth = 210
-    drawSurface(
-      context,
-      cardRight - sharePillWidth - 32,
-      currentY + 28,
-      sharePillWidth,
-      82,
-      {
-        fill: APP_TOPBAR,
-        radius: 26,
-      },
+      group,
+      CANVAS_SIDE_PADDING,
+      currentY,
+      cardWidth,
     )
 
-    context.fillStyle = APP_MUTED
-    context.font = SMALL_FONT
-    context.fillText(
-      "Group total",
-      cardRight - sharePillWidth,
-      currentY + 61,
-    )
-    context.fillStyle = APP_FOREGROUND
-    context.font = GROUP_VALUE_FONT
-    context.fillText(
-      group.amountLabel,
-      cardRight - sharePillWidth,
-      currentY + 95,
-    )
-
-    const itemSectionY = currentY + 86 + headerBlockHeight
-    context.fillStyle = APP_LINE
-    context.fillRect(
-      cardX + 32,
-      currentY + 52 + headerBlockHeight,
-      cardWidth - 64,
-      1,
-    )
-
-    context.fillStyle = APP_MUTED
-    context.font = SMALL_FONT
-    context.fillText("Items to pay", cardX + 32, itemSectionY + 18)
-
-    let nextSectionY = itemSectionY + 42
-
-    if (group.itemDetails.length === 0) {
-      context.fillStyle = APP_MUTED
-      context.font = ITEM_META_FONT
-      context.fillText("No assigned items yet", cardX + 32, nextSectionY + 4)
-      nextSectionY += 34
-    } else {
-      group.itemDetails.forEach((detail, index) => {
-        const rowY = nextSectionY + index * getItemRowHeight()
-        const itemTextWidth = cardWidth - 300
-
-        context.fillStyle = APP_FOREGROUND
-        context.font = BODY_FONT
-        drawWrappedText(
-          context,
-          detail.description,
-          cardX + 32,
-          rowY,
-          itemTextWidth,
-          24,
-          1,
-        )
-
-        context.textAlign = "right"
-        context.fillText(detail.amountLabel, cardRight - 32, rowY)
-        context.textAlign = "left"
-
-        context.fillStyle = APP_MUTED
-        context.font = ITEM_META_FONT
-        context.fillText(
-          `${detail.ratioLabel} share of ${detail.subtotalLabel}`,
-          cardX + 32,
-          rowY + 24,
-        )
-
-        if (index < group.itemDetails.length - 1) {
-          context.fillStyle = APP_LINE
-          context.fillRect(
-            cardX + 32,
-            rowY + 38,
-            cardWidth - 64,
-            1,
-          )
-        }
-      })
-
-      nextSectionY += group.itemDetails.length * getItemRowHeight()
-    }
-
-    context.fillStyle = APP_LINE
-    context.fillRect(
-      cardX + 32,
-      nextSectionY,
-      cardWidth - 64,
-      1,
-    )
-
-    context.fillStyle = APP_MUTED
-    context.font = SMALL_FONT
-    context.fillText("Totals", cardX + 32, nextSectionY + 22)
-
-    const metricsTop = nextSectionY + 48
-    drawMetricRows(context, [
-      { label: "Items", value: group.itemsLabel },
-      { label: "Tax", value: group.taxLabel },
-      { label: "Tip", value: group.tipLabel },
-      { label: "Fees", value: group.feeLabel },
-      { label: "Discount", value: group.discountLabel },
-    ], {
-      labelX: cardX + 32,
-      rowHeight: 44,
-      valueX: cardRight - 32,
-      width: cardWidth - 64,
-      y: metricsTop,
-    })
-
-    currentY += cardHeight + 20
+    currentY += cardHeight + 18
   }
 
   return currentY
@@ -596,9 +1003,11 @@ export function buildReceiptSummaryShareData(input: {
   feeLabel: string
   groups: Array<{
     amountLabel: string
+    amountValue: number
     discountLabel: string
     feeLabel: string
     groupDisplayName: string
+    isPaid: boolean
     itemDetails: ReceiptSummaryShareItemDetail[]
     itemsLabel: string
     taxLabel: string
@@ -612,26 +1021,41 @@ export function buildReceiptSummaryShareData(input: {
   tipLabel: string
   totalLabel: string
 }) {
-  return {
-    discountLabel: input.discountLabel,
-    feeLabel: input.feeLabel,
-    groups: input.groups.map((group) => ({
+  const groups = [...input.groups]
+    .sort((left, right) => {
+      if (left.isPaid !== right.isPaid) {
+        return left.isPaid ? 1 : -1
+      }
+
+      return right.amountValue - left.amountValue
+    })
+    .map((group) => ({
       amountLabel: group.amountLabel,
+      amountValue: group.amountValue,
       discountLabel: group.discountLabel,
       feeLabel: group.feeLabel,
       groupName: group.groupDisplayName || "Untitled group",
+      isPaid: group.isPaid,
       itemDetails: group.itemDetails,
       itemsLabel: group.itemsLabel,
       taxLabel: group.taxLabel,
       tipLabel: group.tipLabel,
-    })),
+    }))
+  const paidGroupCount = groups.filter((group) => group.isPaid).length
+
+  return {
+    discountLabel: input.discountLabel,
+    feeLabel: input.feeLabel,
+    groups,
     locationName: input.locationName.trim(),
     merchantName: input.merchantName.trim() || "Receipt summary",
+    paidGroupCount,
     receiptOccurredAt: input.receiptOccurredAt,
     subtotalLabel: input.subtotalLabel,
     taxLabel: input.taxLabel,
     tipLabel: input.tipLabel,
     totalLabel: input.totalLabel,
+    unpaidGroupCount: Math.max(groups.length - paidGroupCount, 0),
   } satisfies ReceiptSummaryShareData
 }
 
@@ -655,86 +1079,16 @@ export async function renderReceiptSummaryJpegFile(
     throw new Error("Unable to render summary image.")
   }
 
-  context.fillStyle = APP_BACKGROUND
-  context.fillRect(0, 0, SHARE_IMAGE_WIDTH, canvasHeight)
+  drawBackdrop(context, canvasHeight)
 
-  const gradient = context.createLinearGradient(0, 0, SHARE_IMAGE_WIDTH, canvasHeight)
-  gradient.addColorStop(0, APP_PRIMARY_SOFT)
-  gradient.addColorStop(1, "rgba(35, 55, 215, 0)")
-  context.fillStyle = gradient
-  context.fillRect(0, 0, SHARE_IMAGE_WIDTH, canvasHeight)
-
-  const spotlight = context.createRadialGradient(180, 140, 0, 180, 140, 420)
-  spotlight.addColorStop(0, APP_PRIMARY_SOFT)
-  spotlight.addColorStop(1, "rgba(35, 55, 215, 0)")
-  context.fillStyle = spotlight
-  context.fillRect(0, 0, SHARE_IMAGE_WIDTH, canvasHeight)
-
-  const accentSpotlight = context.createRadialGradient(
-    SHARE_IMAGE_WIDTH - 160,
-    canvasHeight - 120,
-    0,
-    SHARE_IMAGE_WIDTH - 160,
-    canvasHeight - 120,
-    320,
-  )
-  accentSpotlight.addColorStop(0, APP_SECONDARY_SOFT)
-  accentSpotlight.addColorStop(1, "rgba(191, 208, 255, 0)")
-  context.fillStyle = accentSpotlight
-  context.fillRect(0, 0, SHARE_IMAGE_WIDTH, canvasHeight)
-
-  const topCardY = 42
-  const topCardHeight = 204
-
-  drawSurface(
-    context,
-    CANVAS_SIDE_PADDING,
-    topCardY,
-    SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2,
-    topCardHeight,
-    {
-      fill: APP_TOPBAR,
-    },
-  )
-
-  context.fillStyle = APP_PRIMARY
-  context.font = HEADING_FONT
-  context.fillText("CHECK SPLIT", CANVAS_SIDE_PADDING + 32, 84)
-
-  context.fillStyle = APP_FOREGROUND
-  context.font = HEADER_FONT
-  const merchantLineCount = drawWrappedText(
-    context,
-    data.merchantName.trim() || "Receipt summary",
-    CANVAS_SIDE_PADDING + 32,
-    146,
-    SHARE_IMAGE_WIDTH - CANVAS_SIDE_PADDING * 2 - 64,
-    66,
-    3,
-  )
-
-  const subtitleParts = [formatShareDate(data.receiptOccurredAt)]
-
-  if (data.locationName.trim()) {
-    subtitleParts.push(data.locationName.trim())
-  }
-
-  context.fillStyle = APP_MUTED
-  context.font = BODY_FONT
-  context.fillText(
-    subtitleParts.join("  •  "),
-    CANVAS_SIDE_PADDING + 32,
-    146 + merchantLineCount * 66,
-  )
-
-  const summaryTop = topCardY + topCardHeight + 24
-  const groupTop = drawSummarySection(context, data, summaryTop)
-  const contentBottom = drawGroupSection(context, data, groupTop)
+  const headerBottom = drawHeaderSection(context, data, 56)
+  const overviewBottom = drawOverviewSection(context, data, headerBottom)
+  const contentBottom = drawGroupSection(context, data, overviewBottom)
 
   context.fillStyle = APP_MUTED
   context.font = SMALL_FONT
   context.fillText(
-    "Generated from receipt summary. Share from device menu.",
+    "Generated from receipt summary. Paid markers reflect export time.",
     CANVAS_SIDE_PADDING,
     contentBottom + 28,
   )
