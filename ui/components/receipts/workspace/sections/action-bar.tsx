@@ -366,7 +366,7 @@ export function ReceiptActionBar({
                   </span>
                 </Button>
                 {warningMessage && !isCompactActionBar ? (
-                  <span className="rounded-full border border-[var(--line)] bg-[color-mix(in_oklab,var(--accent)_22%,transparent)] px-4 py-2 text-sm font-medium text-[var(--foreground)]">
+                  <span className="rounded-full border border-[color-mix(in_oklab,var(--unpaid)_32%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_72%,white)] px-4 py-2 text-sm font-medium text-[var(--unpaid-foreground)]">
                     Review latest version before saving again
                   </span>
                 ) : null}

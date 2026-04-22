@@ -6,6 +6,7 @@ import { AlertCircle } from "lucide-react";
 
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 import { useReceiptWorkspace } from "./workspace/hooks/use-receipt-workspace";
 import { EditorNotice } from "./workspace/lib/shared";
@@ -69,13 +70,27 @@ export function ReceiptWorkspace({
       className="flex-1 pt-4"
       style={{ paddingBottom: Math.max(128, workspace.actionBarHeight + 24) }}
     >
-      <section className="page-shell pb-12">
+      <section
+        className={cn(
+          "page-shell pb-12",
+          workspace.shouldShowUploadGate &&
+            "flex min-h-[calc(100svh-10rem)] items-center",
+        )}
+      >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
+          className={cn("w-full", workspace.shouldShowUploadGate && "mx-auto max-w-5xl")}
         >
-          <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div
+            className={cn(
+              "mt-8",
+              workspace.shouldShowUploadGate
+                ? "mx-auto max-w-5xl"
+                : "grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]",
+            )}
+          >
             <div className="space-y-6">
               {workspace.shouldShowUploadGate ? null : (
                 <WorkspaceHeader

@@ -82,10 +82,10 @@ const APP_ACCENT = "#79d2bc"
 const APP_ACCENT_SOFT = "rgba(121, 210, 188, 0.16)"
 const APP_ACCENT_STROKE = "rgba(48, 126, 108, 0.18)"
 const APP_ACCENT_FOREGROUND = "#10211b"
-const APP_UNPAID = "#d84b39"
-const APP_UNPAID_SOFT = "rgba(216, 75, 57, 0.11)"
-const APP_UNPAID_STROKE = "rgba(143, 47, 34, 0.18)"
-const APP_UNPAID_FOREGROUND = "#8f2f22"
+const APP_UNPAID = "#d97706"
+const APP_UNPAID_SOFT = "#fef3c7"
+const APP_UNPAID_STROKE = "rgba(180, 83, 9, 0.18)"
+const APP_UNPAID_FOREGROUND = "#b45309"
 
 function sanitizeSegment(value: string) {
   return value
@@ -645,7 +645,7 @@ function drawPaymentRosterTile(
   const pillX = getRightAlignedPillX(context, pillLabel, amountRightX, 92)
 
   drawSurface(context, x, y, width, 112, {
-    fill: group.isPaid ? APP_SURFACE : "#fff8f7",
+    fill: group.isPaid ? APP_SURFACE : "#fff9e8",
     radius: 24,
     stroke: palette.stroke,
   })

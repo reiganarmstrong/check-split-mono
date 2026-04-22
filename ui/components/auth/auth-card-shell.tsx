@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { ReactNode } from "react"
+import type { CSSProperties, ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -15,6 +15,7 @@ type AuthCardShellProps = {
   footerLinkClassName?: string
   cardShadowClassName?: string
   bandClassName?: string
+  bandStyle?: CSSProperties
 }
 
 export function AuthCardShell({
@@ -29,6 +30,7 @@ export function AuthCardShell({
   footerLinkClassName,
   cardShadowClassName,
   bandClassName,
+  bandStyle,
 }: AuthCardShellProps) {
   return (
     <section
@@ -38,7 +40,13 @@ export function AuthCardShell({
       )}
     >
       <div className="grid md:grid-cols-[0.92fr_1.08fr]">
-        <div className={cn("auth-band px-6 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12", bandClassName)}>
+        <div
+          className={cn(
+            "auth-band px-6 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12",
+            bandClassName,
+          )}
+          style={bandStyle}
+        >
           <div
             className={cn(
               "inline-flex h-14 w-14 items-center justify-center rounded-[1.15rem] border border-[var(--line)] bg-[var(--panel-strong)] text-[var(--foreground)]",

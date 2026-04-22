@@ -159,7 +159,7 @@ export function SummaryAside({
                   "rounded-[1.1rem] border bg-[var(--surface)] px-4 py-3",
                   group.isPaid
                     ? "border-[color-mix(in_oklab,var(--accent)_45%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_12%,white)]"
-                    : "border-[color-mix(in_oklab,#d84b39_42%,var(--line))] bg-[color-mix(in_oklab,#d84b39_05%,white)]",
+                    : "border-[color-mix(in_oklab,var(--unpaid)_36%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_46%,white)]",
                 )}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -182,15 +182,21 @@ export function SummaryAside({
                       className={cn(
                         "rounded-full border px-3",
                         group.isPaid
-                          ? "border-[color-mix(in_oklab,var(--accent)_40%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent-foreground)] hover:border-[color-mix(in_oklab,#d84b39_42%,var(--line))] hover:bg-[color-mix(in_oklab,#d84b39_14%,white)] hover:text-[#b43b2b]"
-                          : "border-[color-mix(in_oklab,#d84b39_40%,var(--line))] bg-[color-mix(in_oklab,#d84b39_12%,white)] text-[#b43b2b] hover:border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] hover:bg-[color-mix(in_oklab,var(--accent)_18%,white)] hover:text-[var(--accent-foreground)]",
+                          ? "border-[color-mix(in_oklab,var(--accent)_40%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent-foreground)] hover:border-[color-mix(in_oklab,var(--unpaid)_36%,var(--line))] hover:bg-[color-mix(in_oklab,var(--unpaid-soft)_72%,white)] hover:text-[var(--unpaid-foreground)]"
+                          : "border-[color-mix(in_oklab,var(--unpaid)_40%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_64%,white)] text-[var(--unpaid-foreground)] hover:border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] hover:bg-[color-mix(in_oklab,var(--accent)_18%,white)] hover:text-[var(--accent-foreground)]",
                       )}
                       onClick={() => toggleGroupPaid(group.id)}
                     >
                       {group.isPaid ? (
-                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        <>
+                          <CheckCircle2 className="h-3.5 w-3.5 group-hover/button:hidden" />
+                          <CircleDashed className="hidden h-3.5 w-3.5 group-hover/button:inline" />
+                        </>
                       ) : (
-                        <CircleDashed className="h-3.5 w-3.5" />
+                        <>
+                          <CircleDashed className="h-3.5 w-3.5 group-hover/button:hidden" />
+                          <CheckCircle2 className="hidden h-3.5 w-3.5 group-hover/button:inline" />
+                        </>
                       )}
                       <span className="group-hover/button:hidden">
                         {group.isPaid ? "Paid" : "Unpaid"}
