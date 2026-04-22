@@ -968,6 +968,29 @@ function drawGroupSection(
   return currentY
 }
 
+function renderReceiptSummaryCanvas(
+  context: CanvasRenderingContext2D,
+  data: ReceiptSummaryShareData,
+  canvasHeight: number,
+) {
+  drawBackdrop(context, canvasHeight)
+
+  const headerBottom = drawHeaderSection(context, data, 56)
+  const overviewBottom = drawOverviewSection(context, data, headerBottom)
+  const contentBottom = drawGroupSection(context, data, overviewBottom)
+  const footerBaselineY = contentBottom + 28
+
+  context.fillStyle = APP_MUTED
+  context.font = SMALL_FONT
+  context.fillText(
+    "Generated from receipt summary. Paid markers reflect export time.",
+    CANVAS_SIDE_PADDING,
+    footerBaselineY,
+  )
+
+  return footerBaselineY + 40
+}
+
 async function canvasToJpegBlob(canvas: HTMLCanvasElement) {
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
@@ -1072,26 +1095,25 @@ export async function renderReceiptSummaryJpegFile(
   }
 
   const canvasHeight = getCanvasHeight(measurementContext, data)
-  const canvas = createCanvasElement(SHARE_IMAGE_WIDTH, canvasHeight)
-  const context = canvas.getContext("2d")
+  let canvas = createCanvasElement(SHARE_IMAGE_WIDTH, canvasHeight)
+  let context = canvas.getContext("2d")
 
   if (!context) {
     throw new Error("Unable to render summary image.")
   }
 
-  drawBackdrop(context, canvasHeight)
+  const requiredHeight = renderReceiptSummaryCanvas(context, data, canvasHeight)
 
-  const headerBottom = drawHeaderSection(context, data, 56)
-  const overviewBottom = drawOverviewSection(context, data, headerBottom)
-  const contentBottom = drawGroupSection(context, data, overviewBottom)
+  if (requiredHeight > canvasHeight) {
+    canvas = createCanvasElement(SHARE_IMAGE_WIDTH, requiredHeight)
+    context = canvas.getContext("2d")
 
-  context.fillStyle = APP_MUTED
-  context.font = SMALL_FONT
-  context.fillText(
-    "Generated from receipt summary. Paid markers reflect export time.",
-    CANVAS_SIDE_PADDING,
-    contentBottom + 28,
-  )
+    if (!context) {
+      throw new Error("Unable to render summary image.")
+    }
+
+    renderReceiptSummaryCanvas(context, data, requiredHeight)
+  }
 
   const blob = await canvasToJpegBlob(canvas)
   return new File(
