@@ -196,15 +196,14 @@ export function Navbar() {
         ]
       : [];
 
-  function renderBreadcrumbs({
-    mobile = false,
-  }: {
-    mobile?: boolean;
-  }) {
+  function renderBreadcrumbs({ mobile = false }: { mobile?: boolean }) {
     return breadcrumbs.map((item, index) => (
       <div
         key={`${mobile ? "mobile" : "desktop"}-${item.label}-${index}`}
-        className={cn("flex min-w-0 items-center", mobile ? "gap-1" : "gap-1 md:gap-2")}
+        className={cn(
+          "flex min-w-0 items-center",
+          mobile ? "gap-1" : "gap-1 md:gap-2",
+        )}
       >
         {index > 0 ? (
           <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[var(--muted-foreground)]" />
@@ -225,7 +224,9 @@ export function Navbar() {
             aria-current={item.isCurrent ? "page" : undefined}
             className={cn(
               "block truncate rounded-full font-medium underline decoration-[var(--foreground)] decoration-1 underline-offset-4",
-              mobile ? "max-w-32 px-1.5 py-1 text-xs" : "max-w-28 px-1.5 py-1.5 sm:max-w-40 sm:px-2 md:max-w-56",
+              mobile
+                ? "max-w-32 px-1.5 py-1 text-xs"
+                : "max-w-28 px-1.5 py-1.5 sm:max-w-40 sm:px-2 md:max-w-56",
               item.isCurrent
                 ? "text-[var(--foreground)]"
                 : "text-[var(--muted-foreground)]",
@@ -241,7 +242,7 @@ export function Navbar() {
   return (
     <motion.header
       initial={{ y: -24, opacity: 0 }}
-      animate={{ y: isNavVisible ? 0 : -120, opacity: isNavVisible ? 1 : 0.92 }}
+      animate={{ y: isNavVisible ? 0 : -120, opacity: 1 }}
       transition={{ duration: 0.28, ease: "easeOut" }}
       className="sticky top-0 z-50 px-3 py-4 sm:px-6 lg:px-12"
     >
@@ -303,12 +304,12 @@ export function Navbar() {
                     >
                       <div className="panel-surface-strong rounded-b-[1.35rem] border-t-0 px-4 pb-4 pt-3">
                         <button
-                        type="button"
-                        role="menuitem"
-                        onClick={() => void handleSignOut()}
-                        disabled={isSigningOut}
-                        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[1rem] bg-[#ff0000] px-4 text-sm font-medium text-[#fff8f6] transition-colors hover:bg-[#cc0000] disabled:opacity-60"
-                      >
+                          type="button"
+                          role="menuitem"
+                          onClick={() => void handleSignOut()}
+                          disabled={isSigningOut}
+                          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[1rem] bg-[#ff0000] px-4 text-sm font-medium text-[#fff8f6] transition-colors hover:bg-[#cc0000] disabled:opacity-60"
+                        >
                           <LogOut className="h-4 w-4" />
                           {isSigningOut ? "Signing out..." : "Sign out"}
                         </button>
