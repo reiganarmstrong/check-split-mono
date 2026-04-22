@@ -14,6 +14,13 @@ function receiptPk(receiptId) {
   return 'RECEIPT#' + receiptId;
 }
 
+function allocationKey(receiptId, itemId, participantId) {
+  return {
+    pk: receiptPk(receiptId),
+    sk: 'ALLOCATION#ITEM#' + itemId + '#PARTICIPANT#' + participantId,
+  };
+}
+
 function uniqueParticipantIds(allocations) {
   const seen = {};
 
@@ -36,6 +43,8 @@ export function request(ctx) {
   const now = util.time.nowISO8601();
   const existingAllocations = ctx.stash.itemAllocations ?? [];
   const newAllocations = input.allocations ?? [];
+  const existingAllocationsByParticipantId = {};
+  const nextParticipantIds = {};
 
   uniqueParticipantIds(newAllocations);
 
@@ -43,13 +52,36 @@ export function request(ctx) {
     util.error('Too many allocation operations for one transaction', 'ValidationError');
   }
 
-  ctx.stash.allocations = newAllocations.map((allocation) => ({
-    createdAt: now,
-    itemId: input.itemId,
-    participantId: allocation.participantId,
-    shareWeight: allocation.shareWeight,
-    updatedAt: now,
-  }));
+  for (const allocation of existingAllocations) {
+    existingAllocationsByParticipantId[allocation.participant_id] = allocation;
+  }
+
+  ctx.stash.allocations = newAllocations.map((allocation) => {
+    const existingAllocation = existingAllocationsByParticipantId[allocation.participantId];
+
+    nextParticipantIds[allocation.participantId] = true;
+
+    return {
+      createdAt: existingAllocation?.created_at ?? now,
+      itemId: input.itemId,
+      participantId: allocation.participantId,
+      shareWeight: allocation.shareWeight,
+      updatedAt:
+        existingAllocation && existingAllocation.share_weight === allocation.shareWeight
+          ? existingAllocation.updated_at
+          : now,
+    };
+  });
+
+  const allocationsToPut = ctx.stash.allocations.filter((allocation) => {
+    const existingAllocation = existingAllocationsByParticipantId[allocation.participantId];
+
+    return !existingAllocation || existingAllocation.share_weight !== allocation.shareWeight;
+  });
+
+  const allocationsToDelete = existingAllocations.filter(
+    (allocation) => !Object.hasOwn(nextParticipantIds, allocation.participant_id),
+  );
 
   return {
     operation: 'TransactWriteItems',
@@ -84,15 +116,14 @@ export function request(ctx) {
         operation: 'ConditionCheck',
         table: '${table_name}',
       })),
-      ...existingAllocations.map((allocation) => ({
-        key: util.dynamodb.toMapValues({
-          pk: allocation.pk,
-          sk: allocation.sk,
-        }),
+      ...allocationsToDelete.map((allocation) => ({
+        key: util.dynamodb.toMapValues(
+          allocationKey(input.receiptId, input.itemId, allocation.participant_id),
+        ),
         operation: 'DeleteItem',
         table: '${table_name}',
       })),
-      ...ctx.stash.allocations.map((allocation) => ({
+      ...allocationsToPut.map((allocation) => ({
         attributeValues: util.dynamodb.toMapValues({
           created_at: allocation.createdAt,
           item_id: allocation.itemId,

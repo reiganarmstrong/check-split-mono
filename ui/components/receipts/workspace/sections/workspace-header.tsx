@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import {
   REQUIRED_HIGHLIGHT,
   requiredHighlightSoftStyle,
-} from "./constants";
+} from "../lib/constants";
 
 export function WorkspaceHeader({
   heading,

@@ -18,7 +18,7 @@ import { mapReceiptToEditorState } from "@/lib/receipt-editor";
 import { buildReceiptSummaryShareData, renderReceiptSummaryJpegFile } from "@/lib/receipt-summary-share";
 import type { Receipt, ReceiptEditorState } from "@/lib/receipt-types";
 
-import { logWorkspaceError } from "./workspace-helpers";
+import { logWorkspaceError } from "../lib/workspace-helpers";
 
 export function useReceiptWorkspaceActions({
   receiptId,

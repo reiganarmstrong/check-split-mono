@@ -1,13 +1,12 @@
 export type AllocationPolicy = "EVEN" | "PROPORTIONAL"
 
-export type ReceiptStatus = "DRAFT" | "OPEN" | "FINALIZED"
-
 export type ReceiptListItem = {
   locationName: string | null
   merchantName: string
+  paidParticipantCount: number
+  participantCount: number
   receiptId: string
   receiptOccurredAt: string
-  status: ReceiptStatus
   totalCents: number
   updatedAt: string
 }
@@ -23,7 +22,9 @@ export type ReceiptItemAllocation = {
 export type ReceiptParticipant = {
   createdAt: string | null
   displayName: string
+  isPaid: boolean
   notes: string | null
+  paidAt: string | null
   participantId: string
   sortOrder: number | null
   updatedAt: string
@@ -59,11 +60,11 @@ export type Receipt = {
   locationName: string | null
   merchantName: string
   ownerUserId: string
+  paidParticipantCount: number
   participantCount: number
   participants: ReceiptParticipant[]
   receiptId: string
   receiptOccurredAt: string
-  status: ReceiptStatus
   subtotalCents: number
   taxCents: number
   tipCents: number
@@ -74,6 +75,7 @@ export type Receipt = {
 
 export type EditableGroup = {
   id: string
+  isPaid: boolean
   participantId: string | null
   displayName: string
   notes: string
@@ -103,7 +105,6 @@ export type ReceiptEditorState = {
   merchantName: string
   receiptId: string | null
   receiptOccurredAt: string
-  status: ReceiptStatus
   tax: string
   tip: string
   version: number | null

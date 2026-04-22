@@ -10,8 +10,8 @@ import type {
   ReceiptEditorState,
 } from "@/lib/receipt-types";
 
-import { logWorkspaceError } from "./workspace-helpers";
-import type { ReceiptWorkspaceAuthStatus } from "./types";
+import type { ReceiptWorkspaceAuthStatus } from "../lib/types";
+import { logWorkspaceError } from "../lib/workspace-helpers";
 import { getReceipt } from "@/lib/receipt-api";
 
 export function useReceiptWorkspaceData({
@@ -136,6 +136,17 @@ export function useReceiptWorkspaceData({
       ...current,
       groups: current.groups.map((group) =>
         group.id === groupId ? { ...group, ...updates } : group,
+      ),
+    }));
+  }
+
+  function toggleGroupPaid(groupId: string) {
+    clearTransientMessages();
+    clearParseIssues();
+    setEditorState((current) => ({
+      ...current,
+      groups: current.groups.map((group) =>
+        group.id === groupId ? { ...group, isPaid: !group.isPaid } : group,
       ),
     }));
   }
@@ -269,6 +280,7 @@ export function useReceiptWorkspaceData({
     beginManualEntry,
     updateField,
     updateGroup,
+    toggleGroupPaid,
     addGroup,
     removeGroup,
     addItem,

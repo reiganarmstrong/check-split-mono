@@ -29,7 +29,6 @@ import type {
   ReceiptSavePlan,
 } from "@/lib/receipt-types"
 
-const receiptStatusSchema = z.enum(["DRAFT", "OPEN", "FINALIZED"])
 const allocationPolicySchema = z.enum(["EVEN", "PROPORTIONAL"])
 
 const receiptItemAllocationSchema = z.object({
@@ -43,7 +42,9 @@ const receiptItemAllocationSchema = z.object({
 const receiptParticipantSchema = z.object({
   createdAt: z.string().nullable(),
   displayName: z.string(),
+  isPaid: z.boolean(),
   notes: z.string().nullable(),
+  paidAt: z.string().nullable(),
   participantId: z.string(),
   sortOrder: z.number().nullable(),
   updatedAt: z.string(),
@@ -79,11 +80,11 @@ const receiptSchema = z.object({
   locationName: z.string().nullable(),
   merchantName: z.string(),
   ownerUserId: z.string(),
+  paidParticipantCount: z.number(),
   participantCount: z.number(),
   participants: z.array(receiptParticipantSchema),
   receiptId: z.string(),
   receiptOccurredAt: z.string(),
-  status: receiptStatusSchema,
   subtotalCents: z.number(),
   taxCents: z.number(),
   tipCents: z.number(),
@@ -95,9 +96,10 @@ const receiptSchema = z.object({
 const receiptListItemSchema = z.object({
   locationName: z.string().nullable(),
   merchantName: z.string(),
+  paidParticipantCount: z.number(),
+  participantCount: z.number(),
   receiptId: z.string(),
   receiptOccurredAt: z.string(),
-  status: receiptStatusSchema,
   totalCents: z.number(),
   updatedAt: z.string(),
 })
@@ -111,7 +113,6 @@ const receiptMutationResultSchema = z.object({
   itemCount: z.number().nullable().optional(),
   participantCount: z.number().nullable().optional(),
   receiptId: z.string(),
-  status: receiptStatusSchema.nullable().optional(),
   updatedAt: z.string(),
   version: z.number(),
 })
@@ -276,7 +277,6 @@ function buildMetadataInput(state: ReceiptEditorState, receiptId: string, versio
     merchantName: state.merchantName.trim(),
     receiptId,
     receiptOccurredAt: toAwsDateTime(state.receiptOccurredAt),
-    status: state.status,
     subtotalCents: getReceiptSubtotalCents(state),
     taxCents: parseMoneyInputToCents(state.tax),
     tipCents: parseMoneyInputToCents(state.tip),
@@ -295,6 +295,7 @@ function didParticipantChange(
 
   return (
     serverParticipant.displayName !== group.displayName.trim() ||
+    serverParticipant.isPaid !== group.isPaid ||
     (serverParticipant.notes ?? "") !== group.notes.trim() ||
     (serverParticipant.sortOrder ?? index) !== index
   )
@@ -336,9 +337,10 @@ const listReceiptsQuery = /* GraphQL */ `
       items {
         locationName
         merchantName
+        paidParticipantCount
+        participantCount
         receiptId
         receiptOccurredAt
-        status
         totalCents
         updatedAt
       }
@@ -383,18 +385,20 @@ const getReceiptQuery = /* GraphQL */ `
       locationName
       merchantName
       ownerUserId
+      paidParticipantCount
       participantCount
       participants {
         createdAt
         displayName
+        isPaid
         notes
+        paidAt
         participantId
         sortOrder
         updatedAt
       }
       receiptId
       receiptOccurredAt
-      status
       subtotalCents
       taxCents
       tipCents
@@ -441,18 +445,20 @@ const createReceiptMutation = /* GraphQL */ `
       locationName
       merchantName
       ownerUserId
+      paidParticipantCount
       participantCount
       participants {
         createdAt
         displayName
+        isPaid
         notes
+        paidAt
         participantId
         sortOrder
         updatedAt
       }
       receiptId
       receiptOccurredAt
-      status
       subtotalCents
       taxCents
       tipCents
@@ -479,7 +485,6 @@ const updateReceiptMetadataMutation = /* GraphQL */ `
   mutation UpdateReceiptMetadata($input: UpdateReceiptMetadataInput!) {
     updateReceiptMetadata(input: $input) {
       receiptId
-      status
       updatedAt
       version
     }
@@ -492,7 +497,9 @@ const addParticipantMutation = /* GraphQL */ `
       participant {
         createdAt
         displayName
+        isPaid
         notes
+        paidAt
         participantId
         sortOrder
         updatedAt
@@ -510,7 +517,9 @@ const updateParticipantMutation = /* GraphQL */ `
       participant {
         createdAt
         displayName
+        isPaid
         notes
+        paidAt
         participantId
         sortOrder
         updatedAt
@@ -760,6 +769,7 @@ async function persistGroups(
       const result = await addParticipant({
         displayName: group.displayName.trim(),
         expectedVersion: nextVersion,
+        isPaid: group.isPaid,
         notes: trimToNull(group.notes),
         receiptId,
         sortOrder: index,
@@ -783,6 +793,7 @@ async function persistGroups(
     const result = await updateParticipant({
       displayName: group.displayName.trim(),
       expectedVersion: nextVersion,
+      isPaid: group.isPaid,
       notes: trimToNull(group.notes),
       participantId: group.participantId,
       receiptId,
@@ -969,7 +980,6 @@ export async function saveReceiptEditorState(
       locationName: trimToNull(state.locationName),
       merchantName: state.merchantName.trim(),
       receiptOccurredAt: toAwsDateTime(state.receiptOccurredAt),
-      status: "DRAFT",
       subtotalCents: getReceiptSubtotalCents(state),
       taxCents: parseMoneyInputToCents(state.tax),
       tipCents: parseMoneyInputToCents(state.tip),

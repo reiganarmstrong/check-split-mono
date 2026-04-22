@@ -47,9 +47,11 @@ export function getReceiptWorkspaceDerivedState({
 
       return {
         amountLabel: formatCurrency(share?.amountCents ?? 0),
+        amountValue: share?.amountCents ?? 0,
         discountLabel: formatCurrency(share?.discountShareCents ?? 0),
         feeLabel: formatCurrency(share?.feeShareCents ?? 0),
         groupDisplayName: group.displayName,
+        isPaid: group.isPaid,
         itemsLabel: formatCurrency(share?.itemSubtotalCents ?? 0),
         itemDetails: (groupItemShareDetailsByGroupId.get(group.id) ?? []).map(
           (detail) => ({

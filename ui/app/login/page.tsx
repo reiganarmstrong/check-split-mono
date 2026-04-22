@@ -88,7 +88,9 @@ function LoginPageContent() {
         <AuthCardShell
           icon={<LogIn className="ml-1 h-8 w-8" />}
           iconWrapperClassName="bg-[color-mix(in_oklab,var(--accent)_22%,transparent)]"
-          bandClassName="!bg-[linear-gradient(180deg,color-mix(in_srgb,var(--accent)_24%,white)_0%,color-mix(in_srgb,var(--accent)_14%,white)_40%,color-mix(in_srgb,var(--accent)_6%,white)_74%,#fafbf6_100%)]"
+          bandStyle={{
+            background: "color-mix(in oklab, var(--accent) 7%, white)",
+          }}
           title="Welcome back"
           description="Log in to reopen drafts and saved split receipts."
           footerPrompt="Don't have an account?"

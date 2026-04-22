@@ -119,7 +119,7 @@ export function EditorNotice({
     tone === "success"
       ? "border-[var(--line)] bg-[color-mix(in_oklab,var(--primary)_12%,transparent)] text-[var(--foreground)]"
       : tone === "warning"
-        ? "border-[var(--line)] bg-[color-mix(in_oklab,var(--accent)_22%,transparent)] text-[var(--foreground)]"
+        ? "border-[color-mix(in_oklab,var(--unpaid)_32%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_72%,white)] text-[var(--unpaid-foreground)]"
         : "border-destructive/25 bg-destructive/10 text-destructive";
 
   return (

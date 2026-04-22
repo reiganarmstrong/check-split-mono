@@ -115,6 +115,7 @@ export function createEditableGroup(group?: Partial<EditableGroup>): EditableGro
   return {
     displayName: group?.displayName ?? "",
     id: group?.id ?? makeLocalId("group"),
+    isPaid: group?.isPaid ?? false,
     notes: group?.notes ?? "",
     participantId: group?.participantId ?? null,
   }
@@ -149,7 +150,6 @@ export function createEmptyReceiptEditorState(): ReceiptEditorState {
     merchantName: "",
     receiptId: null,
     receiptOccurredAt: normalizeDateTimeInput(new Date().toISOString()),
-    status: "DRAFT",
     tax: "0.00",
     tip: "0.00",
     version: null,
@@ -495,6 +495,7 @@ export function mapReceiptToEditorState(receipt: Receipt): ReceiptEditorState {
     createEditableGroup({
       displayName: participant.displayName,
       id: participant.participantId,
+      isPaid: participant.isPaid,
       notes: participant.notes ?? "",
       participantId: participant.participantId,
     }),
@@ -526,7 +527,6 @@ export function mapReceiptToEditorState(receipt: Receipt): ReceiptEditorState {
     merchantName: receipt.merchantName,
     receiptId: receipt.receiptId,
     receiptOccurredAt: normalizeDateTimeInput(receipt.receiptOccurredAt),
-    status: receipt.status,
     tax: centsToInputValue(receipt.taxCents),
     tip: centsToInputValue(receipt.tipCents),
     version: receipt.version,
@@ -592,6 +592,7 @@ export function buildReceiptSavePlan(
 
     return (
       existing.displayName !== group.displayName.trim() ||
+      existing.isPaid !== group.isPaid ||
       (existing.notes ?? "") !== group.notes.trim() ||
       (existing.sortOrder ?? index) !== index
     )

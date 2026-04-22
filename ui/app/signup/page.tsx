@@ -78,6 +78,9 @@ export default function SignupPage() {
         <AuthCardShell
           icon={<UserPlus className="ml-1 h-8 w-8" />}
           iconWrapperClassName="bg-[color-mix(in_oklab,var(--primary)_18%,transparent)]"
+          bandStyle={{
+            background: "color-mix(in oklab, var(--primary) 7%, white)",
+          }}
           title="Create an account"
           description="Create account, confirm email, then move straight into saved splits and editor."
           footerPrompt="Already have an account?"

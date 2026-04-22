@@ -6,17 +6,19 @@ import { AlertCircle } from "lucide-react";
 
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-import { ReceiptActionBar } from "./workspace/action-bar";
-import { AdjustmentsSection } from "./workspace/adjustments-section";
-import { GroupListSection } from "./workspace/group-list-section";
-import { ItemListSection } from "./workspace/item-list-section";
-import { ReceiptDetailsSection } from "./workspace/receipt-details-section";
-import { ReceiptUploadGate } from "./workspace/receipt-upload-gate";
-import { SummaryAside } from "./workspace/summary-aside";
-import { useReceiptWorkspace } from "./workspace/use-receipt-workspace";
-import { WorkspaceHeader } from "./workspace/workspace-header";
-import { EditorNotice } from "./workspace/shared";
+import { useReceiptWorkspace } from "./workspace/hooks/use-receipt-workspace";
+import { EditorNotice } from "./workspace/lib/shared";
+import { ReceiptActionBar } from "./workspace/sections/action-bar";
+import { AdjustmentsSection } from "./workspace/sections/adjustments-section";
+import { GroupListSection } from "./workspace/sections/group-list-section";
+import { ItemListSection } from "./workspace/sections/item-list-section";
+import { PaymentStatusSection } from "./workspace/sections/payment-status-section";
+import { ReceiptDetailsSection } from "./workspace/sections/receipt-details-section";
+import { ReceiptUploadGate } from "./workspace/sections/receipt-upload-gate";
+import { SummaryAside } from "./workspace/sections/summary-aside";
+import { WorkspaceHeader } from "./workspace/sections/workspace-header";
 
 export function ReceiptWorkspace({
   receiptId,
@@ -68,13 +70,27 @@ export function ReceiptWorkspace({
       className="flex-1 pt-4"
       style={{ paddingBottom: Math.max(128, workspace.actionBarHeight + 24) }}
     >
-      <section className="page-shell pb-12">
+      <section
+        className={cn(
+          "page-shell pb-12",
+          workspace.shouldShowUploadGate &&
+            "flex min-h-[calc(100svh-10rem)] items-center",
+        )}
+      >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
+          className={cn("w-full", workspace.shouldShowUploadGate && "mx-auto max-w-5xl")}
         >
-          <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div
+            className={cn(
+              "mt-8",
+              workspace.shouldShowUploadGate
+                ? "mx-auto max-w-5xl"
+                : "grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]",
+            )}
+          >
             <div className="space-y-6">
               {workspace.shouldShowUploadGate ? null : (
                 <WorkspaceHeader
@@ -142,9 +158,6 @@ export function ReceiptWorkspace({
                       editorState={workspace.editorState}
                       merchantNameMissing={workspace.merchantNameMissing}
                       receiptDateMissing={workspace.receiptDateMissing}
-                      isParsingReceipt={workspace.isParsingReceipt}
-                      requestReceiptUpload={workspace.requestReceiptUpload}
-                      handleReceiptUpload={workspace.handleReceiptUpload}
                       updateField={workspace.updateField}
                     />
                   </motion.div>
@@ -160,6 +173,18 @@ export function ReceiptWorkspace({
                       updateGroup={workspace.updateGroup}
                       addGroup={workspace.addGroup}
                       removeGroup={workspace.removeGroup}
+                    />
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.125, duration: 0.3 }}
+                  >
+                    <PaymentStatusSection
+                      groups={workspace.editorState.groups}
+                      groupSharesById={workspace.groupSharesById}
+                      toggleGroupPaid={workspace.toggleGroupPaid}
                     />
                   </motion.div>
 
@@ -189,6 +214,7 @@ export function ReceiptWorkspace({
                       updateField={workspace.updateField}
                     />
                   </motion.div>
+
                 </>
               )}
             </div>
@@ -204,9 +230,12 @@ export function ReceiptWorkspace({
                 groupItemShareDetailsByGroupId={
                   workspace.groupItemShareDetailsByGroupId
                 }
+                toggleGroupPaid={workspace.toggleGroupPaid}
                 isSharingSummary={workspace.isSharingSummary}
                 handleShareSummary={workspace.handleShareSummary}
                 scrollToFullSummary={workspace.scrollToFullSummary}
+                actionBarHeight={workspace.actionBarHeight}
+                footerOffset={workspace.footerOffset}
               />
             )}
           </div>

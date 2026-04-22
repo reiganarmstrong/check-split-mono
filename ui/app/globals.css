@@ -58,6 +58,10 @@
   --muted-foreground: rgba(19, 24, 31, 0.62);
   --accent: #79d2bc;
   --accent-foreground: #10211b;
+  --unpaid: #d97706;
+  --unpaid-soft: #fef3c7;
+  --unpaid-foreground: #b45309;
+  --unpaid-stroke: rgba(180, 83, 9, 0.18);
   --destructive: #c64944;
   --destructive-foreground: #fff8f6;
   --border: rgba(19, 24, 31, 0.12);
