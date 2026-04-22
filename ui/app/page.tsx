@@ -10,10 +10,10 @@ import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 
-const savedSplitFigureRows = [
-  { title: "Bar Clara", state: "Unpaid", amount: "$84.20" },
-  { title: "Cafe Orchard", state: "Unpaid", amount: "$41.65" },
-  { title: "Late Lunch Club", state: "Paid", amount: "$63.18" },
+const savedSplitFigurePeople = [
+  { name: "Alex", amount: "$28.10" },
+  { name: "Nina", amount: "$24.25" },
+  { name: "June", amount: "$31.85" },
 ];
 
 function SectionReveal({
@@ -343,7 +343,7 @@ function MakeGroupsFigure() {
                 </p>
                 <p className="mt-2 text-3xl font-semibold leading-none">2</p>
               </div>
-              <div className="rounded-[1.2rem] bg-[var(--accent)] px-4 py-4 text-[var(--accent-foreground)]">
+              <div className="rounded-[1.2rem] bg-[var(--secondary)] px-4 py-4 text-[var(--secondary-foreground)]">
                 <p className="text-[0.68rem] uppercase tracking-[0.18em] opacity-70">
                   People
                 </p>
@@ -364,18 +364,18 @@ function SavedSplitsFigure() {
         <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-1">
           <div>
             <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
-              Unpaid
+              Settled total
             </p>
             <p className="mt-3 text-6xl font-semibold leading-none text-[var(--foreground)] sm:text-7xl">
-              $125
+              $189
             </p>
           </div>
           <div>
             <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
-              Paid
+              People paid
             </p>
             <p className="mt-3 text-6xl font-semibold leading-none text-[var(--foreground)] sm:text-7xl">
-              $63
+              9/9
             </p>
           </div>
         </div>
@@ -393,8 +393,8 @@ function SavedSplitsFigure() {
               Late Lunch Club
             </p>
             <div className="mt-5 flex items-center justify-between">
-              <span className="rounded-full bg-[var(--accent)] px-3 py-2 text-sm font-medium text-[var(--accent-foreground)]">
-                Paid
+              <span className="rounded-full bg-[#dff5ea] px-3 py-2 text-sm font-medium text-[#116149]">
+                Everyone paid
               </span>
               <span className="text-xl font-medium text-[var(--foreground)]">
                 $63.18
@@ -408,14 +408,14 @@ function SavedSplitsFigure() {
             className="absolute inset-x-4 top-16 rotate-[3deg] transform-gpu rounded-[2rem] border border-[var(--line)] bg-white px-5 py-5 shadow-[0_18px_38px_rgba(14,18,24,0.05)]"
           >
             <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-              Open split
+              Closed out
             </p>
             <p className="mt-3 text-2xl font-semibold leading-none text-[var(--foreground)]">
               Cafe Orchard
             </p>
             <div className="mt-5 flex items-center justify-between">
-              <span className="rounded-full border border-[var(--line)] px-3 py-2 text-sm font-medium text-[var(--foreground)]">
-                Unpaid
+              <span className="rounded-full bg-[#dff5ea] px-3 py-2 text-sm font-medium text-[#116149]">
+                Everyone paid
               </span>
               <span className="text-xl font-medium text-[var(--foreground)]">
                 $41.65
@@ -436,36 +436,66 @@ function SavedSplitsFigure() {
                 <p className="mt-3 text-3xl font-semibold leading-none text-[var(--foreground)]">
                   Bar Clara
                 </p>
-              </div>
-              <div className="rounded-[1rem] bg-[var(--secondary)] px-4 py-4 text-[var(--secondary-foreground)]">
-                <p className="text-[0.68rem] uppercase tracking-[0.18em] opacity-70">
-                  Share
+                <p className="mt-3 text-sm text-[var(--muted-foreground)]">
+                  Friday dinner settled and saved.
                 </p>
-                <p className="mt-2 text-2xl font-semibold leading-none">
-                  $84.20
+              </div>
+              <div className="rounded-[1.2rem] border border-[#bfe4d2] bg-[#dff5ea] px-4 py-4 text-[#116149]">
+                <p className="text-[0.68rem] uppercase tracking-[0.18em] opacity-70">
+                  Payment status
+                </p>
+                <p className="mt-2 text-xl font-semibold leading-tight">
+                  Everyone paid
+                </p>
+                <p className="mt-2 text-sm font-medium opacity-80">
+                  3 of 3 settled
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 space-y-4">
-              {savedSplitFigureRows.map((row) => (
-                <div
-                  key={row.title}
-                  className="flex items-center justify-between gap-4 rounded-[1.4rem] border border-[var(--line)] px-4 py-4"
-                >
-                  <div>
-                    <p className="text-lg font-semibold leading-none text-[var(--foreground)]">
-                      {row.title}
-                    </p>
-                    <p className="mt-2 text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-                      {row.state}
-                    </p>
-                  </div>
-                  <p className="text-lg font-medium text-[var(--foreground)]">
-                    {row.amount}
+            <div className="mt-6 rounded-[1.5rem] border border-[var(--line)] bg-[#fbfbf7] px-4 py-4">
+              <div className="flex items-center justify-between gap-4 border-b border-[var(--line)] pb-4">
+                <div>
+                  <p className="text-[0.68rem] uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    Split total
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold leading-none text-[var(--foreground)]">
+                    $84.20
                   </p>
                 </div>
-              ))}
+                <div className="rounded-full bg-[#dff5ea] px-3 py-2 text-sm font-medium text-[#116149]">
+                  All settled
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {savedSplitFigurePeople.map((person) => (
+                  <div
+                    key={person.name}
+                    className="flex items-center justify-between gap-4 rounded-[1.25rem] border border-[var(--line)] bg-white px-4 py-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#1f8a63]" />
+                      <div>
+                        <p className="text-lg font-semibold leading-none text-[var(--foreground)]">
+                          {person.name}
+                        </p>
+                        <p className="mt-2 text-[0.68rem] uppercase tracking-[0.2em] text-[#116149]">
+                          Paid
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-semibold leading-none text-[var(--foreground)]">
+                        {person.amount}
+                      </p>
+                      <p className="mt-2 text-[0.68rem] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
+                        Received
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
@@ -571,7 +601,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.4 }}
-          className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 lg:flex"
+          className="absolute bottom-10 left-1/2 hidden -translate-x-1/2 lg:bottom-14 lg:flex"
         >
           <motion.a
             href="#learn-more"
@@ -642,8 +672,8 @@ export default function Home() {
                 Keep every split in one place.
               </h3>
               <p className="mt-5 max-w-xs text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
-                Reopen unpaid receipts, check what is already settled, and keep
-                split totals readable.
+                Review finished dinners, confirm who paid, and keep split totals
+                readable.
               </p>
             </div>
 
@@ -652,7 +682,7 @@ export default function Home() {
         </SectionReveal>
       </section>
 
-      <section className="page-shell mt-44 pb-16 sm:mt-52 sm:pb-24 lg:mt-60">
+      <section className="page-shell mt-80 pb-16 sm:mt-96 sm:pb-24 lg:mt-[28rem]">
         <SectionReveal className="py-16 sm:py-20">
           <div className="flex flex-col items-center text-center">
             <div className="max-w-3xl">
