@@ -58,6 +58,48 @@ export const confirmSignupFormSchema = z.object({
 
 export type ConfirmSignupFormValues = z.infer<typeof confirmSignupFormSchema>
 
+const currentPasswordSchema = z.string().min(1, "Current password is required")
+
+const deleteAccountConfirmationSchema = z
+  .string()
+  .trim()
+  .superRefine((value, context) => {
+    if (value === "DELETE") {
+      return
+    }
+
+    context.addIssue({
+      code: "custom",
+      message: 'Type "DELETE" to confirm',
+    })
+  })
+
+export const changePasswordFormSchema = z
+  .object({
+    currentPassword: currentPasswordSchema,
+    newPassword: signupPasswordSchema,
+    confirmPassword: confirmPasswordSchema,
+  })
+  .superRefine(({ newPassword, confirmPassword }, context) => {
+    if (!confirmPassword || confirmPassword === newPassword) {
+      return
+    }
+
+    context.addIssue({
+      code: "custom",
+      path: ["confirmPassword"],
+      message: "Passwords must match",
+    })
+  })
+
+export type ChangePasswordFormValues = z.infer<typeof changePasswordFormSchema>
+
+export const deleteAccountFormSchema = z.object({
+  confirmation: deleteAccountConfirmationSchema,
+})
+
+export type DeleteAccountFormValues = z.infer<typeof deleteAccountFormSchema>
+
 function getFieldError<FieldName extends string>(
   error: z.ZodError,
   fieldName: FieldName,
@@ -94,4 +136,18 @@ export function validateSignupFormField(
   values: SignupFormValues,
 ) {
   return validateFormField(signupFormSchema, fieldName, values)
+}
+
+export function validateChangePasswordFormField(
+  fieldName: keyof ChangePasswordFormValues,
+  values: ChangePasswordFormValues,
+) {
+  return validateFormField(changePasswordFormSchema, fieldName, values)
+}
+
+export function validateDeleteAccountFormField(
+  fieldName: keyof DeleteAccountFormValues,
+  values: DeleteAccountFormValues,
+) {
+  return validateFormField(deleteAccountFormSchema, fieldName, values)
 }

@@ -172,6 +172,7 @@ export function Navbar() {
 
   const isSavedSplitsPage = pathname === "/dashboard";
   const isNewReceiptPage = pathname === "/dashboard/new";
+  const isManageAccountPage = pathname === "/account";
   const isSavedReceiptEditPage =
     pathname === "/dashboard/receipt" && receiptId.length > 0;
   const breadcrumbs: BreadcrumbItem[] =
@@ -190,6 +191,14 @@ export function Navbar() {
                 {
                   isCurrent: true,
                   label: activeReceiptTitle || "Receipt draft",
+                },
+              ]
+            : []),
+          ...(isManageAccountPage
+            ? [
+                {
+                  isCurrent: true,
+                  label: "Manage account",
                 },
               ]
             : []),
@@ -298,11 +307,19 @@ export function Navbar() {
                       className={cn(
                         "absolute right-0 top-[calc(100%-1px)] z-50 w-full origin-top-right overflow-hidden rounded-b-[1.35rem] transition-[max-height,opacity] duration-180 ease-out",
                         isAccountMenuOpen
-                          ? "max-h-40 opacity-100"
+                          ? "max-h-56 opacity-100"
                           : "pointer-events-none max-h-0 opacity-0",
                       )}
                     >
                       <div className="panel-surface-strong rounded-b-[1.35rem] border-t-0 px-4 pb-4 pt-3">
+                        <Link
+                          href="/account"
+                          role="menuitem"
+                          onClick={() => setIsAccountMenuOpen(false)}
+                          className="mb-2 inline-flex h-11 w-full items-center justify-center rounded-[1rem] bg-[var(--foreground)] px-4 text-center text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90"
+                        >
+                          Manage account
+                        </Link>
                         <button
                           type="button"
                           role="menuitem"
