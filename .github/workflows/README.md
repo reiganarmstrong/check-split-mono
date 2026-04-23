@@ -1,12 +1,10 @@
-# GitHub Automation
+# GitHub Workflows
 
-This folder contains the GitHub Actions workflows and small helper scripts used by this repository.
+This folder contains the GitHub Actions workflows for this repository.
 
-The workflows are centered on one active environment today: `dev`.
+The active automation target today is the `dev` environment.
 
-## Workflows
-
-### `workflows/pr-infra-dev.yml`
+## `pr-infra-dev.yml`
 
 Runs on pull requests to `main` when files under `infra/environments/dev/**` or `infra/modules/**` change.
 
@@ -20,7 +18,7 @@ What it does:
 - runs `terraform plan`
 - posts or updates a PR comment with the plan result
 
-### `workflows/deploy-infra-dev.yml`
+## `deploy-infra-dev.yml`
 
 Runs on pushes to `main` when the dev environment or any shared infra module changes.
 
@@ -33,7 +31,7 @@ What it does:
 - builds the `receipt-ingestion-api` Lambda package
 - runs `terraform apply` for `infra/environments/dev`
 
-### `workflows/deploy-ui-dev.yml`
+## `deploy-ui-dev.yml`
 
 Runs on pushes to `main` when files under `ui/**` change.
 
@@ -47,22 +45,9 @@ What it does:
 - syncs `ui/out` to the target S3 bucket
 - invalidates the CloudFront distribution
 
-## Scripts
-
-### `scripts/pr-plan-comment.sh`
-
-Small helper used by `pr-infra-dev.yml`.
-
-It finds or creates a PR comment marked with `<!--terraform-plan-comment-->` and updates that comment with either:
-
-- `Terraform Plan Succeeded`
-- `Terraform Plan Failed`
-
-This keeps infra PRs to one rolling plan-status comment instead of creating a new comment on every workflow run.
-
 ## Required GitHub Environment Data
 
-The workflows expect repository or environment configuration for items such as:
+These workflows expect repository or environment configuration for items such as:
 
 - AWS role ARN for OIDC-based auth
 - Terraform variable content
@@ -74,6 +59,6 @@ The workflows expect repository or environment configuration for items such as:
 
 ## Notes
 
-- workflow permissions are intentionally declared explicitly because OIDC requires `id-token: write`
-- both infra workflows build the ingestion Lambda before Terraform so the packaged artifact exists for plan/apply
+- workflow permissions are declared explicitly because OIDC requires `id-token: write`
+- both infra workflows build the ingestion Lambda before Terraform so the package exists for plan/apply
 - the workflows use sparse checkout to reduce job setup time and checkout size
