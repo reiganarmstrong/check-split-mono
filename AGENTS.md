@@ -1,5 +1,11 @@
 # Project Guidelines
 
+## General
+
+## Skill Usage
+
+- Use `caveman` when I am asking you to accomplish tasks rather than explain something. Do not use the skill in plan mode or when I am purely ask you to explain something.
+
 ## Git
 
 ### Skill Usage
