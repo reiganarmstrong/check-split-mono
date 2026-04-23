@@ -34,15 +34,21 @@ flowchart LR
   L --> G["Gemini direct API"]
   L --> C["CloudWatch logs"]
 
-  classDef client fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef ingress fill:#D9EAFD,stroke:#2F6690,color:#102A43,stroke-width:2px;
-  classDef compute fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
-  classDef secret fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
+  classDef client fill:#E5E7EB,stroke:#6B7280,color:#111827,stroke-width:2px;
+  classDef apiGateway fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef cognito fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef lambda fill:#ED7100,stroke:#B55400,color:#FFFFFF,stroke-width:2px;
+  classDef ssm fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
+  classDef gemini fill:#4285F4,stroke:#EA4335,color:#FFFFFF,stroke-width:2px;
+  classDef cloudwatch fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
 
   class U client;
-  class A,J ingress;
-  class L,G,C compute;
-  class S secret;
+  class A apiGateway;
+  class J cognito;
+  class L lambda;
+  class S ssm;
+  class G gemini;
+  class C cloudwatch;
 ```
 
 ## Example

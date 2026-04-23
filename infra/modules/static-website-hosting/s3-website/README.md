@@ -25,16 +25,13 @@ config:
 ---
 flowchart LR
   A["Terraform apply"] --> B["S3 bucket"]
-  B --> C["Public access block"]
-  C --> D["Private origin bucket for CloudFront"]
+  B --> C["Public access block<br/>private bucket for CloudFront origin"]
 
-  classDef start fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef bucket fill:#D9EAFD,stroke:#2F6690,color:#102A43,stroke-width:2px;
-  classDef secure fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
+  classDef terraform fill:#844FBA,stroke:#6B21A8,color:#FFFFFF,stroke-width:2px;
+  classDef s3 fill:#7AA116,stroke:#5B7A10,color:#FFFFFF,stroke-width:2px;
 
-  class A start;
-  class B bucket;
-  class C,D secure;
+  class A terraform;
+  class B,C s3;
 ```
 
 ## Example

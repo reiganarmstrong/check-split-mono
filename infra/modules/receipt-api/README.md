@@ -69,19 +69,16 @@ flowchart LR
   A --> R["APPSYNC_JS pipeline resolvers"]
   R --> D["DynamoDB receipt table"]
   A --> L["CloudWatch logs"]
-  A --> X["X-Ray tracing"]
 
-  classDef identity fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef api fill:#D9EAFD,stroke:#2F6690,color:#0B2545,stroke-width:2px;
-  classDef compute fill:#E7D8FF,stroke:#6A4C93,color:#2F1847,stroke-width:2px;
-  classDef storage fill:#DFF2E4,stroke:#3C6E47,color:#132A13,stroke-width:2px;
-  classDef observability fill:#FFE2E2,stroke:#BC4749,color:#5C1A1B,stroke-width:2px;
+  classDef cognito fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef appsync fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
+  classDef dynamodb fill:#C925D1,stroke:#8E1AA1,color:#FFFFFF,stroke-width:2px;
+  classDef cloudwatch fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
 
-  class C identity;
-  class A api;
-  class R compute;
-  class D storage;
-  class L,X observability;
+  class C cognito;
+  class A,R appsync;
+  class D dynamodb;
+  class L cloudwatch;
 ```
 
 ## Resolver Composition
@@ -105,10 +102,10 @@ flowchart TB
   DS --> T["Receipt table"]
   P --> W["Shared pipeline response wrapper"]
 
-  classDef entry fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef appsync fill:#D9EAFD,stroke:#2F6690,color:#0B2545,stroke-width:2px;
-  classDef data fill:#DFF2E4,stroke:#3C6E47,color:#132A13,stroke-width:2px;
-  classDef shared fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
+  classDef entry fill:#F3F4F6,stroke:#6B7280,color:#111827,stroke-width:2px;
+  classDef appsync fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
+  classDef data fill:#C925D1,stroke:#8E1AA1,color:#FFFFFF,stroke-width:2px;
+  classDef shared fill:#FCE7F3,stroke:#B10F5E,color:#831843,stroke-width:2px;
 
   class API entry;
   class P,F1,DS appsync;
@@ -156,11 +153,11 @@ sk = ALLOCATION#ITEM#<item_id>#PARTICIPANT#<participant_id>"]
   RR --> RI
   RI --> RA
 
-  style T fill:#F7F7E8,stroke:#7A8B5B,stroke-width:2px,color:#243119
-  classDef root fill:#D9EAFD,stroke:#2F6690,color:#0B2545,stroke-width:2px;
-  classDef participant fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef item fill:#DFF2E4,stroke:#3C6E47,color:#132A13,stroke-width:2px;
-  classDef allocation fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
+  style T fill:#F3E8FF,stroke:#8E1AA1,stroke-width:2px,color:#4A044E
+  classDef root fill:#C925D1,stroke:#8E1AA1,color:#FFFFFF,stroke-width:2px;
+  classDef participant fill:#E9D5FF,stroke:#A21CAF,color:#581C87,stroke-width:2px;
+  classDef item fill:#F3E8FF,stroke:#A21CAF,color:#581C87,stroke-width:2px;
+  classDef allocation fill:#FAE8FF,stroke:#A21CAF,color:#581C87,stroke-width:2px;
 
   class RR root;
   class RP participant;
@@ -193,12 +190,12 @@ flowchart LR
   L3["mutations"] --> Q3["Read current receipt state"]
   Q3 --> O3["Conditional or transactional write"]
 
-  classDef query fill:#D9EAFD,stroke:#2F6690,color:#0B2545,stroke-width:2px;
-  classDef access fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef result fill:#DFF2E4,stroke:#3C6E47,color:#132A13,stroke-width:2px;
+  classDef query fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
+  classDef access fill:#F3F4F6,stroke:#6B7280,color:#111827,stroke-width:2px;
+  classDef result fill:#F3E8FF,stroke:#8E1AA1,color:#581C87,stroke-width:2px;
 
   class L1,L2,L3 access;
-  class Q1,Q2,Q3 query;
+  class Q1,Q1B,Q2,Q3 query;
   class O1,O2,O3 result;
 ```
 
@@ -212,14 +209,14 @@ config:
     primaryColor: "#D9EAFD"
     primaryTextColor: "#102A43"
     primaryBorderColor: "#2F6690"
-    actorBorder: "#2F6690"
-    actorBkg: "#FFF4CC"
-    actorTextColor: "#4A3A00"
-    signalColor: "#486581"
-    signalTextColor: "#102A43"
-    labelBoxBkgColor: "#E6F4EA"
-    labelBoxBorderColor: "#3C6E47"
-    labelTextColor: "#132A13"
+    actorBorder: "#6B7280"
+    actorBkg: "#F3F4F6"
+    actorTextColor: "#111827"
+    signalColor: "#6B7280"
+    signalTextColor: "#111827"
+    labelBoxBkgColor: "#F9FAFB"
+    labelBoxBorderColor: "#D1D5DB"
+    labelTextColor: "#111827"
 ---
 sequenceDiagram
   autonumber
@@ -227,16 +224,16 @@ sequenceDiagram
   participant G as AppSync resolver
   participant D as DynamoDB
 
-  rect rgb(255, 249, 219)
+  rect rgb(254, 226, 226)
   U->>G: GraphQL request with Cognito identity
   G->>G: Read ctx.identity.sub
   end
-  rect rgb(230, 244, 234)
+  rect rgb(243, 232, 255)
   G->>D: Load receipt or related records
   D-->>G: Receipt owner and version
   G->>G: Enforce ownership/version rules
   end
-  rect rgb(217, 234, 253)
+  rect rgb(252, 231, 243)
   G->>D: Execute allowed read or write
   D-->>G: Result
   G-->>U: Authorized response

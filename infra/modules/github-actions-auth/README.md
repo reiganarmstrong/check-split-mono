@@ -48,15 +48,23 @@ flowchart LR
   A --> L["Lambda"]
   A --> S3["S3"]
 
-  classDef ci fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef trust fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
-  classDef iam fill:#D9EAFD,stroke:#2F6690,color:#102A43,stroke-width:2px;
-  classDef aws fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
+  classDef github fill:#24292F,stroke:#0D1117,color:#FFFFFF,stroke-width:2px;
+  classDef iam fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef apiGateway fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef cloudfront fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef cognito fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef acm fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef lambda fill:#ED7100,stroke:#B55400,color:#FFFFFF,stroke-width:2px;
+  classDef s3 fill:#7AA116,stroke:#5B7A10,color:#FFFFFF,stroke-width:2px;
 
-  class G,T ci;
-  class R,S trust;
-  class I,A iam;
-  class AG,CF,C,ACM,L,S3 aws;
+  class G,T github;
+  class R,S,I,A iam;
+  class AG apiGateway;
+  class CF cloudfront;
+  class C cognito;
+  class ACM acm;
+  class L lambda;
+  class S3 s3;
 ```
 
 ## Trust Boundary
@@ -69,14 +77,14 @@ config:
     primaryColor: "#D9EAFD"
     primaryTextColor: "#102A43"
     primaryBorderColor: "#2F6690"
-    actorBorder: "#2F6690"
-    actorBkg: "#FFF4CC"
-    actorTextColor: "#4A3A00"
-    signalColor: "#486581"
-    signalTextColor: "#102A43"
-    labelBoxBkgColor: "#E6F4EA"
-    labelBoxBorderColor: "#3C6E47"
-    labelTextColor: "#132A13"
+    actorBorder: "#6B7280"
+    actorBkg: "#F3F4F6"
+    actorTextColor: "#111827"
+    signalColor: "#6B7280"
+    signalTextColor: "#111827"
+    labelBoxBkgColor: "#F9FAFB"
+    labelBoxBorderColor: "#D1D5DB"
+    labelTextColor: "#111827"
 ---
 sequenceDiagram
   participant GH as GitHub Actions
@@ -84,16 +92,16 @@ sequenceDiagram
   participant STS as AWS STS
   participant IAM as IAM role
 
-  rect rgb(255, 249, 219)
+  rect rgb(229, 231, 235)
   GH->>OIDC: Request OIDC token
   OIDC-->>GH: Token with repo/environment claims
   end
-  rect rgb(244, 216, 205)
+  rect rgb(254, 226, 226)
   GH->>STS: AssumeRoleWithWebIdentity(token)
   STS->>IAM: Evaluate aud + sub conditions
   IAM-->>STS: Allow for matching repo/environment only
   end
-  rect rgb(230, 244, 234)
+  rect rgb(243, 244, 246)
   STS-->>GH: Temporary AWS credentials
   end
 ```
