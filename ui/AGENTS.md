@@ -3,7 +3,6 @@
 ## Skill Usage
 
 - Use `frontend-skill` for frontend design work.
-- Use `caveman` when I am asking you to accomplish frontend tasks rather than explain something, but do not apply it during planning or Plan Mode.
 
 ## General
 
