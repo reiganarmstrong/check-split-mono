@@ -40,15 +40,17 @@ flowchart LR
   Z["Cloudflare zone"] --> D
   A["Validated ACM certificate"] --> C
 
-  classDef user fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef edge fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
-  classDef auth fill:#D9EAFD,stroke:#2F6690,color:#102A43,stroke-width:2px;
-  classDef dns fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
+  classDef user fill:#E5E7EB,stroke:#6B7280,color:#111827,stroke-width:2px;
+  classDef cloudflare fill:#F48120,stroke:#C96410,color:#FFFFFF,stroke-width:2px;
+  classDef cloudfront fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef cognito fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef acm fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
 
   class U user;
-  class D,CF edge;
-  class C,P,CL,A auth;
-  class Z dns;
+  class D,Z cloudflare;
+  class CF cloudfront;
+  class C,P,CL cognito;
+  class A acm;
 ```
 
 ## Request Flow
@@ -61,14 +63,14 @@ config:
     primaryColor: "#D9EAFD"
     primaryTextColor: "#102A43"
     primaryBorderColor: "#2F6690"
-    actorBorder: "#2F6690"
-    actorBkg: "#FFF4CC"
-    actorTextColor: "#4A3A00"
-    signalColor: "#486581"
-    signalTextColor: "#102A43"
-    labelBoxBkgColor: "#E6F4EA"
-    labelBoxBorderColor: "#3C6E47"
-    labelTextColor: "#132A13"
+    actorBorder: "#6B7280"
+    actorBkg: "#F3F4F6"
+    actorTextColor: "#111827"
+    signalColor: "#6B7280"
+    signalTextColor: "#111827"
+    labelBoxBkgColor: "#F9FAFB"
+    labelBoxBorderColor: "#D1D5DB"
+    labelTextColor: "#111827"
 ---
 sequenceDiagram
   participant B as Browser
@@ -76,15 +78,15 @@ sequenceDiagram
   participant CD as Cognito custom domain
   participant UP as User Pool
 
-  rect rgb(255, 249, 219)
+  rect rgb(255, 237, 213)
   B->>CF: Resolve auth hostname
   CF-->>B: CNAME to Cognito distribution
   end
-  rect rgb(217, 234, 253)
+  rect rgb(254, 226, 226)
   B->>CD: Start sign-in flow
   CD->>UP: Authenticate against user pool
   end
-  rect rgb(230, 244, 234)
+  rect rgb(254, 226, 226)
   UP-->>B: Cognito-hosted auth response
   end
 ```

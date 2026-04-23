@@ -40,15 +40,17 @@ flowchart LR
   OAC --> S3["Private S3 bucket"]
   ACM["Validated ACM certificate"] --> CF
 
-  classDef user fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef edge fill:#D9EAFD,stroke:#2F6690,color:#102A43,stroke-width:2px;
-  classDef storage fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
-  classDef cert fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
+  classDef user fill:#E5E7EB,stroke:#6B7280,color:#111827,stroke-width:2px;
+  classDef cloudflare fill:#F48120,stroke:#C96410,color:#FFFFFF,stroke-width:2px;
+  classDef cloudfront fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef s3 fill:#7AA116,stroke:#5B7A10,color:#FFFFFF,stroke-width:2px;
+  classDef acm fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
 
   class U user;
-  class DNS,CF,F,OAC edge;
-  class S3 storage;
-  class ACM cert;
+  class DNS cloudflare;
+  class CF,F,OAC cloudfront;
+  class S3 s3;
+  class ACM acm;
 ```
 
 ## Module Composition
@@ -75,12 +77,14 @@ flowchart TB
   O2 --> C
   O3 --> C
 
-  classDef parent fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
-  classDef child fill:#D9EAFD,stroke:#2F6690,color:#102A43,stroke-width:2px;
-  classDef output fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
+  classDef terraform fill:#844FBA,stroke:#6B21A8,color:#FFFFFF,stroke-width:2px;
+  classDef s3 fill:#7AA116,stroke:#5B7A10,color:#FFFFFF,stroke-width:2px;
+  classDef cloudfront fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef output fill:#7AA116,stroke:#5B7A10,color:#FFFFFF,stroke-width:2px;
 
-  class M parent;
-  class S,C child;
+  class M terraform;
+  class S s3;
+  class C cloudfront;
   class O1,O2,O3 output;
 ```
 

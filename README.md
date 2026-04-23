@@ -1,56 +1,85 @@
 # CheckSplit
 
-CheckSplit is a work-in-progress receipt splitting app. Goal: let a signed-in user scan a restaurant receipt, turn it into a structured draft, assign items across people or groups, track who has paid, and save the result as a reusable shared record.
+CheckSplit is a work-in-progress receipt splitting app. The goal is to let a signed-in user scan a restaurant receipt, turn it into a structured draft, assign items across people or groups, track who has paid, and save the record for future reference/edits.
 
 This repository currently has two main pieces:
 
-- `ui/`: Next.js frontend for marketing, auth, receipt ingestion, editing, archive, and share flows
-- `infra/`: Terraform for hosting, auth, APIs, storage, CI access, and environment composition
+- `ui/`: Includes the Next.js frontend that will statically export.
+- `infra/`: Includes the Terraform modules that define the infrastructure for the application.
 
-## Current Product Shape
+## Main Usage Flow
 
-Today the app is built around one end-to-end flow:
+The application currently is built around one main end-to-end flow:
 
 1. User signs up or logs in with Cognito.
 2. User starts a new receipt and uploads a photo or enters data manually.
-3. Browser compresses the image to fit the ingestion API limit.
-4. Cognito-protected HTTP API sends the image to a Lambda that calls Gemini and normalizes the response into the app's receipt draft shape.
+3. If a photo was uploaded, the browser compresses the image to fit the ingestion API limit (4 MB).
+4. Cognito-protected HTTP API sends the image to a Lambda that calls a Gemini api and normalizes the response into the app's receipt draft shape.
 5. User reviews merchant details, groups, items, discounts, tax, tip, and fees in the receipt workspace.
 6. Frontend saves the receipt to a Cognito-protected AppSync GraphQL API backed by DynamoDB.
 7. User can reopen saved receipts, mark groups as paid, and generate a shareable visual summary.
 
 ## Architecture Overview
 
-At a high level, CheckSplit uses a static frontend with managed AWS backend services instead of a long-running application server.
+At a high level, CheckSplit uses a static frontend with managed AWS backend services instead of a long-running application server. This route was chosen to scale as close to zero as possible.
 
 ```mermaid
-flowchart LR
-  U["Browser"] --> CF["CloudFront + S3 static site"]
-  U --> C["Cognito auth"]
-  U --> G["AppSync GraphQL API"]
-  U --> H["Receipt ingestion HTTP API"]
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#D9EAFD"
+    primaryTextColor: "#102A43"
+    primaryBorderColor: "#2F6690"
+    lineColor: "#486581"
+    secondaryColor: "#E6F4EA"
+    tertiaryColor: "#FFF4CC"
+---
+flowchart TB
+  U["Browser"] --> CF["CloudFront"]
+  CF --> S3["S3 static site"]
+  CF --> C["Cognito auth"]
+  CF --> G["AppSync GraphQL API"]
+  CF --> H["Receipt ingestion HTTP API"]
+  C -. "JWT auth" .-> G
+  C -. "JWT auth" .-> H
   H --> L["Lambda parser"]
-  L --> S["SSM SecureString"]
+  S["SSM Parameter Store<br/>Gemini API key"] --> L
   L --> M["Gemini API"]
   G --> D["DynamoDB receipt table"]
+
+  classDef client fill:#E5E7EB,stroke:#6B7280,color:#111827,stroke-width:2px;
+  classDef cloudfront fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef s3 fill:#7AA116,stroke:#5B7A10,color:#FFFFFF,stroke-width:2px;
+  classDef cognito fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef appsync fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
+  classDef apiGateway fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef lambda fill:#ED7100,stroke:#B55400,color:#FFFFFF,stroke-width:2px;
+  classDef ssm fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
+  classDef dynamodb fill:#C925D1,stroke:#8E1AA1,color:#FFFFFF,stroke-width:2px;
+  classDef gemini fill:#4285F4,stroke:#EA4335,color:#FFFFFF,stroke-width:2px;
+
+  class U client;
+  class CF cloudfront;
+  class S3 s3;
+  class C cognito;
+  class G appsync;
+  class H apiGateway;
+  class L lambda;
+  class S ssm;
+  class D dynamodb;
+  class M gemini;
 ```
 
-That split keeps responsibilities clear:
-
-- `ui/` owns UX, client-side state, form validation, and receipt editing behavior
-- `receipt-ingestion-api` turns an uploaded image into a draft receipt model
-- `receipt-api` owns persistence and authenticated receipt mutations
-- Terraform composes the environment and deployment edges around those services
-
-## Why Repo Split Looks Like This
+## Repo Folder Structure
 
 ### `ui/`
 
-Frontend is a static-exported Next.js app. It still has rich authenticated behavior because the browser talks directly to Cognito, AppSync, and the receipt parsing HTTP API.
+Holds the frontend, a static-exported Next.js app. Authentication is facilitated using the Amplify js library to authenticate with Cognito. The resulting JWT is sent in the authorization header as a bearer token when communicating with backend apis.
 
 Important UI capabilities visible in code today:
 
-- landing page explaining scan-to-split workflow
+- landing page explaining general application workflow
 - Cognito email/password sign-up, login, and confirmation
 - saved receipt archive with search, sort, and paid/unpaid grouping
 - receipt workspace for manual entry or AI-assisted draft creation
@@ -61,19 +90,17 @@ See [`ui/README.md`](./ui/README.md) for frontend-specific details.
 
 ### `infra/`
 
-Infra is organized as reusable Terraform modules plus environment composition.
+This folder contains the infrastructure definitions. It is structured with reusable Terraform modules in `infra/modules/` plus root level environment modules in `infra/environments/`.
 
-Most interesting top-level pieces:
+#### Modules Overview:
 
-- `infra/environments/bootstrap`: one-time bootstrap for GitHub OIDC and Terraform state storage
-- `infra/environments/dev`: current composed environment wiring together hosting, auth, data, and receipt ingestion
 - `infra/modules/static-website-hosting`: private S3 + CloudFront + Cloudflare DNS for static deploys
-- `infra/modules/cognito-auth`: Cognito user pool, client, and custom auth domain
+- `infra/modules/cognito-auth`: Cognito user pool, client configuration, and custom auth domain configuration
 - `infra/modules/receipt-api`: AppSync + DynamoDB receipt persistence
 - `infra/modules/receipt-ingestion-api`: Cognito-protected HTTP API + Lambda + Gemini integration
 - `infra/modules/github-actions-auth`: narrow AWS role for GitHub Actions via OIDC
 
-Module READMEs are already the detailed source of truth. Use them for implementation specifics, inputs, outputs, and diagrams:
+Module READMEs go into more detail. Use them for implementation specifics, inputs, outputs, and diagrams:
 
 - [`infra/modules/static-website-hosting/README.md`](./infra/modules/static-website-hosting/README.md)
 - [`infra/modules/cognito-auth/README.md`](./infra/modules/cognito-auth/README.md)
@@ -82,30 +109,28 @@ Module READMEs are already the detailed source of truth. Use them for implementa
 - [`infra/modules/certificates/README.md`](./infra/modules/certificates/README.md)
 - [`infra/modules/github-actions-auth/README.md`](./infra/modules/github-actions-auth/README.md)
 
-## Environment Composition
+#### Environment Overview
 
-`infra/environments/dev` currently composes the main application stack:
+`infra/environments/dev` is the root level module for the development environment
 
-- ACM certificate validated through Cloudflare DNS
-- static site hosting for the exported frontend
-- Cognito user pool and client for auth
-- AppSync + DynamoDB for saved receipts
-- HTTP API + Lambda for receipt parsing
+`infra/environments/bootstrap` includes a root level Terraform module for one-time bootstrap for:
 
-The repo also includes:
+- GitHub OIDC
+- Terraform state storage
+- IAM role for GitHub Actions runners
 
-- `infra/environments/bootstrap` for first-time AWS/GitHub setup
-- `infra/environments/prod/terraform.tfvars` as a signal that production wiring is planned but not yet fully composed here
+`infra/environments/prod` currently does not exist but will be the root level module for the production environment in the future
 
-## Deployment Model
+## CI/CD
 
-GitHub Actions currently handles the two main deploy surfaces:
+GitHub Actions currently handles all CI/CD for the dev environment:
 
-- `.github/workflows/pr-infra-dev.yml`: plan Terraform for infra PRs
-- `.github/workflows/deploy-infra-dev.yml`: apply `infra/environments/dev` on `main`
-- `.github/workflows/deploy-ui-dev.yml`: build static frontend and sync `ui/out` to S3, then invalidate CloudFront
-
-This means infra and frontend can evolve independently while still targeting one shared dev environment.
+- `.github/workflows/pr-infra-dev.yml`
+  - plan Terraform for infra PRs
+- `.github/workflows/deploy-infra-dev.yml`
+  - apply `infra/environments/dev` on `main`
+- `.github/workflows/deploy-ui-dev.yml`
+  - build static frontend and sync `ui/out` to S3, then invalidate CloudFront
 
 ## Local Development
 

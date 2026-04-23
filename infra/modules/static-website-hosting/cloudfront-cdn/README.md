@@ -20,6 +20,8 @@ It owns the edge-specific concerns:
 5. `aws_s3_bucket_policy.this` grants `s3:GetObject` only to this CloudFront distribution via `AWS:SourceArn`.
 6. `cloudflare_dns_record.this` publishes the custom hostname as a CNAME to the CloudFront distribution.
 
+CloudFront needs the ACM certificate because it must present a valid TLS certificate for the custom domain during the HTTPS handshake; the default CloudFront certificate only covers the `cloudfront.net` hostname.
+
 ## Architecture
 
 ```mermaid
@@ -43,18 +45,26 @@ flowchart LR
   BP["Bucket policy<br/>SourceArn = distribution"] --> S3
   ACM["ACM certificate"] --> CF
 
-  classDef user fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef edge fill:#D9EAFD,stroke:#2F6690,color:#102A43,stroke-width:2px;
-  classDef storage fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
-  classDef policy fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
+  classDef user fill:#E5E7EB,stroke:#6B7280,color:#111827,stroke-width:2px;
+  classDef cloudflare fill:#F48120,stroke:#C96410,color:#FFFFFF,stroke-width:2px;
+  classDef cloudfront fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef s3 fill:#7AA116,stroke:#5B7A10,color:#FFFFFF,stroke-width:2px;
+  classDef iam fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef acm fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
 
   class U user;
-  class D,CF,F,OAC,ACM edge;
-  class S3 storage;
-  class BP policy;
+  class D cloudflare;
+  class CF,F,OAC cloudfront;
+  class S3 s3;
+  class BP iam;
+  class ACM acm;
 ```
 
 ## Request Rewrite
+
+The rewrite is necessary because the UI is deployed with Next.js static export (`output: "export"` in [`ui/next.config.ts`](../../../ui/next.config.ts)), and that build emits concrete HTML files such as `login.html`, `dashboard.html`, and `dashboard/new.html` in `ui/out/` instead of a server that can resolve clean app routes dynamically.
+
+Users still navigate to extensionless paths like `/login` or `/dashboard/new`. With S3 acting as a private object origin behind CloudFront, the origin lookup is by exact object key, so `/login` would not automatically resolve to `login.html`. The CloudFront Function rewrites those extensionless requests to the exported `.html` object keys before the request reaches S3.
 
 ```mermaid
 ---
@@ -80,9 +90,9 @@ flowchart TD
   F --> G
   G --> H["Forward rewritten request"]
 
-  classDef request fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef decision fill:#D9EAFD,stroke:#2F6690,color:#102A43,stroke-width:2px;
-  classDef result fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
+  classDef request fill:#E5E7EB,stroke:#6B7280,color:#111827,stroke-width:2px;
+  classDef decision fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
+  classDef result fill:#EDE9FE,stroke:#6D28D9,color:#4C1D95,stroke-width:2px;
 
   class A request;
   class B,C,D decision;

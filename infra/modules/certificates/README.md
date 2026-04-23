@@ -36,15 +36,13 @@ flowchart LR
   D --> E["ACM certificate validation"]
   E --> F["Validated certificate ARN"]
 
-  classDef start fill:#FFF4CC,stroke:#C99700,color:#4A3A00,stroke-width:2px;
-  classDef aws fill:#D9EAFD,stroke:#2F6690,color:#0B2545,stroke-width:2px;
-  classDef dns fill:#E6F4EA,stroke:#3C6E47,color:#132A13,stroke-width:2px;
-  classDef out fill:#F4D8CD,stroke:#BC6C25,color:#5F370E,stroke-width:2px;
+  classDef terraform fill:#844FBA,stroke:#6B21A8,color:#FFFFFF,stroke-width:2px;
+  classDef acm fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
+  classDef cloudflare fill:#F48120,stroke:#C96410,color:#FFFFFF,stroke-width:2px;
 
-  class A start;
-  class B,C,E aws;
-  class D dns;
-  class F out;
+  class A terraform;
+  class B,C,E,F acm;
+  class D cloudflare;
 ```
 
 ## Example
