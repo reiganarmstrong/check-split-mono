@@ -7,8 +7,8 @@
       stroke-width="3.4"
     />
     <path d="M45.5 17A5.5 5.5 0 0 1 51 22.5V28.25H40" stroke-width="3.4" />
-    <path d="M21 29.5H32" stroke-width="3.4" />
-    <path d="M21 35H35" stroke-width="3.4" />
-    <path d="M21 40.5H30" stroke-width="3.4" />
+    <path d="M21 26H32" stroke-width="3.4" />
+    <path d="M21 31.5H33.5" stroke-width="3.4" />
+    <path d="M21 37H30" stroke-width="3.4" />
   </g>
 </svg>

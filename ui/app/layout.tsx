@@ -9,18 +9,18 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicon-dark.svg?v=receipt-duo-v1",
+        url: "/favicon-dark.svg?v=receipt-duo-v4",
         type: "image/svg+xml",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/favicon-light.svg?v=receipt-duo-v1",
+        url: "/favicon-light.svg?v=receipt-duo-v4",
         type: "image/svg+xml",
         media: "(prefers-color-scheme: dark)",
       },
-      { url: "/favicon.svg?v=receipt-duo-v1", type: "image/svg+xml" },
+      { url: "/favicon.svg?v=receipt-duo-v4", type: "image/svg+xml" },
     ],
-    shortcut: ["/favicon.svg?v=receipt-duo-v1"],
+    shortcut: ["/favicon.svg?v=receipt-duo-v4"],
   },
 };
 
