@@ -1,89 +1,48 @@
 <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
   <title>CheckSplit favicon</title>
-  <g shape-rendering="geometricPrecision">
-    <rect
-      x="10"
-      y="4"
-      width="44"
-      height="57"
-      rx="14.7"
-      fill="#FFFFFF"
-      stroke="#000000"
-      stroke-width="3"
-    />
+  <style>
+    .light-favicon {
+      display: none;
+    }
 
-    <path d="M17 10.6H46.3" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
+    @media (prefers-color-scheme: dark) {
+      .dark-favicon {
+        display: none;
+      }
 
-    <rect
-      x="17.3"
-      y="15"
-      width="29.3"
-      height="5.1"
-      rx="2.55"
-      fill="#13181F"
-      stroke="#000000"
-      stroke-width="1"
-    />
-    <rect
-      x="17.3"
-      y="25.2"
-      width="29.3"
-      height="4.4"
-      rx="2.2"
-      fill="#BFD0FF"
-      stroke="#000000"
-      stroke-width="0.85"
-    />
-    <rect
-      x="30.1"
-      y="12.1"
-      width="4.4"
-      height="41.1"
-      rx="2.2"
-      fill="#13181F"
-      stroke="#000000"
-      stroke-width="1"
-    />
-
-    <rect
-      x="18"
-      y="38"
-      width="8.8"
-      height="5.1"
-      rx="2.4"
-      fill="#13181F"
-      stroke="#000000"
-      stroke-width="0.85"
-    />
-    <rect
-      x="37.1"
-      y="38"
-      width="8.8"
-      height="5.1"
-      rx="2.4"
-      fill="#79D2BC"
-      stroke="#000000"
-      stroke-width="0.85"
-    />
-    <rect
-      x="18"
-      y="47.4"
-      width="8.8"
-      height="5.1"
-      rx="2.4"
-      fill="#BFD0FF"
-      stroke="#000000"
-      stroke-width="0.85"
-    />
-    <rect
-      x="37.1"
-      y="47.4"
-      width="8.8"
-      height="5.1"
-      rx="2.4"
-      fill="#BFEBDD"
-      stroke="#000000"
-      stroke-width="0.85"
-    />
+      .light-favicon {
+        display: inline;
+      }
+    }
+  </style>
+  <g class="dark-favicon">
+    <rect x="3.5" y="3.5" width="57" height="57" rx="13.5" fill="#000000" stroke="#000000" />
+    <g shape-rendering="geometricPrecision">
+      <path
+        d="M15 48V22.75A6.75 6.75 0 0 1 21.75 16H45.5A8.5 8.5 0 0 0 40 24V49L36 45 32 49 28 45 24 49 20 45 15 48Z"
+        fill="#FFFDF8"
+      />
+      <path d="M44 28V22.5A5.5 5.5 0 0 1 55 22.5V28H44Z" fill="#FFFDF8" />
+      <path
+        d="M21 30H33M21 35.5H36M21 41H30"
+        fill="none"
+        stroke="#000000"
+        stroke-linecap="round"
+        stroke-width="3.4"
+      />
+    </g>
+  </g>
+  <g class="light-favicon">
+    <rect x="3.5" y="3.5" width="57" height="57" rx="13.5" fill="#FFFDF8" stroke="#ECE9E2" />
+    <g fill="none" stroke="#252625" stroke-linecap="round" stroke-linejoin="round">
+      <path
+        d="M45 17H20.75A5.25 5.25 0 0 0 15.5 22.25V46.75L19.75 50.5 23.75 46.5 27.75 50.5 31.75 46.5 35.75 50.5 40 46.75V22.5A5.5 5.5 0 0 1 45.5 17"
+        stroke-width="3.4"
+      />
+      <path d="M45.5 17A5.5 5.5 0 0 1 51 22.5V28.25H40" stroke-width="3.4" />
+      <path d="M21 29.5H32" stroke-width="3.4" />
+      <path d="M21 35H35" stroke-width="3.4" />
+      <path d="M21 40.5H30" stroke-width="3.4" />
+    </g>
   </g>
 </svg>
