@@ -34,6 +34,14 @@ export function Navbar() {
   const receiptId = searchParams.get("receiptId")?.trim() ?? "";
 
   const homeHref = status === "authenticated" ? "/dashboard" : "/";
+  const isLandingPage = status !== "authenticated" && pathname === "/";
+
+  function scrollToFeatures() {
+    document.getElementById("features")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
 
   useEffect(() => {
     function handleReceiptTitleUpdate(event: Event) {
@@ -239,10 +247,59 @@ export function Navbar() {
     ));
   }
 
+  if (isLandingPage) {
+    return (
+      <motion.header
+        initial={{ y: -18 }}
+        animate={{ y: isNavVisible ? 0 : -96 }}
+        transition={{ duration: 0.28, ease: "easeOut" }}
+        className="sticky top-0 z-50 border-b border-[var(--line)] bg-[#f5f6f0] px-4 py-4 shadow-[0_10px_26px_rgba(14,18,24,0.04)] sm:px-8 lg:px-12"
+      >
+        <div className="mx-auto flex min-h-12 w-full max-w-[86rem] items-center justify-between gap-4">
+          <Link href="/" className="flex items-center">
+            <BrandLogo
+              showIcon={false}
+              nameClassName="text-[1rem] font-semibold tracking-[0.32em]"
+            />
+          </Link>
+
+          <nav
+            aria-label="Marketing"
+            className="hidden items-center gap-12 text-sm font-medium text-[var(--foreground)] md:flex"
+          >
+            <button
+              type="button"
+              onClick={scrollToFeatures}
+              className="cursor-pointer transition-colors hover:text-[var(--primary)]"
+            >
+              How it works
+            </button>
+          </nav>
+
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/login">
+              <Button
+                variant="ghost"
+                className="h-10 rounded-[0.8rem] px-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[#86dcae] hover:text-[#052113] focus-visible:bg-[#86dcae] focus-visible:text-[#052113]"
+              >
+                Log in
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button className="h-10 rounded-[0.8rem] bg-[#050506] px-4 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(5,5,6,0.16)] hover:bg-primary/80 hover:text-white focus-visible:bg-primary/80 focus-visible:text-white">
+                Sign up
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </motion.header>
+    );
+  }
+
   return (
     <motion.header
-      initial={{ y: -24, opacity: 0 }}
-      animate={{ y: isNavVisible ? 0 : -120, opacity: 1 }}
+      initial={{ y: -24 }}
+      animate={{ y: isNavVisible ? 0 : -120 }}
       transition={{ duration: 0.28, ease: "easeOut" }}
       className="sticky top-0 z-50 px-3 py-4 sm:px-6 lg:px-12"
     >
