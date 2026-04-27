@@ -27,7 +27,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <div className="site-shell flex min-h-screen flex-col">
-            <Suspense fallback={null}>
+            <Suspense fallback={<div className="h-[81px] shrink-0" />}>
               <Navbar />
             </Suspense>
             <div className="site-main">{children}</div>

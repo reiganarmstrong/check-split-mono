@@ -30,6 +30,24 @@ const receiptRows = [
   { label: "Shared plates", amount: "$31.85", tone: "bg-[var(--accent)]" },
 ];
 
+const workflowChrome = [
+  {
+    step: "01",
+    rail: "bg-[#4053ff]",
+    tab: "border-[#b7bfff] bg-[#eff0ff] text-[#2337d7]",
+  },
+  {
+    step: "02",
+    rail: "bg-[#86dcae]",
+    tab: "border-[#b8e8cd] bg-[#e7f7ed] text-[#116149]",
+  },
+  {
+    step: "03",
+    rail: "bg-[#050506]",
+    tab: "border-[#c7ccd8] bg-[#f0f2f7] text-[#13181f]",
+  },
+];
+
 function SectionReveal({
   children,
   className,
@@ -41,10 +59,10 @@ function SectionReveal({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 14 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.26 }}
-      transition={{ duration: 0.42, ease: "easeOut" }}
+      transition={{ duration: 0.32, ease: "easeOut" }}
       className={className}
       style={style}
     >
@@ -65,7 +83,7 @@ function PrimaryCta({ label = "Get started free" }: { label?: string }) {
   return (
     <Button
       asChild
-      className="h-12 rounded-[0.85rem] bg-[#050506] px-5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(5,5,6,0.18)] hover:bg-primary/80 hover:text-white focus-visible:bg-primary/80 focus-visible:text-white"
+      className="h-12 rounded-[0.85rem] bg-[#050506] px-5 text-sm font-semibold text-white shadow-none hover:bg-primary/80 hover:text-white focus-visible:bg-primary/80 focus-visible:text-white"
     >
       <Link href="/signup">
         {label}
@@ -505,6 +523,7 @@ function WorkflowBand({
   stackIndex?: number;
 }) {
   const isStacked = stackIndex !== undefined;
+  const chrome = isStacked ? workflowChrome[stackIndex] : undefined;
 
   return (
     <SectionReveal
@@ -522,11 +541,24 @@ function WorkflowBand({
           : undefined
       }
     >
-      <section className="rounded-[1rem] border border-[var(--line)] bg-[#fdfdfb] p-6 shadow-[0_16px_34px_rgba(14,18,24,0.04)] sm:p-8 lg:flex lg:h-[calc(100svh-7.75rem)] lg:min-h-[44rem] lg:items-center lg:overflow-hidden">
+      <section className="relative rounded-[1rem] border border-[var(--line)] bg-[#fdfdfb] p-6 pt-16 shadow-[0_16px_34px_rgba(14,18,24,0.04)] sm:p-8 sm:pt-16 lg:flex lg:h-[calc(100svh-7.75rem)] lg:min-h-[44rem] lg:items-center lg:overflow-hidden lg:pt-16">
+        <div className="pointer-events-none absolute inset-0 z-20 rounded-[1rem] border border-[var(--line)]" />
+        {chrome ? (
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-16 overflow-hidden rounded-t-[1rem]">
+            <div className={`absolute inset-x-0 top-0 h-2 ${chrome.rail}`} />
+            <div className="absolute inset-x-0 top-2 h-px bg-white/80" />
+            <div
+              className={`absolute left-0 top-2 flex h-10 items-center gap-3 rounded-br-[0.85rem] border-b border-r px-5 text-[0.66rem] font-semibold uppercase tracking-[0.2em] sm:px-6 ${chrome.tab}`}
+            >
+              <span>{chrome.step}</span>
+              <span className="h-1 w-1 rounded-full bg-current opacity-50" />
+              <span>{eyebrow}</span>
+            </div>
+          </div>
+        ) : null}
         <div className="grid w-full gap-10 lg:grid-cols-[0.34fr_1fr] lg:items-center">
           <div>
-            <Eyebrow>{eyebrow}</Eyebrow>
-            <h2 className="mt-6 text-4xl leading-[0.96] text-[var(--foreground)] sm:text-5xl lg:text-[3.2rem]">
+            <h2 className="text-4xl leading-[0.96] text-[var(--foreground)] sm:text-5xl lg:text-[3.2rem]">
               {title}
             </h2>
             <p className="mt-5 max-w-sm text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
@@ -565,9 +597,9 @@ export default function Home() {
       <section className="relative">
         <div className="page-shell pb-10 pt-8 sm:pt-12 lg:min-h-[650px]">
           <motion.div
-            initial={{ y: 18 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.36, ease: "easeOut" }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.28, ease: "easeOut" }}
             className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:pt-10"
           >
             <div className="mx-auto max-w-[42rem] text-center lg:mx-0 lg:text-left">
@@ -588,9 +620,9 @@ export default function Home() {
             </div>
 
             <motion.div
-              initial={{ x: 22 }}
-              animate={{ x: 0 }}
-              transition={{ delay: 0.1, duration: 0.38, ease: "easeOut" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.08, duration: 0.24, ease: "easeOut" }}
             >
               <HeroVisual />
             </motion.div>
@@ -648,7 +680,7 @@ export default function Home() {
         </div>
 
         <SectionReveal>
-          <section className="flex min-h-[13rem] items-center justify-center px-6 pb-14 pt-8 text-center sm:min-h-[14rem] sm:px-10 sm:pb-16 sm:pt-10">
+          <section className="flex min-h-[21rem] items-center justify-center px-6 pb-20 pt-14 text-center sm:min-h-[23rem] sm:px-10 sm:pb-22 sm:pt-16 lg:min-h-[24rem] lg:pb-24 lg:pt-20">
             <div className="mx-auto flex max-w-2xl flex-col items-center">
               <h2 className="text-4xl leading-none text-[var(--foreground)] sm:text-5xl">
                 Ready to skip the math?
