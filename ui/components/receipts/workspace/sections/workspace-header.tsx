@@ -26,7 +26,7 @@ export function WorkspaceHeader({
   canSave: boolean;
 }) {
   return (
-    <div className="workspace-panel overflow-hidden rounded-[2rem] px-6 py-6 sm:px-8 sm:py-8">
+    <div className="workspace-panel overflow-hidden rounded-[1rem] px-6 py-6 sm:px-8 sm:py-8">
       <h1 className="mt-4 max-w-4xl text-4xl leading-[0.95] tracking-tight text-[var(--foreground)] sm:text-6xl">
         {heading}
       </h1>
@@ -35,7 +35,7 @@ export function WorkspaceHeader({
       </p>
       <div
         className={cn(
-          "mt-6 inline-flex max-w-2xl items-start gap-3 rounded-[1.1rem] border px-4 py-3 text-sm font-medium",
+          "mt-6 inline-flex max-w-2xl items-start gap-3 rounded-[0.85rem] border px-4 py-3 text-sm font-medium",
           canSave
             ? "border-[var(--line)] bg-[var(--surface)] text-[var(--foreground)]"
             : "text-[var(--foreground)]",
@@ -58,13 +58,13 @@ export function WorkspaceHeader({
       </div>
 
       <div className="mt-7 flex flex-wrap gap-3">
-        <div className="metric-chip rounded-full px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+        <div className="metric-chip rounded-[0.8rem] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
           {formatReceiptDate(receiptOccurredAt || new Date().toISOString())}
         </div>
-        <div className="metric-chip rounded-full px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+        <div className="metric-chip rounded-[0.8rem] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
           {groupCount} group{groupCount === 1 ? "" : "s"}
         </div>
-        <div className="metric-chip rounded-full px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+        <div className="metric-chip rounded-[0.8rem] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
           {itemCount} item{itemCount === 1 ? "" : "s"}
         </div>
       </div>

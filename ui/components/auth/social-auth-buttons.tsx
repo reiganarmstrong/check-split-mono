@@ -15,7 +15,7 @@ export function SocialAuthButtons({
         : "disabled:border-[var(--line)] disabled:bg-[var(--surface)] disabled:text-[var(--muted-foreground)]"
 
   const socialButtonClassName =
-    `h-14 rounded-[1rem] border font-medium text-[var(--foreground)] transition-colors disabled:cursor-not-allowed ${disabledToneClassName}`
+    `h-14 rounded-[0.8rem] border font-medium text-[var(--foreground)] transition-colors disabled:cursor-not-allowed ${disabledToneClassName}`
 
   return (
     <>

@@ -35,7 +35,7 @@ export function GroupListSection({
         {groups.map((group, index) => (
           <div
             key={group.id}
-            className="rounded-[1.4rem] border border-[var(--line)] bg-[var(--panel-strong)] p-4"
+            className="rounded-[0.9rem] border border-[var(--line)] bg-[var(--panel-strong)] p-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="rounded-full border border-black bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[color-mix(in_oklab,var(--foreground)_74%,black)]">
@@ -46,7 +46,7 @@ export function GroupListSection({
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="rounded-full border border-[var(--line)] !bg-[var(--foreground)] !text-[var(--background)] hover:!bg-[#ff0000] hover:!text-[#fff8f6] disabled:!bg-[var(--muted)] disabled:!text-[var(--muted-foreground)]"
+                  className="rounded-[0.7rem] border border-[var(--line)] !bg-[var(--foreground)] !text-[var(--background)] hover:!bg-[#ff0000] hover:!text-[#fff8f6] disabled:!bg-[var(--muted)] disabled:!text-[var(--muted-foreground)]"
                   onClick={() => removeGroup(group.id)}
                   disabled={groups.length === 1}
                 >
@@ -69,7 +69,7 @@ export function GroupListSection({
                     })
                   }
                   placeholder="Alex + Sam"
-                  className="h-12 w-full rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium text-[var(--foreground)] outline-none"
+                  className="h-12 w-full rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium text-[var(--foreground)] outline-none"
                   style={
                     unnamedGroupIds.has(group.id)
                       ? requiredHighlightSoftStyle
@@ -90,7 +90,7 @@ export function GroupListSection({
                     })
                   }
                   placeholder="Optional names or notes"
-                  className="h-12 w-full rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium text-[var(--foreground)] outline-none"
+                  className="h-12 w-full rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium text-[var(--foreground)] outline-none"
                 />
               </label>
             </div>
@@ -101,7 +101,7 @@ export function GroupListSection({
       <Button
         type="button"
         variant="outline"
-        className="mt-5 rounded-full border border-[var(--line)] bg-[var(--panel)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
+        className="mt-5 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
         onClick={addGroup}
       >
         <Plus className="h-4 w-4" />

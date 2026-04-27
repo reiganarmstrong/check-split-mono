@@ -42,7 +42,7 @@ export function ReceiptDetailsSection({
             value={editorState.merchantName}
             onChange={(event) => updateField("merchantName", event.target.value)}
             placeholder="The place that got paid"
-            className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+            className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
             style={merchantNameMissing ? requiredHighlightSoftStyle : undefined}
           />
         </label>
@@ -50,7 +50,7 @@ export function ReceiptDetailsSection({
         <label className="w-full min-w-0 space-y-2">
           <FieldLabel label="Receipt date" showRequired={receiptDateMissing} />
           <div
-            className="h-12 w-full min-w-0 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)]"
+            className="h-12 w-full min-w-0 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)]"
             style={receiptDateMissing ? requiredHighlightSoftStyle : undefined}
           >
             <input
@@ -59,7 +59,7 @@ export function ReceiptDetailsSection({
               onChange={(event) =>
                 updateField("receiptOccurredAt", event.target.value)
               }
-              className="block h-full w-full min-w-0 rounded-[1rem] border-0 bg-transparent px-4 pt-2.5 text-left text-base font-medium text-[var(--foreground)] outline-none md:pt-0 md:leading-[3rem] md:[&::-webkit-datetime-edit]:p-0 md:[&::-webkit-datetime-edit-fields-wrapper]:flex md:[&::-webkit-datetime-edit-fields-wrapper]:h-full md:[&::-webkit-datetime-edit-fields-wrapper]:items-center"
+              className="block h-full w-full min-w-0 rounded-[0.8rem] border-0 bg-transparent px-4 pt-2.5 text-left text-base font-medium text-[var(--foreground)] outline-none md:pt-0 md:leading-[3rem] md:[&::-webkit-datetime-edit]:p-0 md:[&::-webkit-datetime-edit-fields-wrapper]:flex md:[&::-webkit-datetime-edit-fields-wrapper]:h-full md:[&::-webkit-datetime-edit-fields-wrapper]:items-center"
             />
           </div>
         </label>
@@ -72,7 +72,7 @@ export function ReceiptDetailsSection({
             value={editorState.locationName}
             onChange={(event) => updateField("locationName", event.target.value)}
             placeholder="Optional neighborhood or venue note"
-            className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+            className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
           />
         </label>
 
@@ -85,7 +85,7 @@ export function ReceiptDetailsSection({
             onChange={(event) =>
               updateField("currencyCode", event.target.value.toUpperCase())
             }
-            className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium uppercase"
+            className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium uppercase"
             maxLength={3}
           />
         </label>
@@ -100,7 +100,7 @@ export function ReceiptDetailsSection({
               updateField("locationAddress", event.target.value)
             }
             placeholder="Optional address, table note, or context for the receipt"
-            className="min-h-28 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] font-medium"
+            className="min-h-28 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] font-medium"
           />
         </label>
       </div>

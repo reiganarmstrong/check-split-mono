@@ -30,10 +30,10 @@ export function SectionShell({
           : "border-[var(--line)] bg-[var(--surface)]";
 
   return (
-    <section className="workspace-panel rounded-[1.75rem] px-5 py-5 sm:px-6 sm:py-6">
+    <section className="workspace-panel rounded-[1rem] px-5 py-5 sm:px-6 sm:py-6">
       <div className="flex items-start gap-3">
         {Icon ? (
-          <div className={cn("rounded-[1rem] border p-3", iconCircleClassName)}>
+          <div className={cn("rounded-[0.8rem] border p-3", iconCircleClassName)}>
             <Icon className="h-4 w-4 text-[var(--foreground)]" />
           </div>
         ) : null}
@@ -90,13 +90,13 @@ export function GroupChip({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full p-0 transition-all duration-150 ease-out",
+        "rounded-[0.75rem] p-0 transition-all duration-150 ease-out",
         active ? "bg-[var(--secondary)]" : "bg-transparent",
       )}
     >
       <span
         className={cn(
-          "block rounded-full border border-[var(--foreground)] px-3 py-2 text-sm font-medium transition-all duration-150 ease-out",
+          "block rounded-[0.75rem] border border-[var(--foreground)] px-3 py-2 text-sm font-medium transition-all duration-150 ease-out",
           active
             ? "-translate-x-0.5 -translate-y-0.5 bg-[var(--foreground)] text-[var(--background)] hover:-translate-x-px hover:-translate-y-px"
             : "bg-[var(--panel-strong)] text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]",
@@ -124,7 +124,7 @@ export function EditorNotice({
 
   return (
     <div
-      className={`rounded-[1.2rem] border px-4 py-3 text-sm font-medium ${className}`}
+      className={`rounded-[0.85rem] border px-4 py-3 text-sm font-medium ${className}`}
     >
       {message}
     </div>

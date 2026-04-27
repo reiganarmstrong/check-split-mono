@@ -28,7 +28,7 @@ export function AdjustmentsSection({
             inputMode="decimal"
             value={editorState.tax}
             onChange={(event) => updateField("tax", event.target.value)}
-            className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+            className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
           />
         </label>
         <label className="space-y-2">
@@ -39,7 +39,7 @@ export function AdjustmentsSection({
             inputMode="decimal"
             value={editorState.tip}
             onChange={(event) => updateField("tip", event.target.value)}
-            className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+            className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
           />
         </label>
         <label className="space-y-2">
@@ -50,7 +50,7 @@ export function AdjustmentsSection({
             inputMode="decimal"
             value={editorState.fee}
             onChange={(event) => updateField("fee", event.target.value)}
-            className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+            className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
           />
         </label>
         <label className="space-y-2">
@@ -61,7 +61,7 @@ export function AdjustmentsSection({
             inputMode="decimal"
             value={editorState.discount}
             onChange={(event) => updateField("discount", event.target.value)}
-            className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+            className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
           />
         </label>
       </div>

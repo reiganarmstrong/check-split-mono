@@ -43,8 +43,8 @@ export function ReceiptWorkspace({
   if (workspace.isMissing) {
     return (
       <main className="flex flex-1 items-center justify-center px-4 pb-20 pt-8 sm:px-6 lg:px-8">
-        <div className="auth-shell w-full max-w-xl rounded-[2rem] px-8 py-12 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[1.2rem] border border-[var(--line)] bg-[var(--surface)]">
+        <div className="auth-shell w-full max-w-xl rounded-[1rem] px-8 py-12 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[0.9rem] border border-[var(--line)] bg-[var(--surface)]">
             <AlertCircle className="h-8 w-8 text-[var(--foreground)]" />
           </div>
           <h1 className="mt-6 text-4xl leading-none text-[var(--foreground)]">
@@ -56,7 +56,7 @@ export function ReceiptWorkspace({
           </p>
           <Button
             asChild
-            className="mt-8 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+            className="mt-8 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
           >
             <Link href="/dashboard">Back to saved splits</Link>
           </Button>
@@ -118,7 +118,7 @@ export function ReceiptWorkspace({
               ) : null}
 
               {workspace.parseIssues.length > 0 ? (
-                <div className="workspace-panel rounded-[1.6rem] px-5 py-5 sm:px-6">
+                <div className="workspace-panel rounded-[1rem] px-5 py-5 sm:px-6">
                   <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
                     Parse notes
                   </p>

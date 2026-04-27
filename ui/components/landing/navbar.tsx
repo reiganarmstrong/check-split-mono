@@ -253,9 +253,9 @@ export function Navbar() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: isNavVisible ? 0 : -96 }}
         transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
-        className="sticky top-0 z-50 transform-gpu border-b border-[var(--line)] bg-[#f5f6f0] px-4 py-4 shadow-[0_10px_26px_rgba(14,18,24,0.04)] sm:px-8 lg:px-12"
+        className="sticky top-0 z-50 transform-gpu border-b border-[var(--line)] bg-[#f5f6f0] px-4 py-4 shadow-[0_8px_20px_rgba(14,18,24,0.035)] sm:px-8 lg:px-12"
       >
-        <div className="mx-auto flex min-h-12 w-full max-w-[86rem] items-center justify-between gap-4">
+        <div className="mx-auto flex min-h-12 w-full max-w-[78rem] items-center justify-between gap-4">
           <Link href="/" className="flex items-center">
             <BrandLogo
               showIcon={false}
@@ -301,114 +301,115 @@ export function Navbar() {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: isNavVisible ? 0 : -120 }}
       transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
-      className="sticky top-0 z-50 transform-gpu px-3 py-4 sm:px-6 lg:px-12"
+      className="sticky top-0 z-50 transform-gpu border-b border-[var(--line)] bg-[#f5f6f0] px-4 py-4 shadow-[0_8px_20px_rgba(14,18,24,0.035)] sm:px-8 lg:px-12"
     >
-      <div className="mx-auto w-full max-w-[86rem]">
-        <div className="topbar-surface rounded-[1.6rem] px-3 py-3 sm:px-5">
-          <div className="flex min-h-[4.5rem] items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href={homeHref} className="flex items-center">
-                <BrandLogo showIcon={false} />
-              </Link>
-            </div>
-
-            <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
-              {status === "authenticated" ? (
-                <nav
-                  aria-label="Breadcrumb"
-                  className="hidden min-w-0 flex-1 items-center justify-start gap-1 px-2 text-xs sm:flex sm:text-sm md:gap-2"
-                >
-                  {renderBreadcrumbs({ mobile: false })}
-                </nav>
-              ) : null}
-
-              <div className="flex shrink-0 items-center gap-2">
-                {status === "authenticated" ? (
-                  <div
-                    ref={accountMenuRef}
-                    className="relative inline-flex shrink-0"
-                  >
-                    <button
-                      type="button"
-                      aria-haspopup="menu"
-                      aria-expanded={isAccountMenuOpen}
-                      onClick={() => setIsAccountMenuOpen((isOpen) => !isOpen)}
-                      className={cn(
-                        "panel-surface-strong inline-flex h-11 max-w-[min(22rem,calc(100vw-2rem))] cursor-pointer items-center gap-3 px-4 text-left text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]",
-                        isAccountMenuOpen
-                          ? "rounded-b-none rounded-t-[1.35rem] border-b-transparent shadow-none"
-                          : "rounded-[1.35rem]",
-                      )}
-                    >
-                      <span className="truncate">
-                        {user?.email ?? user?.username}
-                      </span>
-                      <ChevronDown
-                        className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isAccountMenuOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
-
-                    <div
-                      role="menu"
-                      aria-label="Account actions"
-                      aria-hidden={!isAccountMenuOpen}
-                      className={cn(
-                        "absolute right-0 top-[calc(100%-1px)] z-50 w-full origin-top-right overflow-hidden rounded-b-[1.35rem] transition-[max-height,opacity] duration-180 ease-out",
-                        isAccountMenuOpen
-                          ? "max-h-40 opacity-100"
-                          : "pointer-events-none max-h-0 opacity-0",
-                      )}
-                    >
-                      <div className="panel-surface-strong rounded-b-[1.35rem] border-t-0 px-4 pb-4 pt-3">
-                        <button
-                          type="button"
-                          role="menuitem"
-                          onClick={() => void handleSignOut()}
-                          disabled={isSigningOut}
-                          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[1rem] bg-[#ff0000] px-4 text-sm font-medium text-[#fff8f6] transition-colors hover:bg-[#cc0000] disabled:opacity-60"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          {isSigningOut ? "Signing out..." : "Sign out"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : status === "loading" ? (
-                  <div className="h-11 w-28 animate-[pulse_1.5s_ease-in-out_infinite] rounded-full border border-[var(--line)] bg-[var(--surface)]" />
-                ) : (
-                  <>
-                    {pathname !== "/login" ? (
-                      <Link href="/login">
-                        <Button
-                          variant="ghost"
-                          className="inline-flex h-11 rounded-full px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-[var(--accent-foreground)] focus-visible:bg-[var(--accent)] focus-visible:text-[var(--accent-foreground)] focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)]"
-                        >
-                          Log in
-                        </Button>
-                      </Link>
-                    ) : null}
-                    {pathname !== "/signup" ? (
-                      <Link href="/signup">
-                        <Button className="inline-flex h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90">
-                          Sign up
-                        </Button>
-                      </Link>
-                    ) : null}
-                  </>
-                )}
-              </div>
-            </div>
+      <div className="mx-auto w-full max-w-[78rem]">
+        <div className="flex min-h-12 items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href={homeHref} className="flex items-center">
+              <BrandLogo
+                showIcon={false}
+                nameClassName="text-[1rem] font-semibold tracking-[0.32em]"
+              />
+            </Link>
           </div>
 
-          {status === "authenticated" && breadcrumbs.length > 0 ? (
-            <nav
-              aria-label="Breadcrumb"
-              className="workspace-line mt-1 flex min-w-0 items-center justify-start gap-1 overflow-x-auto px-1 pt-3 text-xs sm:hidden"
-            >
-              {renderBreadcrumbs({ mobile: true })}
-            </nav>
-          ) : null}
+          <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
+            {status === "authenticated" ? (
+              <nav
+                aria-label="Breadcrumb"
+                className="hidden min-w-0 flex-1 items-center justify-start gap-1 px-2 text-xs sm:flex sm:text-sm md:gap-2"
+              >
+                {renderBreadcrumbs({ mobile: false })}
+              </nav>
+            ) : null}
+
+            <div className="flex shrink-0 items-center gap-2">
+              {status === "authenticated" ? (
+                <div
+                  ref={accountMenuRef}
+                  className="relative inline-flex shrink-0"
+                >
+                  <button
+                    type="button"
+                    aria-haspopup="menu"
+                    aria-expanded={isAccountMenuOpen}
+                    onClick={() => setIsAccountMenuOpen((isOpen) => !isOpen)}
+                    className={cn(
+                      "panel-surface-strong inline-flex h-11 max-w-[min(22rem,calc(100vw-2rem))] cursor-pointer items-center gap-3 px-4 text-left text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]",
+                      isAccountMenuOpen
+                        ? "rounded-b-none rounded-t-[0.85rem] border-b-transparent shadow-none"
+                        : "rounded-[0.85rem]",
+                    )}
+                  >
+                    <span className="truncate">
+                      {user?.email ?? user?.username}
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isAccountMenuOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  <div
+                    role="menu"
+                    aria-label="Account actions"
+                    aria-hidden={!isAccountMenuOpen}
+                    className={cn(
+                      "absolute right-0 top-[calc(100%-1px)] z-50 w-full origin-top-right overflow-hidden rounded-b-[0.85rem] transition-[max-height,opacity] duration-180 ease-out",
+                      isAccountMenuOpen
+                        ? "max-h-40 opacity-100"
+                        : "pointer-events-none max-h-0 opacity-0",
+                    )}
+                  >
+                    <div className="panel-surface-strong rounded-b-[0.85rem] border-t-0 px-4 pb-4 pt-3">
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => void handleSignOut()}
+                        disabled={isSigningOut}
+                        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[0.8rem] bg-[#ff0000] px-4 text-sm font-medium text-[#fff8f6] transition-colors hover:bg-[#cc0000] disabled:opacity-60"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        {isSigningOut ? "Signing out..." : "Sign out"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : status === "loading" ? (
+                <div className="h-10 w-28 animate-[pulse_1.5s_ease-in-out_infinite] rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)]" />
+              ) : (
+                <>
+                  {pathname !== "/login" ? (
+                    <Link href="/login">
+                      <Button
+                        variant="ghost"
+                        className="h-10 rounded-[0.8rem] px-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[#86dcae] hover:text-[#052113] focus-visible:bg-[#86dcae] focus-visible:text-[#052113]"
+                      >
+                        Log in
+                      </Button>
+                    </Link>
+                  ) : null}
+                  {pathname !== "/signup" ? (
+                    <Link href="/signup">
+                      <Button className="h-10 rounded-[0.8rem] bg-[#050506] px-4 text-sm font-semibold text-white shadow-none hover:bg-primary/80 hover:text-white focus-visible:bg-primary/80 focus-visible:text-white">
+                        Sign up
+                      </Button>
+                    </Link>
+                  ) : null}
+                </>
+              )}
+            </div>
+          </div>
         </div>
+
+        {status === "authenticated" && breadcrumbs.length > 0 ? (
+          <nav
+            aria-label="Breadcrumb"
+            className="mt-3 flex min-w-0 items-center justify-start gap-1 overflow-x-auto border-t border-[var(--line)] px-1 pt-3 text-xs sm:hidden"
+          >
+            {renderBreadcrumbs({ mobile: true })}
+          </nav>
+        ) : null}
       </div>
     </motion.header>
   );

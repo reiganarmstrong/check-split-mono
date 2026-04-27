@@ -19,7 +19,7 @@ export function AuthSessionScreen({
         transition={{ duration: 0.35 }}
         className="page-shell"
       >
-        <div className="auth-shell mx-auto max-w-3xl rounded-[2rem] px-6 py-8 sm:px-8 sm:py-10">
+        <div className="auth-shell mx-auto max-w-3xl rounded-[1rem] px-6 py-8 sm:px-8 sm:py-10">
           <div className="inline-flex rounded-full border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-[0.68rem] font-medium uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
             Loading
           </div>

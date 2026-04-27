@@ -173,13 +173,13 @@ function LoginPageContent() {
             </div>
 
             {authError ? (
-              <p className="rounded-[1rem] border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+              <p className="rounded-[0.8rem] border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
                 {authError}
               </p>
             ) : null}
 
             {authMessage ? (
-              <p className="rounded-[1rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+              <p className="rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
                 {authMessage}
               </p>
             ) : null}
@@ -194,7 +194,7 @@ function LoginPageContent() {
                 <Button
                   type="submit"
                   disabled={!canSubmit || isSubmitting}
-                  className="h-14 w-full rounded-[1rem] bg-foreground text-base font-medium text-background transition-opacity hover:opacity-90 hover:bg-accent hover:text-accent-foreground active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+                  className="h-14 w-full rounded-[0.8rem] bg-foreground text-base font-medium text-background transition-opacity hover:opacity-90 hover:bg-accent hover:text-accent-foreground active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
                 >
                   {isSubmitting ? "Logging in..." : "Log in"}
                 </Button>

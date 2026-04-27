@@ -67,7 +67,7 @@ export function ReceiptUploadGate({
           className="hidden lg:col-start-2 lg:row-span-2 lg:flex lg:min-h-52 lg:flex-col lg:items-center lg:justify-center"
         >
           <div className="h-10 w-px bg-[linear-gradient(180deg,transparent,color-mix(in_oklab,var(--primary)_30%,var(--line)),transparent)]" />
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--primary)_20%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_10%,white)] text-[var(--primary)] shadow-[0_10px_24px_rgba(35,55,215,0.12)]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[0.85rem] border border-[color-mix(in_oklab,var(--primary)_20%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_10%,white)] text-[var(--primary)] shadow-[0_6px_16px_rgba(35,55,215,0.08)]">
             <ArrowRight className="h-4 w-4" />
           </div>
           <div className="h-10 w-px bg-[linear-gradient(180deg,transparent,color-mix(in_oklab,var(--primary)_30%,var(--line)),transparent)]" />
@@ -77,7 +77,7 @@ export function ReceiptUploadGate({
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.06, duration: 0.3 }}
-          className="order-2 hidden overflow-hidden rounded-[1.7rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_5%,white)] p-5 shadow-[0_18px_38px_rgba(14,18,24,0.05)] sm:p-6 lg:relative lg:block lg:col-start-3 lg:row-span-2"
+          className="order-2 hidden overflow-hidden rounded-[1rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_5%,white)] p-5 shadow-[0_8px_20px_rgba(14,18,24,0.035)] sm:p-6 lg:relative lg:block lg:col-start-3 lg:row-span-2"
         >
           <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
             Upload flow
@@ -86,7 +86,7 @@ export function ReceiptUploadGate({
             <motion.div
               whileHover={{ x: 3 }}
               transition={{ duration: 0.18 }}
-              className="relative flex gap-4 rounded-[1.15rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-white/88 px-4 py-4"
+              className="relative flex gap-4 rounded-[0.85rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-white/88 px-4 py-4"
             >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--primary)_20%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_12%,white)] text-sm font-semibold text-[var(--primary)]">
                 1
@@ -104,7 +104,7 @@ export function ReceiptUploadGate({
             <motion.div
               whileHover={{ x: 3 }}
               transition={{ duration: 0.18 }}
-              className="relative flex gap-4 rounded-[1.15rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-white/88 px-4 py-4"
+              className="relative flex gap-4 rounded-[0.85rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-white/88 px-4 py-4"
             >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--primary)_20%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_12%,white)] text-sm font-semibold text-[var(--primary)]">
                 2
@@ -127,7 +127,7 @@ export function ReceiptUploadGate({
             type="button"
             onClick={openPicker}
             disabled={isParsingReceipt}
-            className="h-12 cursor-pointer rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+            className="h-12 cursor-pointer rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
           >
             {isParsingReceipt ? (
               <LoaderCircle className="h-4 w-4 animate-spin" />
@@ -141,7 +141,7 @@ export function ReceiptUploadGate({
             variant="outline"
             onClick={beginManualEntry}
             disabled={isParsingReceipt}
-            className="h-12 cursor-pointer rounded-full border border-[var(--line)] bg-[var(--panel)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
+            className="h-12 cursor-pointer rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
           >
             Skip to manual entry
           </Button>

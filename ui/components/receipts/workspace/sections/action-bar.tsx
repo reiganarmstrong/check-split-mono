@@ -102,7 +102,7 @@ export function ReceiptActionBar({
         >
           <div
             className={cn(
-              "page-shell topbar-surface flex max-w-7xl rounded-[1.4rem] px-4 md:flex-row md:items-center md:justify-between",
+              "page-shell topbar-surface flex max-w-7xl rounded-[1rem] px-4 md:flex-row md:items-center md:justify-between",
               isCompactActionBar ? "flex-col gap-2 py-3" : "flex-col gap-3 py-4",
             )}
           >
@@ -120,7 +120,7 @@ export function ReceiptActionBar({
               </p>
               {isCompactActionBar ? (
                 <div className="flex items-center gap-2">
-                  <span className="flex min-w-26 flex-col items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1.5 text-center">
+                  <span className="flex min-w-26 flex-col items-center justify-center rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1.5 text-center">
                     <span className="text-[0.58rem] font-medium uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
                       Total
                     </span>
@@ -133,7 +133,7 @@ export function ReceiptActionBar({
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-8 rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 text-xs font-medium text-[var(--foreground)] hover:bg-[var(--surface)]"
+                      className="h-8 rounded-[0.7rem] border border-[var(--line)] bg-[var(--panel)] px-3 text-xs font-medium text-[var(--foreground)] hover:bg-[var(--surface)]"
                       onClick={toggleMobileActionBarMinimized}
                     >
                       {isMinimizedMobileActionBar ? (
@@ -202,7 +202,7 @@ export function ReceiptActionBar({
                 >
                   <span
                     className={cn(
-                      "rounded-full border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted-foreground)]",
+                      "rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted-foreground)]",
                       isCompactActionBar && "hidden",
                     )}
                   >
@@ -213,7 +213,7 @@ export function ReceiptActionBar({
                     variant="outline"
                     size="sm"
                     className={cn(
-                      "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
+                      "h-10 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
                       isCompactActionBar &&
                         "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
                     )}
@@ -226,7 +226,7 @@ export function ReceiptActionBar({
                     variant="outline"
                     size="sm"
                     className={cn(
-                      "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
+                      "h-10 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
                       isCompactActionBar &&
                         "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
                     )}
@@ -250,7 +250,7 @@ export function ReceiptActionBar({
                           variant="outline"
                           size="sm"
                           className={cn(
-                            "h-11 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)]",
+                            "h-11 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)]",
                             isCompactActionBar &&
                               "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
                           )}
@@ -265,7 +265,7 @@ export function ReceiptActionBar({
                         onClick={() => void handleDelete()}
                         disabled={isSaving || isDeleting || isParsingReceipt}
                         className={cn(
-                          "h-11 rounded-full bg-[#ff0000] px-5 text-sm font-medium text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
+                          "h-11 rounded-[0.8rem] bg-[#ff0000] px-5 text-sm font-medium text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
                           isCompactActionBar &&
                             "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
                         )}
@@ -297,7 +297,7 @@ export function ReceiptActionBar({
                       isParsingReceipt
                     }
                     className={cn(
-                      "h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
+                      "h-11 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
                       isCompactActionBar &&
                         "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
                     )}
@@ -325,7 +325,7 @@ export function ReceiptActionBar({
               >
                 <span
                   className={cn(
-                    "rounded-full border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted-foreground)]",
+                    "rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--muted-foreground)]",
                     isCompactActionBar && "hidden",
                   )}
                 >
@@ -336,7 +336,7 @@ export function ReceiptActionBar({
                   variant="outline"
                   size="sm"
                   className={cn(
-                    "h-10 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
+                    "h-10 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
                     isCompactActionBar &&
                       "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
                   )}
@@ -349,7 +349,7 @@ export function ReceiptActionBar({
                   variant="outline"
                   size="sm"
                   className={cn(
-                    "h-10 min-w-40 justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
+                    "h-10 min-w-40 justify-center rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)] md:hidden",
                     isCompactActionBar &&
                       "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
                   )}
@@ -366,7 +366,7 @@ export function ReceiptActionBar({
                   </span>
                 </Button>
                 {warningMessage && !isCompactActionBar ? (
-                  <span className="rounded-full border border-[color-mix(in_oklab,var(--unpaid)_32%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_72%,white)] px-4 py-2 text-sm font-medium text-[var(--unpaid-foreground)]">
+                  <span className="rounded-[0.8rem] border border-[color-mix(in_oklab,var(--unpaid)_32%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_72%,white)] px-4 py-2 text-sm font-medium text-[var(--unpaid-foreground)]">
                     Review latest version before saving again
                   </span>
                 ) : null}
@@ -378,7 +378,7 @@ export function ReceiptActionBar({
                         variant="outline"
                         size="sm"
                         className={cn(
-                          "h-11 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)]",
+                          "h-11 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface)]",
                           isCompactActionBar &&
                             "min-w-[calc(50%-0.375rem)] flex-1 justify-center",
                         )}
@@ -393,7 +393,7 @@ export function ReceiptActionBar({
                       onClick={() => void handleDelete()}
                       disabled={isSaving || isDeleting || isParsingReceipt}
                       className={cn(
-                        "h-11 rounded-full bg-[#ff0000] px-5 text-sm font-medium text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
+                        "h-11 rounded-[0.8rem] bg-[#ff0000] px-5 text-sm font-medium text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
                         isCompactActionBar &&
                           "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
                       )}
@@ -425,7 +425,7 @@ export function ReceiptActionBar({
                     isParsingReceipt
                   }
                   className={cn(
-                    "h-11 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
+                    "h-11 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
                     isCompactActionBar &&
                       "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
                   )}

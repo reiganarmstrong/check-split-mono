@@ -593,7 +593,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex-1 bg-[radial-gradient(#d4d9e7_1px,transparent_1px)] [background-size:22px_22px] pb-4">
+    <main className="flex-1 pb-4">
       <section className="relative">
         <div className="page-shell pb-10 pt-8 sm:pt-12 lg:min-h-[650px]">
           <motion.div

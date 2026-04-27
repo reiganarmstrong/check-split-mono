@@ -35,7 +35,7 @@ export function AuthCardShell({
   return (
     <section
       className={cn(
-        "auth-shell mx-auto w-full max-w-5xl overflow-hidden rounded-[2rem]",
+        "auth-shell mx-auto w-full max-w-5xl overflow-hidden rounded-[1rem]",
         cardShadowClassName,
       )}
     >
@@ -49,7 +49,7 @@ export function AuthCardShell({
         >
           <div
             className={cn(
-              "inline-flex h-14 w-14 items-center justify-center rounded-[1.15rem] border border-[var(--line)] bg-[var(--panel-strong)] text-[var(--foreground)]",
+              "inline-flex h-14 w-14 items-center justify-center rounded-[0.9rem] border border-[var(--line)] bg-[var(--panel-strong)] text-[var(--foreground)]",
               iconWrapperClassName,
             )}
           >

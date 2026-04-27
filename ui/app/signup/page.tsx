@@ -185,13 +185,13 @@ export default function SignupPage() {
             </div>
 
             {authError ? (
-              <p className="rounded-[1rem] border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+              <p className="rounded-[0.8rem] border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
                 {authError}
               </p>
             ) : null}
 
             {authMessage ? (
-              <p className="rounded-[1rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+              <p className="rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
                 {authMessage}
               </p>
             ) : null}
@@ -206,7 +206,7 @@ export default function SignupPage() {
                 <Button
                   type="submit"
                   disabled={!canSubmit || isSubmitting}
-                  className="h-14 w-full rounded-[1rem] bg-[var(--foreground)] text-base font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
+                  className="h-14 w-full rounded-[0.8rem] bg-[var(--foreground)] text-base font-medium text-[var(--background)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
                 >
                   {isSubmitting ? "Creating account..." : "Sign up"}
                 </Button>

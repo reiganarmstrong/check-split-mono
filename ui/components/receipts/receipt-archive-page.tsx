@@ -81,7 +81,7 @@ function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
       href={`/dashboard/receipt?receiptId=${encodeURIComponent(receipt.receiptId)}`}
       className="block"
     >
-      <article className="grid gap-4 rounded-[1.6rem] border border-[var(--line)] bg-white/90 px-5 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_36px_rgba(14,18,24,0.06)] md:grid-cols-[1.25fr_0.95fr_0.8fr_auto] md:items-center">
+      <article className="grid gap-4 rounded-[1rem] border border-[var(--line)] bg-white/90 px-5 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(14,18,24,0.04)] md:grid-cols-[1.25fr_0.95fr_0.8fr_auto] md:items-center">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span
@@ -148,7 +148,7 @@ function CreateReceiptButton() {
   return (
     <Button
       asChild
-      className="h-12 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
     >
       <Link href="/dashboard/new">
         <PencilLine className="h-4 w-4" />
@@ -307,7 +307,7 @@ export function ReceiptArchivePage() {
 
           </section>
 
-          <div className="workspace-panel rounded-[2rem] px-5 py-6 sm:px-6">
+          <div className="workspace-panel rounded-[1rem] px-5 py-6 sm:px-6">
             <div>
               <div>
                 <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
@@ -330,7 +330,7 @@ export function ReceiptArchivePage() {
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
                   placeholder="Search merchant or location"
-                  className="h-12 rounded-full border-[var(--line)] bg-white pl-11 pr-4 text-sm shadow-none"
+                  className="h-12 rounded-[0.8rem] border-[var(--line)] bg-white pl-11 pr-4 text-sm shadow-none"
                 />
               </label>
 
@@ -342,7 +342,7 @@ export function ReceiptArchivePage() {
                       type="button"
                       onClick={() => setStatusFilter(option.value)}
                       className={cn(
-                        "rounded-full border px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors",
+                        "rounded-[0.8rem] border px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors",
                         statusFilter === option.value
                           ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
                           : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]",
@@ -353,7 +353,7 @@ export function ReceiptArchivePage() {
                   ))}
                 </div>
 
-                <label className="flex cursor-pointer items-center gap-3 rounded-full border border-[var(--line)] bg-white px-4 py-3 text-sm uppercase tracking-[0.14em] text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]">
+                <label className="flex cursor-pointer items-center gap-3 rounded-[0.8rem] border border-[var(--line)] bg-white px-4 py-3 text-sm uppercase tracking-[0.14em] text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]">
                   <SlidersHorizontal className="h-4 w-4" />
                   <span>Sort</span>
                   <span className="relative ml-auto min-w-0 flex-1 pl-2">
@@ -378,7 +378,7 @@ export function ReceiptArchivePage() {
 
             {errorMessage ? (
               <div className="workspace-line mt-5 pt-5">
-                <div className="rounded-[1.25rem] border border-destructive/25 bg-destructive/10 px-4 py-4 text-sm text-destructive">
+                <div className="rounded-[0.9rem] border border-destructive/25 bg-destructive/10 px-4 py-4 text-sm text-destructive">
                   {errorMessage}
                 </div>
               </div>
@@ -386,7 +386,7 @@ export function ReceiptArchivePage() {
 
             {receipts.length === 0 ? (
               <div className="workspace-line mt-5 pt-5">
-                <div className="rounded-[1.6rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
+                <div className="rounded-[1rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
                     <ReceiptText className="h-6 w-6 text-[var(--foreground)]" />
                   </div>
@@ -399,14 +399,14 @@ export function ReceiptArchivePage() {
                   <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                     <Button
                       asChild
-                      className="h-12 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+                      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
                     >
                       <Link href="/dashboard/new">Create custom receipt</Link>
                     </Button>
                     <Button
                       asChild
                       variant="outline"
-                      className="rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
+                      className="rounded-[0.8rem] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
                     >
                       <Link href="/dashboard/new?prompt=upload">
                         Upload receipt
@@ -417,7 +417,7 @@ export function ReceiptArchivePage() {
               </div>
             ) : filteredReceipts.length === 0 ? (
               <div className="workspace-line mt-5 pt-5">
-                <div className="rounded-[1.6rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
+                <div className="rounded-[1rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
                     <Search className="h-5 w-5 text-[var(--foreground)]" />
                   </div>
@@ -436,7 +436,7 @@ export function ReceiptArchivePage() {
                         setStatusFilter("all");
                         setSortOption("newest");
                       }}
-                      className="h-12 rounded-full border border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
+                      className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
                     >
                       Reset filters
                     </Button>
@@ -465,7 +465,7 @@ export function ReceiptArchivePage() {
                     >
                       <div
                         className={cn(
-                          "flex flex-col gap-3 rounded-[1.6rem] border px-4 py-4 sm:flex-row sm:items-end sm:justify-between",
+                          "flex flex-col gap-3 rounded-[1rem] border px-4 py-4 sm:flex-row sm:items-end sm:justify-between",
                           group.key === "paid"
                             ? "border-emerald-200 bg-emerald-50"
                             : "border-amber-200 bg-amber-50",
