@@ -1,3 +1,4 @@
 *.env
 **/.pnpm-store/
+.claude/
 **/.DS_Store
