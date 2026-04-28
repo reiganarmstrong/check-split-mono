@@ -181,6 +181,7 @@ export function Navbar() {
 
   const isSavedSplitsPage = pathname === "/dashboard";
   const isNewReceiptPage = pathname === "/dashboard/new";
+  const isManageAccountPage = pathname === "/account";
   const isSavedReceiptEditPage =
     pathname === "/dashboard/receipt" && receiptId.length > 0;
   const breadcrumbs: BreadcrumbItem[] =
@@ -199,6 +200,14 @@ export function Navbar() {
                 {
                   isCurrent: true,
                   label: activeReceiptTitle || "Receipt draft",
+                },
+              ]
+            : []),
+          ...(isManageAccountPage
+            ? [
+                {
+                  isCurrent: true,
+                  label: "Manage account",
                 },
               ]
             : []),
@@ -374,6 +383,15 @@ export function Navbar() {
                       </p>
                     </div>
                     <div className="p-2">
+                      <Link
+                        href="/account"
+                        role="menuitem"
+                        onClick={() => setIsAccountMenuOpen(false)}
+                        className="mb-1 inline-flex h-10 w-full items-center justify-start gap-2 rounded-[0.7rem] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface)]"
+                      >
+                        <CircleUserRound className="h-4 w-4" />
+                        Manage account
+                      </Link>
                       <button
                         type="button"
                         role="menuitem"

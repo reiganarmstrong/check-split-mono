@@ -1,10 +1,12 @@
 import {
   confirmSignUp,
+  deleteUser,
   getCurrentUser,
   resendSignUpCode,
   signIn,
   signOut,
   signUp,
+  updatePassword,
 } from "aws-amplify/auth"
 
 import {
@@ -12,14 +14,18 @@ import {
   hasAmplifyAuthConfig,
 } from "@/lib/amplify-auth"
 import type {
+  ChangePasswordFormValues,
   ConfirmSignupFormValues,
+  DeleteAccountFormValues,
   LoginFormValues,
   SignupFormValues,
 } from "@/lib/auth-form-schemas"
 import { cognitoPasswordPolicyMessage } from "@/lib/password-policy"
 
 export type {
+  ChangePasswordFormValues,
   ConfirmSignupFormValues,
+  DeleteAccountFormValues,
   LoginFormValues,
   SignupFormValues,
 } from "@/lib/auth-form-schemas"
@@ -260,12 +266,63 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
   }
 }
 
+export async function changeCurrentUserPassword(
+  values: ChangePasswordFormValues,
+): Promise<string> {
+  if (values.newPassword !== values.confirmPassword) {
+    throw new Error("Passwords must match.")
+  }
+
+  configureAmplifyAuth()
+
+  try {
+    await updatePassword({
+      oldPassword: values.currentPassword,
+      newPassword: values.newPassword,
+    })
+
+    return "Password updated."
+  } catch (error) {
+    if (getErrorName(error) === "NotAuthorizedException") {
+      throw new Error("Current password is incorrect.")
+    }
+
+    throw toAuthError(error)
+  }
+}
+
 export async function signOutCurrentUser() {
   if (!hasAmplifyAuthConfig()) {
     return
   }
 
   configureAmplifyAuth()
+
+  try {
+    await signOut()
+  } catch (error) {
+    if (isUnauthenticatedError(error)) {
+      return
+    }
+
+    throw toAuthError(error)
+  }
+}
+
+export async function deleteCurrentUserAccount(
+  values: DeleteAccountFormValues,
+): Promise<void> {
+  if (values.confirmation.trim() !== "DELETE") {
+    throw new Error('Type "DELETE" to confirm.')
+  }
+
+  configureAmplifyAuth()
+
+  try {
+    await deleteUser()
+  } catch (error) {
+    throw toAuthError(error)
+  }
 
   try {
     await signOut()

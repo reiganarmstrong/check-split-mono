@@ -21,8 +21,10 @@ function LoginPageContent() {
   const searchParams = useSearchParams();
   const { status, refreshSession } = useAuth();
   const seededEmail = searchParams.get("email") ?? "";
-  const confirmedMessage =
-    searchParams.get("confirmed") === "1"
+  const sessionMessage =
+    searchParams.get("deleted") === "1"
+      ? "Account deleted."
+      : searchParams.get("confirmed") === "1"
       ? "Email verified. You can log in now."
       : searchParams.get("created") === "1"
         ? "Account created successfully. Log in to continue."
@@ -30,7 +32,7 @@ function LoginPageContent() {
 
   const [authError, setAuthError] = useState<string | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(
-    confirmedMessage,
+    sessionMessage,
   );
 
   useEffect(() => {
