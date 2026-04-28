@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, type CSSProperties, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { motion } from "motion/react";
 import {
   ArrowRight,
@@ -558,6 +564,7 @@ function WorkflowBand({
   if (isStacked) {
     return (
       <div
+        data-workflow-card
         className="lg:sticky lg:translate-y-0"
         style={{
           top: "5.75rem",
@@ -572,15 +579,108 @@ function WorkflowBand({
   return <SectionReveal>{content}</SectionReveal>;
 }
 
+function WorkflowProgressRail({
+  progress,
+}: {
+  progress: number;
+}) {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute bottom-24 -left-12 top-0 hidden w-7 xl:-left-14 lg:block"
+    >
+      <div className="sticky top-[5.75rem] flex h-[calc(100svh-7.75rem)] min-h-[34rem] w-7 items-center justify-center">
+        <div className="relative h-[78%] w-px bg-[#cdd3df]">
+          <div
+            className="absolute left-1/2 top-0 w-[3px] -translate-x-1/2 rounded-full bg-[#050506]"
+            style={{ height: `${progress * 100}%` }}
+          />
+          {workflowChrome.map((item, index) => (
+            <div
+              key={item.step}
+              className="absolute left-1/2 flex -translate-x-1/2 items-center"
+              style={{ top: `${index * 50}%` }}
+            >
+              <span
+                className={`h-3.5 w-3.5 rounded-full border-2 border-[#fdfdfb] shadow-[0_0_0_1px_rgba(19,24,31,0.18)] ${item.rail}`}
+              />
+              <span className="ml-3 font-sans text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[#53607e]">
+                {item.step}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const { status } = useAuth();
+  const workflowRef = useRef<HTMLDivElement>(null);
+  const [workflowProgress, setWorkflowProgress] = useState(0);
 
   useEffect(() => {
     if (status === "authenticated") {
       router.replace("/dashboard");
     }
   }, [router, status]);
+
+  useEffect(() => {
+    const workflow = workflowRef.current;
+
+    if (!workflow) {
+      return;
+    }
+
+    const workflowElement = workflow;
+
+    function updateWorkflowProgress() {
+      const cards = Array.from(
+        workflowElement.querySelectorAll<HTMLElement>("[data-workflow-card]"),
+      );
+
+      if (cards.length < 3) {
+        return;
+      }
+
+      const rootFontSize = Number.parseFloat(
+        window.getComputedStyle(document.documentElement).fontSize,
+      );
+      const stickyTop = 5.75 * rootFontSize;
+      const workflowStyle = window.getComputedStyle(workflowElement);
+      const workflowGap = Number.parseFloat(workflowStyle.rowGap);
+      const cardStep = cards[0].getBoundingClientRect().height + workflowGap;
+
+      if (cardStep <= 0) {
+        return;
+      }
+
+      const clampProgress = (value: number) => Math.max(0, Math.min(1, value));
+      const secondCardDistance =
+        cards[1].getBoundingClientRect().top - stickyTop;
+      const thirdCardDistance =
+        cards[2].getBoundingClientRect().top - stickyTop;
+      const nextProgress =
+        secondCardDistance > 0
+          ? (1 - clampProgress(secondCardDistance / cardStep)) * 0.5
+          : 0.5 + (1 - clampProgress(thirdCardDistance / cardStep)) * 0.5;
+
+      setWorkflowProgress(clampProgress(nextProgress));
+    }
+
+    updateWorkflowProgress();
+    window.addEventListener("scroll", updateWorkflowProgress, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateWorkflowProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updateWorkflowProgress);
+      window.removeEventListener("resize", updateWorkflowProgress);
+    };
+  }, []);
 
   if (status === "authenticated") {
     return (
@@ -630,7 +730,11 @@ export default function Home() {
       </section>
 
       <div id="features" className="page-shell pt-4">
-        <div className="relative flex flex-col gap-8 pb-16 lg:gap-32 lg:pb-24">
+        <div
+          ref={workflowRef}
+          className="relative flex flex-col gap-8 pb-16 lg:gap-32 lg:pb-24"
+        >
+          <WorkflowProgressRail progress={workflowProgress} />
           <WorkflowBand
             stackIndex={0}
             eyebrow="Parse receipt"
