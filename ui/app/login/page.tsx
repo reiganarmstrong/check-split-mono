@@ -162,7 +162,7 @@ function LoginPageContent() {
                     labelAside={
                       <Link
                         href="#"
-                        className="text-sm font-bold text-[var(--accent)] hover:underline underline-offset-4"
+                        className="text-sm font-semibold text-[var(--accent)] underline-offset-4 hover:underline"
                       >
                         Forgot password?
                       </Link>
@@ -194,7 +194,7 @@ function LoginPageContent() {
                 <Button
                   type="submit"
                   disabled={!canSubmit || isSubmitting}
-                  className="h-14 w-full rounded-[0.8rem] bg-foreground text-base font-medium text-background transition-opacity hover:opacity-90 hover:bg-accent hover:text-accent-foreground active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+                  className="h-14 w-full rounded-[0.8rem] bg-foreground text-base font-semibold text-background transition-opacity hover:bg-accent hover:text-accent-foreground hover:opacity-90 active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
                 >
                   {isSubmitting ? "Logging in..." : "Log in"}
                 </Button>

@@ -41,7 +41,7 @@ export function SectionShell({
           <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
             {eyebrow}
           </p>
-          <h2 className="mt-2 text-3xl font-semibold leading-none text-[var(--foreground)] sm:text-4xl">
+          <h2 className="mt-2 text-3xl leading-none text-[var(--foreground)] sm:text-4xl">
             {title}
           </h2>
         </div>
@@ -66,8 +66,8 @@ export function SummaryRow({
       <span
         className={
           emphasis
-            ? "text-xl font-medium text-[var(--foreground)]"
-            : "text-sm font-medium text-[var(--foreground)]"
+            ? "text-xl font-semibold text-[var(--foreground)]"
+            : "text-sm font-semibold text-[var(--foreground)]"
         }
       >
         {value}

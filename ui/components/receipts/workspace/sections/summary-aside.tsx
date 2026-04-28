@@ -70,7 +70,7 @@ export function SummaryAside({
             type="button"
             variant="outline"
             size="sm"
-            className="min-w-40 justify-center rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
+            className="min-w-40 justify-center rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-semibold text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
             onClick={() => void handleShareSummary()}
             disabled={isSharingSummary}
           >
@@ -119,7 +119,7 @@ export function SummaryAside({
             type="button"
             variant="outline"
             size="sm"
-            className="pointer-events-auto relative h-11 rounded-[0.8rem] border border-[color-mix(in_oklab,var(--line)_85%,white)] bg-[color-mix(in_oklab,var(--panel)_88%,white)] px-5 text-sm font-medium text-[var(--foreground)] shadow-[0_8px_18px_rgba(14,18,24,0.05)] backdrop-blur-md hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
+            className="pointer-events-auto relative h-11 rounded-[0.8rem] border border-[color-mix(in_oklab,var(--line)_85%,white)] bg-[color-mix(in_oklab,var(--panel)_88%,white)] px-5 text-sm font-semibold text-[var(--foreground)] shadow-[0_8px_18px_rgba(14,18,24,0.05)] backdrop-blur-md hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
             onClick={scrollToFullSummary}
           >
             See full summary
@@ -172,7 +172,7 @@ export function SummaryAside({
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <p className="text-xl font-medium text-[var(--foreground)]">
+                    <p className="text-xl font-semibold text-[var(--foreground)]">
                       {formatCurrency(share.amountCents)}
                     </p>
                     <Button

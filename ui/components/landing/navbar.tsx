@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, LogOut } from "lucide-react";
+import { ChevronDown, ChevronRight, CircleUserRound, LogOut } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 
@@ -35,6 +35,7 @@ export function Navbar() {
 
   const homeHref = status === "authenticated" ? "/dashboard" : "/";
   const isLandingPage = status !== "authenticated" && pathname === "/";
+  const accountLabel = user?.email ?? user?.username ?? "Account";
 
   function scrollToFeatures() {
     document.getElementById("features")?.scrollIntoView({
@@ -335,45 +336,56 @@ export function Navbar() {
                     aria-haspopup="menu"
                     aria-expanded={isAccountMenuOpen}
                     onClick={() => setIsAccountMenuOpen((isOpen) => !isOpen)}
-                    className={cn(
-                      "panel-surface-strong inline-flex h-11 max-w-[min(22rem,calc(100vw-2rem))] cursor-pointer items-center gap-3 px-4 text-left text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]",
-                      isAccountMenuOpen
-                        ? "rounded-b-none rounded-t-[0.85rem] border-b-transparent shadow-none"
-                        : "rounded-[0.85rem]",
-                    )}
+                    className="inline-flex h-10 max-w-[min(15rem,calc(100vw-2rem))] cursor-pointer items-center gap-2 rounded-[0.8rem] border border-[var(--line)] bg-white px-3 text-left text-sm font-medium text-[var(--foreground)] shadow-none transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                   >
-                    <span className="truncate">
-                      {user?.email ?? user?.username}
-                    </span>
+                    <CircleUserRound className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
+                    <span className="hidden truncate sm:inline">Account</span>
                     <ChevronDown
-                      className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isAccountMenuOpen ? "rotate-180" : ""}`}
+                      className={`h-4 w-4 shrink-0 text-[var(--muted-foreground)] transition-transform duration-200 ${isAccountMenuOpen ? "rotate-180" : ""}`}
                     />
                   </button>
 
-                  <div
+                  <motion.div
                     role="menu"
                     aria-label="Account actions"
                     aria-hidden={!isAccountMenuOpen}
-                    className={cn(
-                      "absolute right-0 top-[calc(100%-1px)] z-50 w-full origin-top-right overflow-hidden rounded-b-[0.85rem] transition-[max-height,opacity] duration-180 ease-out",
+                    initial={false}
+                    animate={
                       isAccountMenuOpen
-                        ? "max-h-40 opacity-100"
-                        : "pointer-events-none max-h-0 opacity-0",
+                        ? { opacity: 1, y: 0 }
+                        : { opacity: 0, y: -4 }
+                    }
+                    transition={
+                      isAccountMenuOpen
+                        ? { duration: 0.16, ease: [0.16, 1, 0.3, 1] }
+                        : { duration: 0.1, ease: [0.4, 0, 1, 1] }
+                    }
+                    className={cn(
+                      "absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 origin-top-right transform-gpu overflow-hidden rounded-[0.85rem] border border-[var(--line)] bg-white shadow-[0_12px_28px_rgba(14,18,24,0.08)] will-change-[transform,opacity]",
+                      !isAccountMenuOpen && "pointer-events-none",
                     )}
                   >
-                    <div className="panel-surface-strong rounded-b-[0.85rem] border-t-0 px-4 pb-4 pt-3">
+                    <div className="border-b border-[var(--line)] px-4 py-3">
+                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                        Signed in
+                      </p>
+                      <p className="mt-1 truncate text-sm font-medium text-[var(--foreground)]">
+                        {accountLabel}
+                      </p>
+                    </div>
+                    <div className="p-2">
                       <button
                         type="button"
                         role="menuitem"
                         onClick={() => void handleSignOut()}
                         disabled={isSigningOut}
-                        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-[0.8rem] bg-[#ff0000] px-4 text-sm font-medium text-[#fff8f6] transition-colors hover:bg-[#cc0000] disabled:opacity-60"
+                        className="inline-flex h-10 w-full items-center justify-start gap-2 rounded-[0.7rem] px-3 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-60"
                       >
                         <LogOut className="h-4 w-4" />
                         {isSigningOut ? "Signing out..." : "Sign out"}
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               ) : status === "loading" ? (
                 <div className="h-10 w-28 animate-[pulse_1.5s_ease-in-out_infinite] rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)]" />

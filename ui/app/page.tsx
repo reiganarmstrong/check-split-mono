@@ -79,7 +79,7 @@ function Eyebrow({ children }: { children: ReactNode }) {
   );
 }
 
-function PrimaryCta({ label = "Get started free" }: { label?: string }) {
+function PrimaryCta({ label = "Get started now" }: { label?: string }) {
   return (
     <Button
       asChild
@@ -524,53 +524,52 @@ function WorkflowBand({
 }) {
   const isStacked = stackIndex !== undefined;
   const chrome = isStacked ? workflowChrome[stackIndex] : undefined;
-
-  return (
-    <SectionReveal
-      className={
-        isStacked
-          ? "lg:sticky lg:translate-y-0"
-          : undefined
-      }
-      style={
-        isStacked
-          ? {
-              top: "5.75rem",
-              zIndex: 20 + stackIndex,
-            }
-          : undefined
-      }
-    >
-      <section className="relative rounded-[1rem] border border-[var(--line)] bg-[#fdfdfb] p-6 pt-16 shadow-[0_16px_34px_rgba(14,18,24,0.04)] sm:p-8 sm:pt-16 lg:flex lg:h-[calc(100svh-7.75rem)] lg:min-h-[44rem] lg:items-center lg:overflow-hidden lg:pt-16">
-        <div className="pointer-events-none absolute inset-0 z-20 rounded-[1rem] border border-[var(--line)]" />
-        {chrome ? (
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-16 overflow-hidden rounded-t-[1rem]">
-            <div className={`absolute inset-x-0 top-0 h-2 ${chrome.rail}`} />
-            <div className="absolute inset-x-0 top-2 h-px bg-white/80" />
-            <div
-              className={`absolute left-0 top-2 flex h-10 items-center gap-3 rounded-br-[0.85rem] border-b border-r px-5 text-[0.66rem] font-semibold uppercase tracking-[0.2em] sm:px-6 ${chrome.tab}`}
-            >
-              <span>{chrome.step}</span>
-              <span className="h-1 w-1 rounded-full bg-current opacity-50" />
-              <span>{eyebrow}</span>
-            </div>
+  const content = (
+    <section className="relative rounded-[1rem] border border-[var(--line)] bg-[#fdfdfb] p-6 pt-16 shadow-[0_16px_34px_rgba(14,18,24,0.04)] sm:p-8 sm:pt-16 lg:flex lg:h-[calc(100svh-7.75rem)] lg:min-h-[44rem] lg:items-center lg:overflow-hidden lg:pt-16">
+      <div className="pointer-events-none absolute inset-0 z-20 rounded-[1rem] border border-[var(--line)]" />
+      {chrome ? (
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 overflow-hidden rounded-t-[1rem]">
+          <div className={`absolute inset-x-0 top-0 h-2 ${chrome.rail}`} />
+          <div className="absolute inset-x-0 top-2 h-px bg-white/80" />
+          <div
+            className={`absolute left-0 top-2 flex h-10 items-center gap-3 rounded-br-[0.85rem] border-b border-r px-5 text-[0.66rem] font-semibold uppercase tracking-[0.2em] sm:px-6 ${chrome.tab}`}
+          >
+            <span>{chrome.step}</span>
+            <span className="h-1 w-1 rounded-full bg-current opacity-50" />
+            <span>{eyebrow}</span>
           </div>
-        ) : null}
-        <div className="grid w-full gap-10 lg:grid-cols-[0.34fr_1fr] lg:items-center">
-          <div>
-            <h2 className="text-4xl leading-[0.96] text-[var(--foreground)] sm:text-5xl lg:text-[3.2rem]">
-              {title}
-            </h2>
-            <p className="mt-5 max-w-sm text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
-              {description}
-            </p>
-            {sidebar}
-          </div>
-          {children}
         </div>
-      </section>
-    </SectionReveal>
+      ) : null}
+      <div className="grid w-full gap-10 lg:grid-cols-[0.34fr_1fr] lg:items-center">
+        <div>
+          <h2 className="text-4xl leading-[0.96] text-[var(--foreground)] sm:text-5xl lg:text-[3.2rem]">
+            {title}
+          </h2>
+          <p className="mt-5 max-w-sm text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
+            {description}
+          </p>
+          {sidebar}
+        </div>
+        {children}
+      </div>
+    </section>
   );
+
+  if (isStacked) {
+    return (
+      <div
+        className="lg:sticky lg:translate-y-0"
+        style={{
+          top: "5.75rem",
+          zIndex: 20 + stackIndex,
+        }}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return <SectionReveal>{content}</SectionReveal>;
 }
 
 export default function Home() {

@@ -127,7 +127,7 @@ export function ReceiptUploadGate({
             type="button"
             onClick={openPicker}
             disabled={isParsingReceipt}
-            className="h-12 cursor-pointer rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+            className="h-12 cursor-pointer rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90"
           >
             {isParsingReceipt ? (
               <LoaderCircle className="h-4 w-4 animate-spin" />
@@ -141,7 +141,7 @@ export function ReceiptUploadGate({
             variant="outline"
             onClick={beginManualEntry}
             disabled={isParsingReceipt}
-            className="h-12 cursor-pointer rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
+            className="h-12 cursor-pointer rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-5 text-sm font-semibold text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
           >
             Skip to manual entry
           </Button>

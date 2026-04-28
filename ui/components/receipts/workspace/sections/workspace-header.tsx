@@ -27,7 +27,7 @@ export function WorkspaceHeader({
 }) {
   return (
     <div className="workspace-panel overflow-hidden rounded-[1rem] px-6 py-6 sm:px-8 sm:py-8">
-      <h1 className="mt-4 max-w-4xl text-4xl leading-[0.95] tracking-tight text-[var(--foreground)] sm:text-6xl">
+      <h1 className="mt-4 max-w-4xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl">
         {heading}
       </h1>
       <p className="mt-4 max-w-md text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">

@@ -47,7 +47,7 @@ export function ReceiptWorkspace({
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[0.9rem] border border-[var(--line)] bg-[var(--surface)]">
             <AlertCircle className="h-8 w-8 text-[var(--foreground)]" />
           </div>
-          <h1 className="mt-6 text-4xl leading-none text-[var(--foreground)]">
+          <h1 className="mt-6 text-4xl leading-[0.95] text-[var(--foreground)]">
             Receipt not found
           </h1>
           <p className="mt-4 text-base leading-7 text-[var(--muted-foreground)]">
@@ -56,7 +56,7 @@ export function ReceiptWorkspace({
           </p>
           <Button
             asChild
-            className="mt-8 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+            className="mt-8 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90"
           >
             <Link href="/dashboard">Back to saved splits</Link>
           </Button>

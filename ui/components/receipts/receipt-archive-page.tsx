@@ -148,7 +148,7 @@ function CreateReceiptButton() {
   return (
     <Button
       asChild
-      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90"
     >
       <Link href="/dashboard/new">
         <PencilLine className="h-4 w-4" />
@@ -292,10 +292,10 @@ export function ReceiptArchivePage() {
           <section className="border-b border-[var(--line)] pb-8">
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
               <div>
-                <h1 className="max-w-3xl text-4xl leading-[0.92] text-[var(--foreground)] sm:text-5xl">
+                <h1 className="max-w-3xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl">
                   Saved splits
                 </h1>
-                <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)]">
+                <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
                   Start a new receipt or edit an old one.
                 </p>
               </div>
@@ -310,7 +310,7 @@ export function ReceiptArchivePage() {
           <div className="workspace-panel rounded-[1rem] px-5 py-6 sm:px-6">
             <div>
               <div>
-                <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
                   Receipts
                 </p>
                 <h2 className="mt-3 text-3xl leading-none text-[var(--foreground)]">
@@ -399,14 +399,14 @@ export function ReceiptArchivePage() {
                   <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                     <Button
                       asChild
-                      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+                      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90"
                     >
                       <Link href="/dashboard/new">Create custom receipt</Link>
                     </Button>
                     <Button
                       asChild
                       variant="outline"
-                      className="rounded-[0.8rem] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
+                      className="rounded-[0.8rem] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
                     >
                       <Link href="/dashboard/new?prompt=upload">
                         Upload receipt
@@ -436,7 +436,7 @@ export function ReceiptArchivePage() {
                         setStatusFilter("all");
                         setSortOption("newest");
                       }}
-                      className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
+                      className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
                     >
                       Reset filters
                     </Button>
