@@ -266,7 +266,7 @@ export function Navbar() {
     return (
       <motion.header
         initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: isNavVisible ? 0 : -96 }}
+        animate={{ opacity: 1, y: isNavVisible ? 0 : "-110%" }}
         transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
         className="sticky top-0 z-50 transform-gpu border-b border-[var(--line)] bg-[#f5f6f0] px-4 py-4 shadow-[0_8px_20px_rgba(14,18,24,0.035)] sm:px-8 lg:px-12"
       >
@@ -314,7 +314,7 @@ export function Navbar() {
   return (
     <motion.header
       initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: isNavVisible ? 0 : -120 }}
+      animate={{ opacity: 1, y: isNavVisible ? 0 : "-110%" }}
       transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
       className="sticky top-0 z-50 transform-gpu border-b border-[var(--line)] bg-[#f5f6f0] px-4 py-4 shadow-[0_8px_20px_rgba(14,18,24,0.035)] sm:px-8 lg:px-12"
     >
@@ -440,7 +440,7 @@ export function Navbar() {
         {status === "authenticated" && breadcrumbs.length > 0 ? (
           <nav
             aria-label="Breadcrumb"
-            className="mt-3 flex min-w-0 items-center justify-start gap-1 overflow-x-auto border-t border-[var(--line)] px-1 pt-3 text-xs sm:hidden"
+            className="-mx-4 mt-3 flex min-w-0 items-center justify-start gap-1 overflow-x-auto border-t border-[var(--line)] px-5 pt-3 text-xs sm:hidden"
           >
             {renderBreadcrumbs({ mobile: true })}
           </nav>
