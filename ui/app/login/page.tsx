@@ -26,6 +26,8 @@ function LoginPageContent() {
       ? "Account deleted."
       : searchParams.get("confirmed") === "1"
       ? "Email verified. You can log in now."
+      : searchParams.get("reset") === "1"
+        ? "Password reset. Log in with your new password."
       : searchParams.get("created") === "1"
         ? "Account created successfully. Log in to continue."
         : null;
@@ -163,7 +165,13 @@ function LoginPageContent() {
                     autoComplete="current-password"
                     labelAside={
                       <Link
-                        href="#"
+                        href={
+                          form.state.values.email
+                            ? `/forgot-password?email=${encodeURIComponent(
+                                form.state.values.email,
+                              )}`
+                            : "/forgot-password"
+                        }
                         className="text-sm font-semibold text-[var(--accent)] underline-offset-4 hover:underline"
                       >
                         Forgot password?

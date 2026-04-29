@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ChangeEvent } from "react";
-import { motion } from "motion/react";
-import { ArrowRight, Camera, LoaderCircle, ScanSearch } from "lucide-react";
+import { Camera, LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -49,80 +48,23 @@ export function ReceiptUploadGate({
 
   return (
     <SectionShell
-      title="Start from a receipt image"
+      title="Start from an image, or enter things manually"
       eyebrow="Getting started"
-      icon={ScanSearch}
+      // icon={ScanSearch}
       tone="primary"
+      className="mx-auto flex aspect-square w-full max-w-[30rem] max-h-[22rem] flex-col"
+      contentClassName="flex flex-1"
     >
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_auto_minmax(19rem,1fr)] lg:grid-rows-[auto_auto] lg:items-center">
-        <div className="order-1 max-w-xl lg:col-start-1 lg:row-start-1">
+      <div className="flex flex-1 flex-col justify-between gap-8">
+        <div className="max-w-xl">
           <p className="max-w-lg text-base leading-7 text-[var(--muted-foreground)]">
-            Drop in receipt photo, review parsed draft, then finish by making
-            small edits instead of starting from blank fields.
+            {
+              "If you upload your receipt, we extract the contents so you don't have to :)"
+            }
           </p>
         </div>
 
-        <div
-          aria-hidden="true"
-          className="hidden lg:col-start-2 lg:row-span-2 lg:flex lg:min-h-52 lg:flex-col lg:items-center lg:justify-center"
-        >
-          <div className="h-10 w-px bg-[linear-gradient(180deg,transparent,color-mix(in_oklab,var(--primary)_30%,var(--line)),transparent)]" />
-          <div className="flex h-12 w-12 items-center justify-center rounded-[0.85rem] border border-[color-mix(in_oklab,var(--primary)_20%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_10%,white)] text-[var(--primary)] shadow-[0_6px_16px_rgba(35,55,215,0.08)]">
-            <ArrowRight className="h-4 w-4" />
-          </div>
-          <div className="h-10 w-px bg-[linear-gradient(180deg,transparent,color-mix(in_oklab,var(--primary)_30%,var(--line)),transparent)]" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.06, duration: 0.3 }}
-          className="order-2 hidden overflow-hidden rounded-[1rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_5%,white)] p-5 shadow-[0_8px_20px_rgba(14,18,24,0.035)] sm:p-6 lg:relative lg:block lg:col-start-3 lg:row-span-2"
-        >
-          <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Upload flow
-          </p>
-          <div className="relative mt-4 space-y-3">
-            <motion.div
-              whileHover={{ x: 3 }}
-              transition={{ duration: 0.18 }}
-              className="relative flex gap-4 rounded-[0.85rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-white/88 px-4 py-4"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--primary)_20%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_12%,white)] text-sm font-semibold text-[var(--primary)]">
-                1
-              </div>
-              <div>
-                <p className="text-sm font-medium text-[var(--foreground)]">
-                  Choose receipt image
-                </p>
-                <p className="mt-1 text-sm leading-6 text-[var(--muted-foreground)]">
-                  Photo, screenshot, or export. If browser opens it, upload
-                  works.
-                </p>
-              </div>
-            </motion.div>
-            <motion.div
-              whileHover={{ x: 3 }}
-              transition={{ duration: 0.18 }}
-              className="relative flex gap-4 rounded-[0.85rem] border border-[color-mix(in_oklab,var(--primary)_16%,var(--line))] bg-white/88 px-4 py-4"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_oklab,var(--primary)_20%,var(--line))] bg-[color-mix(in_oklab,var(--primary)_12%,white)] text-sm font-semibold text-[var(--primary)]">
-                2
-              </div>
-              <div>
-                <p className="text-sm font-medium text-[var(--foreground)]">
-                  Confirm parsed draft
-                </p>
-                <p className="mt-1 text-sm leading-6 text-[var(--muted-foreground)]">
-                  Check totals, line items, and date. Edit only what needs
-                  cleanup.
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        <div className="order-3 flex flex-wrap gap-3 lg:col-start-1 lg:row-start-2 lg:mt-5">
+        <div className="flex flex-wrap gap-3">
           <Button
             type="button"
             onClick={openPicker}

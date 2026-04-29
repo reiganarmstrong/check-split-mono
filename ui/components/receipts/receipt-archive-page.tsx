@@ -20,6 +20,11 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ReceiptApiError, listReceipts } from "@/lib/receipt-api";
+import {
+  getPaymentProgressLabel,
+  getReceiptPaymentState,
+  receiptMatchesArchiveSearch,
+} from "@/lib/receipt-archive-search";
 import { formatCurrency, formatReceiptDate } from "@/lib/receipt-editor";
 import type { ReceiptListItem } from "@/lib/receipt-types";
 import { cn } from "@/lib/utils";
@@ -48,29 +53,6 @@ const sortOptionLabels: Record<ReceiptSortOption, string> = {
   smallest: "Smallest total",
   updated: "Recently updated",
 };
-
-function getReceiptPaymentState(receipt: ReceiptListItem) {
-  if (
-    receipt.participantCount > 0 &&
-    receipt.paidParticipantCount === receipt.participantCount
-  ) {
-    return "paid";
-  }
-
-  return "unpaid";
-}
-
-function getPaymentProgressLabel(receipt: ReceiptListItem) {
-  if (receipt.participantCount === 0) {
-    return "No groups";
-  }
-
-  if (receipt.paidParticipantCount === receipt.participantCount) {
-    return "All groups paid";
-  }
-
-  return `${receipt.paidParticipantCount} of ${receipt.participantCount} paid`;
-}
 
 function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
   const paymentProgressLabel = getPaymentProgressLabel(receipt);
@@ -225,17 +207,12 @@ export function ReceiptArchivePage() {
     );
   }
 
-  const normalizedQuery = searchValue.trim().toLowerCase();
-
   const filteredReceipts = receipts
     .filter((receipt) => {
       const paymentState = getReceiptPaymentState(receipt);
       const matchesStatus =
         statusFilter === "all" || paymentState === statusFilter;
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        receipt.merchantName.toLowerCase().includes(normalizedQuery) ||
-        receipt.locationName?.toLowerCase().includes(normalizedQuery);
+      const matchesQuery = receiptMatchesArchiveSearch(receipt, searchValue);
 
       return matchesStatus && matchesQuery;
     })
@@ -293,10 +270,10 @@ export function ReceiptArchivePage() {
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
               <div>
                 <h1 className="max-w-3xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl">
-                  Saved splits
+                  Your Dashboard
                 </h1>
                 <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
-                  Start a new receipt or edit an old one.
+                  Start a new split or edit an old one.
                 </p>
               </div>
 
@@ -304,20 +281,19 @@ export function ReceiptArchivePage() {
                 <CreateReceiptButton />
               </div>
             </div>
-
           </section>
 
           <div className="workspace-panel rounded-[1rem] px-5 py-6 sm:px-6">
             <div>
               <div>
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+                {/* <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
                   Receipts
-                </p>
+                </p> */}
                 <h2 className="mt-3 text-3xl leading-none text-[var(--foreground)]">
-                  Recent splits
+                  Saved Splits
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted-foreground)]">
-                  Search merchant or location, then sort by date, total, or
+                  Search visible split details, then sort by date, total, or
                   latest changes.
                 </p>
               </div>
@@ -329,7 +305,7 @@ export function ReceiptArchivePage() {
                 <Input
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
-                  placeholder="Search merchant or location"
+                  placeholder="Search split details"
                   className="h-12 rounded-[0.8rem] border-[var(--line)] bg-white pl-11 pr-4 text-sm shadow-none"
                 />
               </label>
@@ -364,11 +340,13 @@ export function ReceiptArchivePage() {
                       }
                       className="w-full cursor-pointer appearance-none bg-transparent pr-6 text-right text-sm font-medium text-[var(--foreground)] outline-none"
                     >
-                      {Object.entries(sortOptionLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
+                      {Object.entries(sortOptionLabels).map(
+                        ([value, label]) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ),
+                      )}
                     </select>
                     <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)]" />
                   </span>

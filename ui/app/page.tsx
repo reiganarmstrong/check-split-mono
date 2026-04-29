@@ -176,7 +176,7 @@ function HeroProof() {
   const items = [
     { icon: Zap, label: "Fast", detail: "Scan in seconds" },
     { icon: Users, label: "Easy", detail: "Simple groups" },
-    { icon: ShieldCheck, label: "Paid", detail: "Secure & private" },
+    { icon: ShieldCheck, label: "Paid", detail: "Without headache" },
   ];
 
   return (
@@ -579,11 +579,7 @@ function WorkflowBand({
   return <SectionReveal>{content}</SectionReveal>;
 }
 
-function WorkflowProgressRail({
-  progress,
-}: {
-  progress: number;
-}) {
+function WorkflowProgressRail({ progress }: { progress: number }) {
   return (
     <div
       aria-hidden="true"

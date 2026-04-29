@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, CircleUserRound, LogOut } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  CircleUserRound,
+  LogOut,
+} from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 
@@ -345,7 +350,7 @@ export function Navbar() {
                     aria-haspopup="menu"
                     aria-expanded={isAccountMenuOpen}
                     onClick={() => setIsAccountMenuOpen((isOpen) => !isOpen)}
-                    className="inline-flex h-10 max-w-[min(15rem,calc(100vw-2rem))] cursor-pointer items-center gap-2 rounded-[0.8rem] border border-[var(--line)] bg-white px-3 text-left text-sm font-medium text-[var(--foreground)] shadow-none transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                    className="inline-flex h-10 max-w-[min(15rem,calc(100vw-2rem))] cursor-pointer items-center gap-2 rounded-[0.8rem] border border-[var(--line)] bg-white px-3 text-left text-sm font-medium text-[var(--foreground)] shadow-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                   >
                     <CircleUserRound className="h-4 w-4 shrink-0 text-[var(--muted-foreground)]" />
                     <span className="hidden truncate sm:inline">Account</span>
@@ -387,7 +392,7 @@ export function Navbar() {
                         href="/account"
                         role="menuitem"
                         onClick={() => setIsAccountMenuOpen(false)}
-                        className="mb-1 inline-flex h-10 w-full items-center justify-start gap-2 rounded-[0.7rem] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface)]"
+                        className="mb-1 inline-flex h-10 w-full items-center justify-start gap-2 rounded-[0.7rem] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
                       >
                         <CircleUserRound className="h-4 w-4" />
                         Manage account

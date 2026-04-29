@@ -1,8 +1,10 @@
 import {
+  confirmResetPassword,
   confirmSignUp,
   deleteUser,
   getCurrentUser,
   resendSignUpCode,
+  resetPassword,
   signIn,
   signOut,
   signUp,
@@ -15,18 +17,22 @@ import {
 } from "@/lib/amplify-auth"
 import type {
   ChangePasswordFormValues,
+  ConfirmPasswordResetFormValues,
   ConfirmSignupFormValues,
   DeleteAccountFormValues,
   LoginFormValues,
+  RequestPasswordResetFormValues,
   SignupFormValues,
 } from "@/lib/auth-form-schemas"
 import { cognitoPasswordPolicyMessage } from "@/lib/password-policy"
 
 export type {
   ChangePasswordFormValues,
+  ConfirmPasswordResetFormValues,
   ConfirmSignupFormValues,
   DeleteAccountFormValues,
   LoginFormValues,
+  RequestPasswordResetFormValues,
   SignupFormValues,
 } from "@/lib/auth-form-schemas"
 
@@ -56,6 +62,11 @@ export type SignupResult =
       email: string
       message: string
     }
+
+export type PasswordResetRequestResult = {
+  email: string
+  message: string
+}
 
 function getErrorName(error: unknown) {
   if (
@@ -238,6 +249,61 @@ export async function resendSignupConfirmationCode(email: string): Promise<strin
     return `A new verification code was sent${formatCodeDestination(
       result.destination,
     )}.`
+  } catch (error) {
+    throw toAuthError(error)
+  }
+}
+
+export async function requestPasswordReset(
+  values: RequestPasswordResetFormValues,
+): Promise<PasswordResetRequestResult> {
+  configureAmplifyAuth()
+
+  try {
+    const result = await resetPassword({
+      username: values.email,
+    })
+
+    switch (result.nextStep.resetPasswordStep) {
+      case "CONFIRM_RESET_PASSWORD_WITH_CODE":
+        return {
+          email: values.email,
+          message: `We sent a reset code to your email${formatCodeDestination(
+            result.nextStep.codeDeliveryDetails.destination,
+          )}.`,
+        }
+      case "DONE":
+        return {
+          email: values.email,
+          message: "Password reset request completed.",
+        }
+      default:
+        throw new Error(
+          `This UI currently supports the standard Cognito password reset flow only. Cognito requested ${result.nextStep.resetPasswordStep}.`,
+        )
+    }
+  } catch (error) {
+    throw toAuthError(error)
+  }
+}
+
+export async function confirmPasswordResetWithCode(
+  values: ConfirmPasswordResetFormValues,
+): Promise<string> {
+  if (values.newPassword !== values.confirmPassword) {
+    throw new Error("Passwords must match.")
+  }
+
+  configureAmplifyAuth()
+
+  try {
+    await confirmResetPassword({
+      username: values.email,
+      confirmationCode: values.code,
+      newPassword: values.newPassword,
+    })
+
+    return "Password reset. Log in with your new password."
   } catch (error) {
     throw toAuthError(error)
   }

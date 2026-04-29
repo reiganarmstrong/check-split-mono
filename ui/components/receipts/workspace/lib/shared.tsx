@@ -13,12 +13,16 @@ export function SectionShell({
   eyebrow,
   icon: Icon,
   tone = "default",
+  className,
+  contentClassName,
 }: {
   children: ReactNode;
   title: string;
   eyebrow: string;
   icon?: LucideIcon;
   tone?: "default" | "primary" | "secondary" | "accent";
+  className?: string;
+  contentClassName?: string;
 }) {
   const iconCircleClassName =
     tone === "primary"
@@ -30,7 +34,12 @@ export function SectionShell({
           : "border-[var(--line)] bg-[var(--surface)]";
 
   return (
-    <section className="workspace-panel rounded-[1rem] px-5 py-5 sm:px-6 sm:py-6">
+    <section
+      className={cn(
+        "workspace-panel rounded-[1rem] px-5 py-5 sm:px-6 sm:py-6",
+        className,
+      )}
+    >
       <div className="flex items-start gap-3">
         {Icon ? (
           <div className={cn("rounded-[0.8rem] border p-3", iconCircleClassName)}>
@@ -46,7 +55,9 @@ export function SectionShell({
           </h2>
         </div>
       </div>
-      <div className="workspace-line mt-5 pt-5">{children}</div>
+      <div className={cn("workspace-line mt-5 pt-5", contentClassName)}>
+        {children}
+      </div>
     </section>
   );
 }

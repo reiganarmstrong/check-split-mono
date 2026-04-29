@@ -117,7 +117,7 @@ export default function AccountPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.35 }}
-            className="workspace-panel mt-8 rounded-[1rem] px-5 py-5 sm:px-6"
+            className="mt-8 border-t border-[var(--line)] pt-6"
           >
             <div>
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
@@ -130,7 +130,7 @@ export default function AccountPage() {
           </motion.div>
         </section>
 
-        <section className="grid gap-8 py-8 sm:py-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-10">
+        <section className="workspace-panel mt-8 grid gap-8 rounded-[1rem] px-5 py-6 sm:px-6 lg:grid-cols-[0.7fr_1.3fr] lg:gap-10">
           <motion.div
             initial={{ opacity: 0, x: -18 }}
             animate={{ opacity: 1, x: 0 }}
@@ -160,7 +160,7 @@ export default function AccountPage() {
             initial={{ opacity: 0, x: 18 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.18, duration: 0.35 }}
-            className="workspace-panel rounded-[1rem] px-5 py-6 sm:px-6"
+            className="border-t border-[var(--line)] pt-8 lg:border-t-0 lg:border-l lg:pl-10 lg:pt-0"
           >
             <form
               className="space-y-6"
@@ -303,7 +303,7 @@ export default function AccountPage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22, duration: 0.35 }}
-          className="border-t border-[var(--line)] py-8 sm:py-10"
+          className="workspace-panel mt-8 rounded-[1rem] px-5 py-6 sm:px-6"
         >
           <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:gap-10">
             <div>
@@ -327,7 +327,7 @@ export default function AccountPage() {
               </div>
             </div>
 
-            <div className="workspace-panel rounded-[1rem] px-5 py-6 sm:px-6">
+            <div className="border-t border-[var(--line)] pt-8 lg:border-t-0 lg:border-l lg:pl-10 lg:pt-0">
               <form
                 className="space-y-6"
                 onSubmit={(event) => {
