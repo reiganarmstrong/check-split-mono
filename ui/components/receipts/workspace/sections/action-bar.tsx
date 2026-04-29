@@ -83,7 +83,6 @@ export function ReceiptActionBar({
       <div
         style={{
           transform: `translate3d(0, -${footerOffset}px, 0)`,
-          transition: "transform 140ms ease-out",
           willChange: "transform",
         }}
       >
