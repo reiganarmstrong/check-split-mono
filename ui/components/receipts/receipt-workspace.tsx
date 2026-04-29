@@ -16,6 +16,7 @@ import { GroupListSection } from "./workspace/sections/group-list-section";
 import { ItemListSection } from "./workspace/sections/item-list-section";
 import { PaymentStatusSection } from "./workspace/sections/payment-status-section";
 import { ReceiptDetailsSection } from "./workspace/sections/receipt-details-section";
+import { ReceiptParseProgress } from "./workspace/sections/receipt-parse-progress";
 import { ReceiptUploadGate } from "./workspace/sections/receipt-upload-gate";
 import { SummaryAside } from "./workspace/sections/summary-aside";
 import { WorkspaceHeader } from "./workspace/sections/workspace-header";
@@ -134,7 +135,17 @@ export function ReceiptWorkspace({
                 </div>
               ) : null}
 
-              {workspace.shouldShowUploadGate ? (
+              {workspace.shouldShowUploadGate && workspace.isParsingReceipt ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05, duration: 0.3 }}
+                >
+                  <ReceiptParseProgress
+                    fileName={workspace.parsingReceiptFileName}
+                  />
+                </motion.div>
+              ) : workspace.shouldShowUploadGate ? (
                 <motion.div
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}

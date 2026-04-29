@@ -111,6 +111,16 @@
     }
   }
 
+  @keyframes receiptScanLine {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, 250px, 0);
+    }
+  }
+
   @keyframes backdropFloat {
     0%,
     100% {
@@ -307,6 +317,11 @@
 
   .loading-sweep {
     animation: loadingSweep 1.4s linear infinite;
+  }
+
+  .receipt-scan-line {
+    animation: receiptScanLine 4.8s ease-in-out infinite;
+    will-change: transform;
   }
 
   .required-highlight-fill {

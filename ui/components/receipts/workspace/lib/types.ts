@@ -48,6 +48,7 @@ export type ReceiptWorkspaceController = {
   isDeleteConfirming: boolean;
   isSharingSummary: boolean;
   isParsingReceipt: boolean;
+  parsingReceiptFileName: string | null;
   saveMessage: string | null;
   shareMessage: string | null;
   parseMessage: string | null;

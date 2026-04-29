@@ -52,7 +52,7 @@ export function ReceiptUploadGate({
       eyebrow="Getting started"
       // icon={ScanSearch}
       tone="primary"
-      className="mx-auto flex aspect-square w-full max-w-[30rem] max-h-[22rem] flex-col"
+      className="mx-auto flex aspect-square w-full max-w-120 flex-col sm:max-h-90"
       contentClassName="flex flex-1"
     >
       <div className="flex flex-1 flex-col justify-between gap-8">
@@ -93,7 +93,7 @@ export function ReceiptUploadGate({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif"
         className="sr-only"
         onChange={(event) => void handleInputChange(event)}
       />

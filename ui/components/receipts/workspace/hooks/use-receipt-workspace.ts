@@ -97,6 +97,7 @@ export function useReceiptWorkspace({
     isDeleteConfirming: actions.isDeleteConfirming,
     isSharingSummary: actions.isSharingSummary,
     isParsingReceipt: actions.isParsingReceipt,
+    parsingReceiptFileName: actions.parsingReceiptFileName,
     saveMessage: data.saveMessage,
     shareMessage: data.shareMessage,
     parseMessage: data.parseMessage,

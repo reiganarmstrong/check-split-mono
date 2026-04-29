@@ -20,6 +20,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      heic-to:
+        specifier: ^1.4.2
+        version: 1.4.2
       lucide-react:
         specifier: ^0.577.0
         version: 0.577.0(react@19.2.3)
@@ -3099,6 +3102,9 @@ packages:
 
   headers-polyfill@4.0.3:
     resolution: {integrity: sha512-IScLbePpkvO846sIwOtOTDjutRMWdXdJmXdMvk6gCBHxFO8d+QKOQedyZSxFTTFYRSmlgSTDtXqqq4pcenBXLQ==}
+
+  heic-to@1.4.2:
+    resolution: {integrity: sha512-y69thwxfNcEm2Vk8lbOD/cMabnvMJyOREfJYiCHcXCDqlfcPyJoBhyRc8+iDe1B95LRfpbTOpzxzY1xbRkdwBA==}
 
   hermes-estree@0.25.1:
     resolution: {integrity: sha512-0wUoCcLp+5Ev5pDW2OriHC2MJCbwLwuRx+gAqMTOkGKJJiBCLjtrvy4PWUGn6MIVefecRpzoOZ/UV6iGdOr+Cw==}
@@ -8311,6 +8317,8 @@ snapshots:
       function-bind: 1.1.2
 
   headers-polyfill@4.0.3: {}
+
+  heic-to@1.4.2: {}
 
   hermes-estree@0.25.1: {}
 
