@@ -16,6 +16,7 @@ import { GroupListSection } from "./workspace/sections/group-list-section";
 import { ItemListSection } from "./workspace/sections/item-list-section";
 import { PaymentStatusSection } from "./workspace/sections/payment-status-section";
 import { ReceiptDetailsSection } from "./workspace/sections/receipt-details-section";
+import { ReceiptParseProgress } from "./workspace/sections/receipt-parse-progress";
 import { ReceiptUploadGate } from "./workspace/sections/receipt-upload-gate";
 import { SummaryAside } from "./workspace/sections/summary-aside";
 import { WorkspaceHeader } from "./workspace/sections/workspace-header";
@@ -43,11 +44,11 @@ export function ReceiptWorkspace({
   if (workspace.isMissing) {
     return (
       <main className="flex flex-1 items-center justify-center px-4 pb-20 pt-8 sm:px-6 lg:px-8">
-        <div className="auth-shell w-full max-w-xl rounded-[2rem] px-8 py-12 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[1.2rem] border border-[var(--line)] bg-[var(--surface)]">
+        <div className="auth-shell w-full max-w-xl rounded-[1rem] px-8 py-12 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[0.9rem] border border-[var(--line)] bg-[var(--surface)]">
             <AlertCircle className="h-8 w-8 text-[var(--foreground)]" />
           </div>
-          <h1 className="mt-6 text-4xl leading-none text-[var(--foreground)]">
+          <h1 className="mt-6 text-4xl leading-[0.95] text-[var(--foreground)]">
             Receipt not found
           </h1>
           <p className="mt-4 text-base leading-7 text-[var(--muted-foreground)]">
@@ -56,7 +57,7 @@ export function ReceiptWorkspace({
           </p>
           <Button
             asChild
-            className="mt-8 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+            className="mt-8 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90"
           >
             <Link href="/dashboard">Back to saved splits</Link>
           </Button>
@@ -67,25 +68,31 @@ export function ReceiptWorkspace({
 
   return (
     <main
-      className="flex-1 pt-4"
-      style={{ paddingBottom: Math.max(128, workspace.actionBarHeight + 24) }}
+      className={cn(
+        "flex-1",
+        workspace.shouldShowUploadGate
+          ? "flex items-center px-4 py-10 sm:px-6 lg:px-8"
+          : "pt-4",
+      )}
     >
       <section
         className={cn(
-          "page-shell pb-12",
-          workspace.shouldShowUploadGate &&
-            "flex min-h-[calc(100svh-10rem)] items-center",
+          "page-shell",
+          !workspace.shouldShowUploadGate && "pb-12",
         )}
       >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className={cn("w-full", workspace.shouldShowUploadGate && "mx-auto max-w-5xl")}
+          className={cn(
+            "w-full",
+            workspace.shouldShowUploadGate && "mx-auto my-8 max-w-5xl",
+          )}
         >
           <div
             className={cn(
-              "mt-8",
+              !workspace.shouldShowUploadGate && "mt-8",
               workspace.shouldShowUploadGate
                 ? "mx-auto max-w-5xl"
                 : "grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]",
@@ -118,7 +125,7 @@ export function ReceiptWorkspace({
               ) : null}
 
               {workspace.parseIssues.length > 0 ? (
-                <div className="workspace-panel rounded-[1.6rem] px-5 py-5 sm:px-6">
+                <div className="workspace-panel rounded-[1rem] px-5 py-5 sm:px-6">
                   <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
                     Parse notes
                   </p>
@@ -134,7 +141,17 @@ export function ReceiptWorkspace({
                 </div>
               ) : null}
 
-              {workspace.shouldShowUploadGate ? (
+              {workspace.shouldShowUploadGate && workspace.isParsingReceipt ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05, duration: 0.3 }}
+                >
+                  <ReceiptParseProgress
+                    fileName={workspace.parsingReceiptFileName}
+                  />
+                </motion.div>
+              ) : workspace.shouldShowUploadGate ? (
                 <motion.div
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -235,7 +252,6 @@ export function ReceiptWorkspace({
                 handleShareSummary={workspace.handleShareSummary}
                 scrollToFullSummary={workspace.scrollToFullSummary}
                 actionBarHeight={workspace.actionBarHeight}
-                footerOffset={workspace.footerOffset}
               />
             )}
           </div>
@@ -246,7 +262,6 @@ export function ReceiptWorkspace({
         <ReceiptActionBar
           actionBarRef={workspace.actionBarRef}
           actionBarActionsRef={workspace.actionBarActionsRef}
-          footerOffset={workspace.footerOffset}
           isCompactActionBar={workspace.isCompactActionBar}
           isMinimizedMobileActionBar={workspace.isMinimizedMobileActionBar}
           isMobileViewport={workspace.isMobileViewport}

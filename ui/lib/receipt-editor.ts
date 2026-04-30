@@ -22,6 +22,14 @@ const optionalMoneyInputSchema = z
     "Enter a valid amount with up to 2 decimals.",
   )
 
+const optionalPercentageInputSchema = z
+  .string()
+  .trim()
+  .refine(
+    (value) => value === "" || /^\d+(\.\d{0,2})?$/.test(value),
+    "Enter a valid percentage with up to 2 decimals.",
+  )
+
 const quantityInputSchema = z
   .string()
   .trim()
@@ -50,6 +58,8 @@ const receiptEditorSchema = z.object({
   receiptOccurredAt: z.string().trim().min(1, "Receipt date is required."),
   tax: optionalMoneyInputSchema,
   tip: optionalMoneyInputSchema,
+  tipInputMode: z.enum(["amount", "percent"]),
+  tipPercentage: optionalPercentageInputSchema,
 })
 
 export type ReceiptEditorValidation = {
@@ -152,6 +162,8 @@ export function createEmptyReceiptEditorState(): ReceiptEditorState {
     receiptOccurredAt: normalizeDateTimeInput(new Date().toISOString()),
     tax: "0.00",
     tip: "0.00",
+    tipInputMode: "amount",
+    tipPercentage: "20",
     version: null,
   }
 }
@@ -172,6 +184,17 @@ export function parseQuantityInput(value: string) {
 
   if (!Number.isFinite(numericValue) || numericValue < 1) {
     return 1
+  }
+
+  return numericValue
+}
+
+export function parsePercentageInput(value: string) {
+  const normalized = value.trim()
+  const numericValue = normalized === "" ? 0 : Number.parseFloat(normalized)
+
+  if (!Number.isFinite(numericValue)) {
+    return 0
   }
 
   return numericValue
@@ -224,11 +247,21 @@ export function getReceiptSubtotalCents(state: ReceiptEditorState) {
   return state.items.reduce((sum, item) => sum + getItemLineSubtotalCents(item), 0)
 }
 
+export function getReceiptTipCents(state: ReceiptEditorState) {
+  if (state.tipInputMode !== "percent") {
+    return parseMoneyInputToCents(state.tip)
+  }
+
+  return Math.round(
+    getReceiptSubtotalCents(state) * (parsePercentageInput(state.tipPercentage) / 100),
+  )
+}
+
 export function getReceiptTotalCents(state: ReceiptEditorState) {
   return (
     getReceiptSubtotalCents(state) +
     parseMoneyInputToCents(state.tax) +
-    parseMoneyInputToCents(state.tip) +
+    getReceiptTipCents(state) +
     parseMoneyInputToCents(state.fee) -
     parseMoneyInputToCents(state.discount)
   )
@@ -369,7 +402,7 @@ export function getGroupShareSummaries(
     fallbackRecipientIds,
   )
   const tipShares = distributeCentsByWeight(
-    parseMoneyInputToCents(state.tip),
+    getReceiptTipCents(state),
     weightedGroups,
     fallbackRecipientIds,
   )
@@ -453,7 +486,9 @@ export function getReceiptEditorValidation(
     merchantName: state.merchantName,
     receiptOccurredAt: state.receiptOccurredAt,
     tax: normalizeMoneyInput(state.tax),
-    tip: normalizeMoneyInput(state.tip),
+    tip: state.tipInputMode === "amount" ? normalizeMoneyInput(state.tip) : "0",
+    tipInputMode: state.tipInputMode,
+    tipPercentage: state.tipInputMode === "percent" ? state.tipPercentage : "0",
   })
 
   if (result.success) {
@@ -529,6 +564,8 @@ export function mapReceiptToEditorState(receipt: Receipt): ReceiptEditorState {
     receiptOccurredAt: normalizeDateTimeInput(receipt.receiptOccurredAt),
     tax: centsToInputValue(receipt.taxCents),
     tip: centsToInputValue(receipt.tipCents),
+    tipInputMode: "amount",
+    tipPercentage: "20",
     version: receipt.version,
   }
 }
@@ -573,7 +610,7 @@ export function buildReceiptSavePlan(
     (receipt.locationAddress ?? "") !== state.locationAddress.trim() ||
     receipt.currencyCode !== state.currencyCode.trim().toUpperCase() ||
     receipt.taxCents !== parseMoneyInputToCents(state.tax) ||
-    receipt.tipCents !== parseMoneyInputToCents(state.tip) ||
+    receipt.tipCents !== getReceiptTipCents(state) ||
     receipt.feeCents !== parseMoneyInputToCents(state.fee) ||
     receipt.discountCents !== parseMoneyInputToCents(state.discount) ||
     receipt.subtotalCents !== getReceiptSubtotalCents(state) ||

@@ -2,6 +2,8 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
+const INITIAL_ACTION_BAR_ACTIONS_HEIGHT = 480;
+
 export function useReceiptWorkspaceLayout({
   isDeleteConfirming,
   isSharingSummary,
@@ -17,91 +19,20 @@ export function useReceiptWorkspaceLayout({
   const actionBarRef = useRef<HTMLDivElement | null>(null);
   const actionBarActionsRef = useRef<HTMLDivElement | null>(null);
   const actionBarScrollYRef = useRef(0);
-  const footerElementRef = useRef<HTMLElement | null>(null);
-  const [footerOffset, setFooterOffset] = useState(0);
   const [actionBarHeight, setActionBarHeight] = useState(128);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [isMobileActionBarCompact, setIsMobileActionBarCompact] =
     useState(false);
   const [isMobileActionBarMinimized, setIsMobileActionBarMinimized] =
     useState(false);
-  const [actionBarActionsHeight, setActionBarActionsHeight] = useState(0);
+  const [actionBarActionsHeight, setActionBarActionsHeight] = useState(
+    INITIAL_ACTION_BAR_ACTIONS_HEIGHT,
+  );
 
-  useEffect(() => {
-    let footerIntersectionObserver: IntersectionObserver | null = null;
-    let footerResizeObserver: ResizeObserver | null = null;
-
-    function resolveFooterElement() {
-      const cachedFooter = footerElementRef.current;
-      const footer =
-        cachedFooter && cachedFooter.isConnected
-          ? cachedFooter
-          : document.querySelector("footer");
-
-      footerElementRef.current = footer;
-
-      return footer;
-    }
-
-    function updateFooterOffset(nextOffset: number) {
-      const normalizedOffset =
-        nextOffset <= 2 ? 0 : Math.round(nextOffset / 6) * 6;
-
-      setFooterOffset((currentOffset) =>
-        currentOffset === normalizedOffset ? currentOffset : normalizedOffset,
-      );
-    }
-
-    function measureFooterOffset() {
-      const footer = resolveFooterElement();
-
-      if (!footer) {
-        updateFooterOffset(0);
-        return;
-      }
-
-      const footerRect = footer.getBoundingClientRect();
-      updateFooterOffset(Math.max(0, window.innerHeight - footerRect.top));
-    }
-
-    const footer = resolveFooterElement();
-
-    if (!footer) {
-      updateFooterOffset(0);
-      return;
-    }
-
-    const thresholds = Array.from({ length: 21 }, (_, index) => index / 20);
-
-    footerIntersectionObserver = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-
-        if (!entry) {
-          return;
-        }
-
-        updateFooterOffset(
-          entry.isIntersecting ? entry.intersectionRect.height : 0,
-        );
-      },
-      {
-        threshold: thresholds,
-      },
-    );
-    footerIntersectionObserver.observe(footer);
-
-    footerResizeObserver = new ResizeObserver(measureFooterOffset);
-    footerResizeObserver.observe(footer);
-    window.addEventListener("resize", measureFooterOffset);
-    measureFooterOffset();
-
-    return () => {
-      footerIntersectionObserver?.disconnect();
-      footerResizeObserver?.disconnect();
-      window.removeEventListener("resize", measureFooterOffset);
-    };
-  }, []);
+  const isCompactActionBar =
+    (isMobileViewport || isMobileActionBarCompact) && !isDeleteConfirming;
+  const isMinimizedMobileActionBar =
+    isMobileViewport && isCompactActionBar && isMobileActionBarMinimized;
 
   useEffect(() => {
     const actionBarElement = actionBarRef.current;
@@ -113,7 +44,17 @@ export function useReceiptWorkspaceLayout({
     const measuredActionBarElement = actionBarElement;
 
     function updateActionBarHeight() {
-      setActionBarHeight(measuredActionBarElement.getBoundingClientRect().height);
+      const measuredHeight = Math.ceil(
+        measuredActionBarElement.getBoundingClientRect().height,
+      );
+
+      setActionBarHeight((currentHeight) => {
+        if (isMobileViewport && measuredHeight < currentHeight) {
+          return currentHeight;
+        }
+
+        return currentHeight === measuredHeight ? currentHeight : measuredHeight;
+      });
     }
 
     updateActionBarHeight();
@@ -124,7 +65,7 @@ export function useReceiptWorkspaceLayout({
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [isMobileViewport]);
 
   useLayoutEffect(() => {
     const actionBarActionsElement = actionBarActionsRef.current;
@@ -156,7 +97,7 @@ export function useReceiptWorkspaceLayout({
     sourceReceiptId,
   ]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     function updateCompactState() {
       const nextIsMobileViewport = window.innerWidth < 768;
       const currentScrollY = window.scrollY;
@@ -189,11 +130,6 @@ export function useReceiptWorkspaceLayout({
     };
   }, []);
 
-  const isCompactActionBar =
-    (isMobileViewport || isMobileActionBarCompact) && !isDeleteConfirming;
-  const isMinimizedMobileActionBar =
-    isMobileViewport && isCompactActionBar && isMobileActionBarMinimized;
-
   function toggleMobileActionBarMinimized() {
     if (isMobileActionBarMinimized) {
       const measuredHeight = actionBarActionsRef.current?.scrollHeight ?? 0;
@@ -224,7 +160,6 @@ export function useReceiptWorkspaceLayout({
     summaryRef,
     actionBarRef,
     actionBarActionsRef,
-    footerOffset,
     actionBarHeight,
     actionBarActionsHeight,
     isMobileViewport,

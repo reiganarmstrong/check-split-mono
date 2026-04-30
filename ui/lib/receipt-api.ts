@@ -13,6 +13,7 @@ import {
   getItemLineSubtotalCents,
   getReceiptEditorValidation,
   getReceiptSubtotalCents,
+  getReceiptTipCents,
   getReceiptTotalCents,
   parseMoneyInputToCents,
   parseQuantityInput,
@@ -279,7 +280,7 @@ function buildMetadataInput(state: ReceiptEditorState, receiptId: string, versio
     receiptOccurredAt: toAwsDateTime(state.receiptOccurredAt),
     subtotalCents: getReceiptSubtotalCents(state),
     taxCents: parseMoneyInputToCents(state.tax),
-    tipCents: parseMoneyInputToCents(state.tip),
+    tipCents: getReceiptTipCents(state),
     totalCents: getReceiptTotalCents(state),
   }
 }
@@ -982,7 +983,7 @@ export async function saveReceiptEditorState(
       receiptOccurredAt: toAwsDateTime(state.receiptOccurredAt),
       subtotalCents: getReceiptSubtotalCents(state),
       taxCents: parseMoneyInputToCents(state.tax),
-      tipCents: parseMoneyInputToCents(state.tip),
+      tipCents: getReceiptTipCents(state),
       totalCents: getReceiptTotalCents(state),
     })
 

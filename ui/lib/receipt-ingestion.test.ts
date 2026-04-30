@@ -83,9 +83,12 @@ describe("prepareReceiptUploadWithCodec", () => {
     expect(codec.decode).not.toHaveBeenCalled()
   })
 
-  it("transcodes an unsupported image format into a JPEG upload", async () => {
+  it("transcodes a HEIC image into a JPEG upload", async () => {
     const file = new File([new Uint8Array(MAX_UPLOAD_BYTES + 32)], "receipt.heic", {
       type: "image/heic",
+    })
+    const convertedJpeg = new Blob([new Uint8Array(MAX_UPLOAD_BYTES + 16)], {
+      type: "image/jpeg",
     })
     const codec = {
       decode: vi.fn().mockResolvedValue({
@@ -95,6 +98,7 @@ describe("prepareReceiptUploadWithCodec", () => {
       encode: vi.fn().mockResolvedValue(
         new Blob([new Uint8Array(512_000)], { type: "image/jpeg" }),
       ),
+      transcodeHeicToJpeg: vi.fn().mockResolvedValue(convertedJpeg),
     }
 
     const result = await prepareReceiptUploadWithCodec(file, codec)
@@ -102,8 +106,64 @@ describe("prepareReceiptUploadWithCodec", () => {
     expect(result.mimeType).toBe("image/jpeg")
     expect(result.file.type).toBe("image/jpeg")
     expect(result.file.name).toBe("receipt.jpg")
+    expect(codec.transcodeHeicToJpeg).toHaveBeenCalledWith(file)
     expect(codec.decode).toHaveBeenCalledOnce()
+    expect(codec.decode).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "receipt.jpg",
+        type: "image/jpeg",
+      }),
+    )
     expect(codec.encode).toHaveBeenCalled()
+  })
+
+  it("recognizes HEIC files by extension when the browser omits the MIME type", async () => {
+    const file = new File([new Uint8Array(512)], "receipt.heic", {
+      type: "",
+    })
+    const codec = {
+      decode: vi.fn().mockResolvedValue({
+        height: 1200,
+        width: 900,
+      }),
+      encode: vi.fn().mockResolvedValue(
+        new Blob([new Uint8Array(256_000)], { type: "image/jpeg" }),
+      ),
+      transcodeHeicToJpeg: vi.fn().mockResolvedValue(
+        new Blob([new Uint8Array(MAX_UPLOAD_BYTES + 16)], {
+          type: "image/jpeg",
+        }),
+      ),
+    }
+
+    const result = await prepareReceiptUploadWithCodec(file, codec)
+
+    expect(result.mimeType).toBe("image/jpeg")
+    expect(result.file.name).toBe("receipt.jpg")
+    expect(codec.transcodeHeicToJpeg).toHaveBeenCalledWith(file)
+    expect(codec.decode).toHaveBeenCalledOnce()
+  })
+
+  it("keeps a converted HEIC JPEG when it is already under the limit", async () => {
+    const file = new File([new Uint8Array(MAX_UPLOAD_BYTES + 32)], "receipt.heic", {
+      type: "image/heic",
+    })
+    const convertedJpeg = new Blob([new Uint8Array(512_000)], {
+      type: "image/jpeg",
+    })
+    const codec = {
+      decode: vi.fn(),
+      encode: vi.fn(),
+      transcodeHeicToJpeg: vi.fn().mockResolvedValue(convertedJpeg),
+    }
+
+    const result = await prepareReceiptUploadWithCodec(file, codec)
+
+    expect(result.mimeType).toBe("image/jpeg")
+    expect(result.file.name).toBe("receipt.jpg")
+    expect(result.file.size).toBe(512_000)
+    expect(codec.decode).not.toHaveBeenCalled()
+    expect(codec.encode).not.toHaveBeenCalled()
   })
 
   it("fails when an image cannot be compressed below the API limit", async () => {
@@ -125,9 +185,44 @@ describe("prepareReceiptUploadWithCodec", () => {
     })
   })
 
-  it("rejects files the browser codec cannot decode", async () => {
+  it("rejects unsupported file types before decoding them", async () => {
     const file = new File([new Uint8Array(256)], "receipt.txt", {
       type: "text/plain",
+    })
+    const codec = {
+      decode: vi.fn(),
+      encode: vi.fn(),
+    }
+
+    await expect(prepareReceiptUploadWithCodec(file, codec)).rejects.toMatchObject({
+      code: "unsupported-type",
+      message:
+        "This file type is not accepted. Accepted receipt image types: JPEG, PNG, or HEIC.",
+    })
+    expect(codec.decode).not.toHaveBeenCalled()
+  })
+
+  it("rejects HEIC files the converter cannot decode", async () => {
+    const file = new File([new Uint8Array(256)], "receipt.heic", {
+      type: "image/heic",
+    })
+    const codec = {
+      decode: vi.fn(),
+      encode: vi.fn(),
+      transcodeHeicToJpeg: vi.fn().mockRejectedValue(new Error("decode failed")),
+    }
+
+    await expect(prepareReceiptUploadWithCodec(file, codec)).rejects.toMatchObject({
+      code: "unsupported-type",
+      message:
+        "This HEIC image could not be opened in this browser. Accepted receipt image types: JPEG, PNG, or HEIC.",
+    })
+    expect(codec.decode).not.toHaveBeenCalled()
+  })
+
+  it("rejects accepted files the browser codec cannot decode", async () => {
+    const file = new File([new Uint8Array(MAX_UPLOAD_BYTES + 16)], "receipt.jpg", {
+      type: "image/jpeg",
     })
     const codec = {
       decode: vi.fn().mockRejectedValue(new Error("decode failed")),
@@ -136,6 +231,8 @@ describe("prepareReceiptUploadWithCodec", () => {
 
     await expect(prepareReceiptUploadWithCodec(file, codec)).rejects.toMatchObject({
       code: "unsupported-type",
+      message:
+        "This receipt image could not be opened in this browser. Accepted receipt image types: JPEG, PNG, or HEIC.",
     })
   })
 })

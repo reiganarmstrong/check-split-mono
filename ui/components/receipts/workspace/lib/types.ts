@@ -48,12 +48,12 @@ export type ReceiptWorkspaceController = {
   isDeleteConfirming: boolean;
   isSharingSummary: boolean;
   isParsingReceipt: boolean;
+  parsingReceiptFileName: string | null;
   saveMessage: string | null;
   shareMessage: string | null;
   parseMessage: string | null;
   parseIssues: string[];
   warningMessage: string | null;
-  footerOffset: number;
   actionBarHeight: number;
   actionBarActionsHeight: number;
   isMobileViewport: boolean;

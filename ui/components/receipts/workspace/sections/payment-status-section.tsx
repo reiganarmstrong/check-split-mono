@@ -33,7 +33,7 @@ export function PaymentStatusSection({
       <div className="space-y-4">
         <div
           className={cn(
-            "flex flex-wrap items-center justify-between gap-3 rounded-[1.2rem] border px-4 py-3",
+            "flex flex-wrap items-center justify-between gap-3 rounded-[0.85rem] border px-4 py-3",
             "border-[var(--line)] bg-white",
           )}
         >
@@ -47,7 +47,7 @@ export function PaymentStatusSection({
           </div>
           <span
             className={cn(
-              "rounded-full border px-3 py-1.5 text-sm font-medium",
+              "rounded-[0.75rem] border px-3 py-1.5 text-sm font-medium",
               allGroupsPaid
                 ? "border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_24%,white)] text-[var(--foreground)]"
                 : "border-[color-mix(in_oklab,var(--unpaid)_36%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_78%,white)] text-[var(--unpaid-foreground)]",
@@ -65,7 +65,7 @@ export function PaymentStatusSection({
               <div
                 key={group.id}
                 className={cn(
-                  "flex flex-col gap-4 rounded-[1.25rem] border px-4 py-4 sm:flex-row sm:items-center sm:justify-between",
+                  "flex flex-col gap-4 rounded-[0.9rem] border px-4 py-4 sm:flex-row sm:items-center sm:justify-between",
                   group.isPaid
                     ? "border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_10%,white)]"
                     : "border-[color-mix(in_oklab,var(--unpaid)_36%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_60%,white)]",
@@ -89,7 +89,7 @@ export function PaymentStatusSection({
                   size="sm"
                   aria-label={group.isPaid ? "Mark group unpaid" : "Mark group paid"}
                   className={cn(
-                    "h-10 rounded-full border px-4 text-sm font-medium",
+                    "h-10 rounded-[0.8rem] border px-4 text-sm font-medium",
                     group.isPaid
                       ? "border-[color-mix(in_oklab,var(--accent)_40%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent-foreground)] hover:border-[color-mix(in_oklab,var(--unpaid)_36%,var(--line))] hover:bg-[color-mix(in_oklab,var(--unpaid-soft)_72%,white)] hover:text-[var(--unpaid-foreground)]"
                       : "border-[color-mix(in_oklab,var(--unpaid)_42%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_78%,white)] text-[var(--unpaid-foreground)] hover:border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] hover:bg-[color-mix(in_oklab,var(--accent)_18%,white)] hover:text-[var(--accent-foreground)]",

@@ -1,0 +1,14 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <title>CheckSplit light favicon</title>
+  <rect x="3.5" y="3.5" width="57" height="57" rx="13.5" fill="#FFFDF8" stroke="#ECE9E2" />
+  <g fill="none" stroke="#252625" stroke-linecap="round" stroke-linejoin="round">
+    <path
+      d="M45 17H20.75A5.25 5.25 0 0 0 15.5 22.25V46.75L19.75 50.5 23.75 46.5 27.75 50.5 31.75 46.5 35.75 50.5 40 46.75V22.5A5.5 5.5 0 0 1 45.5 17"
+      stroke-width="3.4"
+    />
+    <path d="M45.5 17A5.5 5.5 0 0 1 51 22.5V28.25H40" stroke-width="3.4" />
+    <path d="M21 26H32" stroke-width="3.4" />
+    <path d="M21 31.5H33.5" stroke-width="3.4" />
+    <path d="M21 37H30" stroke-width="3.4" />
+  </g>
+</svg>

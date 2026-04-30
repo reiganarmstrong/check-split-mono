@@ -7,8 +7,20 @@ export const metadata: Metadata = {
   title: "CheckSplit",
   description: "Snap your receipt, let AI extract the items, and easily assign who pays.",
   icons: {
-    icon: [{ url: "/favicon.svg?v=app-palette-v6", type: "image/svg+xml" }],
-    shortcut: ["/favicon.svg?v=app-palette-v6"],
+    icon: [
+      {
+        url: "/favicon-dark.svg?v=receipt-duo-v4",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/favicon-light.svg?v=receipt-duo-v4",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: dark)",
+      },
+      { url: "/favicon.svg?v=receipt-duo-v4", type: "image/svg+xml" },
+    ],
+    shortcut: ["/favicon.svg?v=receipt-duo-v4"],
   },
 };
 
@@ -27,7 +39,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <div className="site-shell flex min-h-screen flex-col">
-            <Suspense fallback={null}>
+            <Suspense fallback={<div className="h-[81px] shrink-0" />}>
               <Navbar />
             </Suspense>
             <div className="site-main">{children}</div>

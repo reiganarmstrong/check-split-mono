@@ -17,6 +17,11 @@ import type { ReceiptEditorState } from "./receipt-types"
 
 const RECEIPT_PARSE_MAX_UPLOAD_BYTES = 4_194_304
 const RECEIPT_PARSE_SUPPORTED_MIME_TYPES = ["image/jpeg", "image/png"] as const
+const RECEIPT_UPLOAD_ACCEPTED_FILE_TYPES = "JPEG, PNG, or HEIC"
+const RECEIPT_PARSE_SUPPORTED_HEIC_MIME_TYPES = [
+  "image/heic",
+  "image/heif",
+] as const
 
 type ReceiptParseSupportedMimeType =
   (typeof RECEIPT_PARSE_SUPPORTED_MIME_TYPES)[number]
@@ -34,6 +39,7 @@ type ReceiptImageCodec<
       width: number
     },
   ) => Promise<Blob | null>
+  transcodeHeicToJpeg?: (file: File) => Promise<Blob>
 }
 
 type PreparedReceiptUpload = {
@@ -168,6 +174,55 @@ function isSupportedReceiptMimeType(
   ).includes(mimeType)
 }
 
+function isHeicReceiptFile(file: File) {
+  const normalizedMimeType = file.type.toLowerCase()
+  const normalizedName = file.name.toLowerCase()
+
+  return (
+    (RECEIPT_PARSE_SUPPORTED_HEIC_MIME_TYPES as readonly string[]).includes(
+      normalizedMimeType,
+    ) ||
+    normalizedName.endsWith(".heic") ||
+    normalizedName.endsWith(".heif")
+  )
+}
+
+function isAcceptedReceiptUploadFile(file: File) {
+  return isSupportedReceiptMimeType(file.type) || isHeicReceiptFile(file)
+}
+
+function createUnsupportedReceiptFileError() {
+  return new ReceiptIngestionError(
+    `This file type is not accepted. Accepted receipt image types: ${RECEIPT_UPLOAD_ACCEPTED_FILE_TYPES}.`,
+    "unsupported-type",
+  )
+}
+
+function createUnreadableReceiptImageError(file: File) {
+  return new ReceiptIngestionError(
+    `This ${isHeicReceiptFile(file) ? "HEIC" : "receipt"} image could not be opened in this browser. Accepted receipt image types: ${RECEIPT_UPLOAD_ACCEPTED_FILE_TYPES}.`,
+    "unsupported-type",
+  )
+}
+
+async function transcodeHeicReceiptToJpeg<
+  TDecodedImage extends { height: number; width: number },
+>(file: File, codec: ReceiptImageCodec<TDecodedImage>) {
+  if (!codec.transcodeHeicToJpeg) {
+    throw createUnreadableReceiptImageError(file)
+  }
+
+  try {
+    const jpegBlob = await codec.transcodeHeicToJpeg(file)
+
+    return new File([jpegBlob], buildOutputFileName(file.name, "image/jpeg"), {
+      type: "image/jpeg",
+    })
+  } catch {
+    throw createUnreadableReceiptImageError(file)
+  }
+}
+
 function getCompressionScales(width: number, height: number) {
   const longestSide = Math.max(width, height)
 
@@ -238,7 +293,8 @@ function mapHttpError(status: number, message: string | null) {
       )
     case 415:
       return new ReceiptIngestionError(
-        message ?? "Only JPEG and PNG receipt images are supported.",
+        message ??
+          `This file type is not accepted. Accepted receipt image types: ${RECEIPT_UPLOAD_ACCEPTED_FILE_TYPES}.`,
         "unsupported-type",
       )
     default:
@@ -317,6 +373,15 @@ function createBrowserImageCodec(): ReceiptImageCodec<{
         )
       })
     },
+    async transcodeHeicToJpeg(file) {
+      const { heicTo } = await import("heic-to/next")
+
+      return heicTo({
+        blob: file,
+        quality: 0.92,
+        type: "image/jpeg",
+      })
+    },
   }
 }
 
@@ -334,20 +399,32 @@ export async function prepareReceiptUploadWithCodec<
     }
   }
 
+  if (!isAcceptedReceiptUploadFile(file)) {
+    throw createUnsupportedReceiptFileError()
+  }
+
+  const sourceFile = isHeicReceiptFile(file)
+    ? await transcodeHeicReceiptToJpeg(file, codec)
+    : file
+
+  if (sourceFile.size <= maxUploadBytes) {
+    return {
+      file: sourceFile,
+      mimeType: "image/jpeg",
+    }
+  }
+
   let decodedImage: TDecodedImage | null = null
 
   try {
-    decodedImage = await codec.decode(file)
+    decodedImage = await codec.decode(sourceFile)
   } catch {
-    throw new ReceiptIngestionError(
-      "Choose a receipt image the browser can open, then try again.",
-      "unsupported-type",
-    )
+    throw createUnreadableReceiptImageError(file)
   }
 
   try {
     const targetMimeTypes: ReceiptParseSupportedMimeType[] =
-      file.type === "image/png" && file.size <= maxUploadBytes
+      sourceFile.type === "image/png" && sourceFile.size <= maxUploadBytes
         ? ["image/png"]
         : ["image/jpeg"]
 
@@ -442,6 +519,8 @@ export function mapReceiptParseResponseToEditorState(
     receiptOccurredAt: getReceiptOccurredAt(payload.createReceiptInputDraft),
     tax: centsToEditorMoney(payload.createReceiptInputDraft.taxCents),
     tip: centsToEditorMoney(payload.createReceiptInputDraft.tipCents),
+    tipInputMode: "amount",
+    tipPercentage: nextState.tipPercentage,
     version: null,
   }
 }

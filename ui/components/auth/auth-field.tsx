@@ -145,7 +145,7 @@ export function AuthField({
         }}
         aria-invalid={Boolean(errorMessage)}
         className={cn(
-          "h-[3.25rem] rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 text-base font-medium text-[var(--foreground)] transition-colors focus:outline-none focus:ring-0",
+          "h-[3.25rem] rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 text-base font-medium text-[var(--foreground)] transition-colors focus:outline-none focus:ring-0",
           toneClassName,
           className,
         )}

@@ -4,9 +4,9 @@ import { BrandLogo } from "@/components/brand-logo"
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto pb-4 pt-1">
+    <footer className="relative mt-auto border-t border-[var(--line)] bg-[var(--background)]">
       <div className="page-shell">
-        <div className="py-3">
+        <div className="py-8">
           <div className="flex items-start justify-between gap-3">
             <BrandLogo
               className="gap-2.5"
