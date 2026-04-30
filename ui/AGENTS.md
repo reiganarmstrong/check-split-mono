@@ -2,7 +2,7 @@
 
 ## Skill Usage
 
-- Use `frontend-skill` for frontend design work.
+- Use `frontend-skill` for frontend design work, do not use `frontend-design`.
 
 ## General
 
