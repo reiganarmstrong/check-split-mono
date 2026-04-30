@@ -29,8 +29,7 @@ resource "aws_cognito_user_pool" "this" {
 
 }
 
-# assign the user pool a custom domain used by federated login providers
-# this will show the checksplit domain rather than cognito when logging in with google or apple
+# assign the user pool a custom domain for auth flows
 resource "aws_cognito_user_pool_domain" "this" {
   domain          = var.auth_domain
   user_pool_id    = aws_cognito_user_pool.this.id
@@ -70,10 +69,10 @@ resource "aws_cognito_user_pool_client" "this" {
   # prevent guessing of registered emails
   prevent_user_existence_errors = "ENABLED"
 
-  # TODO: Configure google and apple federated providers
+  # TODO: Configure federated providers
   # allowed_oauth_flows_user_pool_client = true
   # allowed_oauth_flows                  = ["code"]
-  # supported_identity_providers         = ["COGNITO", "Google", "SignInWithApple"]
+  # supported_identity_providers         = ["COGNITO"]
 
   # allowed_oauth_scopes = ["email", "openid", "profile"]
 

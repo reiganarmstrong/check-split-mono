@@ -10,7 +10,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCardShell } from "@/components/auth/auth-card-shell";
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
-import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { validateLoginFormField } from "@/lib/auth-form-schemas";
@@ -210,8 +209,6 @@ function LoginPageContent() {
                 </Button>
               )}
             </form.Subscribe>
-
-            <SocialAuthButtons tone="secondary" />
           </form>
         </AuthCardShell>
       </motion.div>
