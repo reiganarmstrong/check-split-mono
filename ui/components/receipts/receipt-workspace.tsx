@@ -67,23 +67,32 @@ export function ReceiptWorkspace({
   }
 
   return (
-    <main className="flex-1 pt-4">
+    <main
+      className={cn(
+        "flex-1",
+        workspace.shouldShowUploadGate
+          ? "flex items-center px-4 py-10 sm:px-6 lg:px-8"
+          : "pt-4",
+      )}
+    >
       <section
         className={cn(
-          "page-shell pb-12",
-          workspace.shouldShowUploadGate &&
-            "flex min-h-[calc(100svh-10rem)] items-center",
+          "page-shell",
+          !workspace.shouldShowUploadGate && "pb-12",
         )}
       >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className={cn("w-full", workspace.shouldShowUploadGate && "mx-auto max-w-5xl")}
+          className={cn(
+            "w-full",
+            workspace.shouldShowUploadGate && "mx-auto my-8 max-w-5xl",
+          )}
         >
           <div
             className={cn(
-              "mt-8",
+              !workspace.shouldShowUploadGate && "mt-8",
               workspace.shouldShowUploadGate
                 ? "mx-auto max-w-5xl"
                 : "grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]",
