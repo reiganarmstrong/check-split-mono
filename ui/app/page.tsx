@@ -50,7 +50,7 @@ const workflowChrome = [
   {
     step: "03",
     rail: "bg-[#050506]",
-    tab: "border-[#c7ccd8] bg-[#f0f2f7] text-[#13181f]",
+    tab: "border-[#d5d7dc] bg-[#f3f4f5] text-[#13181f]",
   },
 ];
 
@@ -272,7 +272,7 @@ function ReceiptScanFigure() {
             {["Tax $3.10", "Tip $4.00", "Total $104.50"].map((item) => (
               <p
                 key={item}
-                className={`rounded-full border border-[var(--line)] px-3 py-1.5 sm:py-2 ${item.startsWith("Total") ? "bg-[#9bdab5]" : "bg-white"}`}
+                className={`rounded-full border px-3 py-1.5 sm:py-2 ${item.startsWith("Total") ? "border-[#b8e8cd] bg-[#c8efd9] text-[#116149]" : "border-[var(--line)] bg-white"}`}
               >
                 {item}
               </p>
@@ -298,7 +298,7 @@ function GroupIconGrid() {
   const items = [
     { label: "Couples", icon: Users, color: "text-[#4053ff]" },
     { label: "Friends", icon: Users, color: "text-[#16a765]" },
-    { label: "Teams", icon: Users, color: "text-[#4053ff]" },
+    { label: "Teams", icon: Users, color: "text-[#050506]" },
     { label: "Any group size", icon: Users, color: "text-[#ffab18]" },
   ];
 
@@ -329,7 +329,7 @@ function AssignPeopleFigure() {
       ],
     },
     {
-      label: "Team tab",
+      label: "Friends tab",
       note: "Shared plates ready",
       people: [
         { name: "June", active: false },
@@ -480,9 +480,7 @@ function SavedSplitFigure() {
             <p className="mt-1.5 text-sm font-semibold sm:mt-3 sm:text-base">
               Everyone paid
             </p>
-            <p className="mt-1 text-xs font-medium sm:mt-2">
-              3 of 3 settled
-            </p>
+            <p className="mt-1 text-xs font-medium sm:mt-2">3 of 3 settled</p>
           </div>
         </div>
 
@@ -603,7 +601,7 @@ function WorkflowProgressRail({ progress }: { progress: number }) {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute bottom-24 -left-12 top-0 hidden w-7 xl:-left-14 lg:block"
+      className="pointer-events-none absolute bottom-24 left-0 top-0 hidden w-7 lg:block 2xl:-left-14"
     >
       <div className="sticky top-[5.75rem] flex h-[calc(100svh-7.75rem)] min-h-[34rem] w-7 items-center justify-center">
         <div className="relative h-[78%] w-px bg-[#cdd3df]">
@@ -748,7 +746,7 @@ export default function Home() {
       <div id="features" className="page-shell pt-4">
         <div
           ref={workflowRef}
-          className="relative flex flex-col gap-8 pb-16 lg:gap-32 lg:pb-24"
+          className="relative flex flex-col gap-8 pb-16 lg:gap-32 lg:pb-24 lg:pl-12 2xl:pl-0"
         >
           <WorkflowProgressRail progress={workflowProgress} />
           <WorkflowBand
