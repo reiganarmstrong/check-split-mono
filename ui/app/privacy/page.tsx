@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+
+import { ScrollToPageTop } from "@/components/navigation/scroll-to-page-top";
+
 export const metadata: Metadata = {
   title: "Privacy | CheckSplit",
   description: "Privacy information for CheckSplit.",
@@ -26,12 +29,10 @@ const privacySections = [
 export default function PrivacyPage() {
   return (
     <main className="flex-1 pb-24">
+      <ScrollToPageTop />
       <section className="page-shell pt-16 sm:pt-20 lg:pt-24">
         <div className="mx-auto max-w-3xl">
-          <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
-            Privacy
-          </p>
-          <h1 className="mt-4 text-4xl leading-[0.92] text-[var(--foreground)] sm:text-5xl">
+          <h1 className="text-4xl leading-[0.92] text-[var(--foreground)] sm:text-5xl">
             Privacy Policy
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-foreground)]">
@@ -55,7 +56,6 @@ export default function PrivacyPage() {
                 </p>
               </section>
             ))}
-
           </div>
         </div>
       </section>
