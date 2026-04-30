@@ -121,6 +121,16 @@
     }
   }
 
+  @keyframes landingReceiptScanLine {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, var(--receipt-scan-travel), 0);
+    }
+  }
+
   @keyframes backdropFloat {
     0%,
     100% {
@@ -321,6 +331,11 @@
 
   .receipt-scan-line {
     animation: receiptScanLine 4.8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .landing-receipt-scan-line {
+    animation: landingReceiptScanLine 4.8s ease-in-out infinite;
     will-change: transform;
   }
 

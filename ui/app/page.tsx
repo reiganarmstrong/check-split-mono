@@ -254,11 +254,7 @@ function ReceiptScanFigure() {
 
           <div className="pointer-events-none absolute inset-x-8 top-16 h-7 rounded-full bg-[#efedff]/80 sm:inset-x-11 sm:top-[5.2rem] sm:h-9" />
           <div className="pointer-events-none absolute inset-x-9 top-[6.75rem] h-8 rounded-full bg-[#dff4e8]/90 sm:inset-x-12 sm:top-[9.25rem] sm:h-10" />
-          <motion.div
-            animate={{ y: [0, 132, 0] }}
-            transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute inset-x-4 top-7 h-1.5 transform-gpu rounded-full bg-[#050506]/80 shadow-[0_0_24px_rgba(5,5,6,0.2)]"
-          />
+          <div className="landing-receipt-scan-line pointer-events-none absolute inset-x-4 top-4 h-1.5 transform-gpu rounded-full bg-[#050506]/80 shadow-[0_0_24px_rgba(5,5,6,0.2)] [--receipt-scan-travel:9.625rem] sm:top-5 sm:[--receipt-scan-travel:15.125rem]" />
         </div>
       </div>
 
