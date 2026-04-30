@@ -11,7 +11,11 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { formatCurrency, parseMoneyInputToCents } from "@/lib/receipt-editor";
+import {
+  formatCurrency,
+  getReceiptTipCents,
+  parseMoneyInputToCents,
+} from "@/lib/receipt-editor";
 import type { EditableGroup, ReceiptEditorState } from "@/lib/receipt-types";
 import { cn } from "@/lib/utils";
 
@@ -94,7 +98,7 @@ export function SummaryAside({
         />
         <SummaryRow
           label="Tip"
-          value={formatCurrency(parseMoneyInputToCents(editorState.tip))}
+          value={formatCurrency(getReceiptTipCents(editorState))}
         />
         <SummaryRow
           label="Fees"

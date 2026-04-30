@@ -7,6 +7,7 @@ import {
   getGroupShareSummaries,
   getReceiptEditorValidation,
   getReceiptSubtotalCents,
+  getReceiptTipCents,
   getReceiptTotalCents,
   isMeaningfullyDirty,
   parseMoneyInputToCents,
@@ -70,7 +71,7 @@ export function getReceiptWorkspaceDerivedState({
     receiptOccurredAt: editorState.receiptOccurredAt,
     subtotalLabel: formatCurrency(subtotalCents),
     taxLabel: formatCurrency(parseMoneyInputToCents(editorState.tax)),
-    tipLabel: formatCurrency(parseMoneyInputToCents(editorState.tip)),
+    tipLabel: formatCurrency(getReceiptTipCents(editorState)),
     totalLabel: formatCurrency(totalCents),
   });
   const merchantNameMissing = editorState.merchantName.trim().length === 0;

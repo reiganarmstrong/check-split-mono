@@ -519,6 +519,8 @@ export function mapReceiptParseResponseToEditorState(
     receiptOccurredAt: getReceiptOccurredAt(payload.createReceiptInputDraft),
     tax: centsToEditorMoney(payload.createReceiptInputDraft.taxCents),
     tip: centsToEditorMoney(payload.createReceiptInputDraft.tipCents),
+    tipInputMode: "amount",
+    tipPercentage: nextState.tipPercentage,
     version: null,
   }
 }

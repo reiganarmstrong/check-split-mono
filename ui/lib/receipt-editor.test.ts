@@ -61,6 +61,8 @@ function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorStat
     receiptOccurredAt: "2025-01-01T00:00",
     tax: "0.00",
     tip: "0.00",
+    tipInputMode: "amount",
+    tipPercentage: "20",
     version: null,
     ...overrides,
   }
@@ -188,6 +190,36 @@ describe("getGroupShareSummaries", () => {
         groupId: "group-b",
         itemSubtotalCents: 2000,
         taxShareCents: 200,
+        tipShareCents: 400,
+      },
+    ])
+  })
+
+  it("calculates percentage tips from the receipt subtotal", () => {
+    const state = createState({
+      tipInputMode: "percent",
+      tipPercentage: "20",
+    })
+    const summaries = getGroupShareSummaries(state)
+
+    expect(getReceiptTotalCents(state)).toBe(3600)
+    expect(summaries).toEqual([
+      {
+        amountCents: 1200,
+        discountShareCents: 0,
+        feeShareCents: 0,
+        groupId: "group-a",
+        itemSubtotalCents: 1000,
+        taxShareCents: 0,
+        tipShareCents: 200,
+      },
+      {
+        amountCents: 2400,
+        discountShareCents: 0,
+        feeShareCents: 0,
+        groupId: "group-b",
+        itemSubtotalCents: 2000,
+        taxShareCents: 0,
         tipShareCents: 400,
       },
     ])
