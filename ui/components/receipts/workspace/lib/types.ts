@@ -54,7 +54,6 @@ export type ReceiptWorkspaceController = {
   parseMessage: string | null;
   parseIssues: string[];
   warningMessage: string | null;
-  footerOffset: number;
   actionBarHeight: number;
   actionBarActionsHeight: number;
   isMobileViewport: boolean;

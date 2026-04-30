@@ -19,9 +19,6 @@ export function useReceiptWorkspaceLayout({
   const actionBarRef = useRef<HTMLDivElement | null>(null);
   const actionBarActionsRef = useRef<HTMLDivElement | null>(null);
   const actionBarScrollYRef = useRef(0);
-  const footerElementRef = useRef<HTMLElement | null>(null);
-  const footerOffsetFrameRef = useRef<number | null>(null);
-  const [footerOffset, setFooterOffset] = useState(0);
   const [actionBarHeight, setActionBarHeight] = useState(128);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [isMobileActionBarCompact, setIsMobileActionBarCompact] =
@@ -36,97 +33,6 @@ export function useReceiptWorkspaceLayout({
     (isMobileViewport || isMobileActionBarCompact) && !isDeleteConfirming;
   const isMinimizedMobileActionBar =
     isMobileViewport && isCompactActionBar && isMobileActionBarMinimized;
-
-  useEffect(() => {
-    let footerResizeObserver: ResizeObserver | null = null;
-
-    function resolveFooterElement() {
-      const cachedFooter = footerElementRef.current;
-      const footer =
-        cachedFooter && cachedFooter.isConnected
-          ? cachedFooter
-          : document.querySelector("footer");
-
-      footerElementRef.current = footer;
-
-      return footer;
-    }
-
-    function updateFooterOffset(nextOffset: number) {
-      const normalizedOffset =
-        nextOffset <= 1 ? 0 : Math.round(nextOffset / 2) * 2;
-
-      setFooterOffset((currentOffset) =>
-        currentOffset === normalizedOffset ? currentOffset : normalizedOffset,
-      );
-    }
-
-    function scheduleFooterOffsetMeasure() {
-      if (footerOffsetFrameRef.current !== null) {
-        return;
-      }
-
-      footerOffsetFrameRef.current = window.requestAnimationFrame(() => {
-        footerOffsetFrameRef.current = null;
-        measureFooterOffset();
-      });
-    }
-
-    function measureFooterOffset() {
-      const footer = resolveFooterElement();
-
-      if (!footer) {
-        updateFooterOffset(0);
-        return;
-      }
-
-      const footerRect = footer.getBoundingClientRect();
-      updateFooterOffset(Math.max(0, window.innerHeight - footerRect.top));
-    }
-
-    const footer = resolveFooterElement();
-
-    if (!footer) {
-      updateFooterOffset(0);
-      return;
-    }
-
-    footerResizeObserver = new ResizeObserver(scheduleFooterOffsetMeasure);
-    footerResizeObserver.observe(footer);
-    window.addEventListener("scroll", scheduleFooterOffsetMeasure, {
-      passive: true,
-    });
-    window.addEventListener("resize", scheduleFooterOffsetMeasure);
-    window.visualViewport?.addEventListener(
-      "resize",
-      scheduleFooterOffsetMeasure,
-    );
-    window.visualViewport?.addEventListener(
-      "scroll",
-      scheduleFooterOffsetMeasure,
-      { passive: true },
-    );
-    measureFooterOffset();
-
-    return () => {
-      footerResizeObserver?.disconnect();
-      window.removeEventListener("scroll", scheduleFooterOffsetMeasure);
-      window.removeEventListener("resize", scheduleFooterOffsetMeasure);
-      window.visualViewport?.removeEventListener(
-        "resize",
-        scheduleFooterOffsetMeasure,
-      );
-      window.visualViewport?.removeEventListener(
-        "scroll",
-        scheduleFooterOffsetMeasure,
-      );
-
-      if (footerOffsetFrameRef.current !== null) {
-        window.cancelAnimationFrame(footerOffsetFrameRef.current);
-        footerOffsetFrameRef.current = null;
-      }
-    };
-  }, []);
 
   useEffect(() => {
     const actionBarElement = actionBarRef.current;
@@ -254,7 +160,6 @@ export function useReceiptWorkspaceLayout({
     summaryRef,
     actionBarRef,
     actionBarActionsRef,
-    footerOffset,
     actionBarHeight,
     actionBarActionsHeight,
     isMobileViewport,

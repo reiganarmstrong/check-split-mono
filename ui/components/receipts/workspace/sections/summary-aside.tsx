@@ -34,7 +34,6 @@ export function SummaryAside({
   handleShareSummary,
   scrollToFullSummary,
   actionBarHeight,
-  footerOffset,
 }: {
   summaryRef: RefObject<HTMLElement | null>;
   groups: EditableGroup[];
@@ -51,7 +50,6 @@ export function SummaryAside({
   handleShareSummary: () => Promise<void>;
   scrollToFullSummary: () => void;
   actionBarHeight: number;
-  footerOffset: number;
 }) {
   return (
     <motion.aside
@@ -112,7 +110,7 @@ export function SummaryAside({
       <div className="pointer-events-none hidden h-20 lg:block">
         <div
           className="sticky z-10 flex justify-center px-2 pt-4"
-          style={{ bottom: actionBarHeight + footerOffset + 16 }}
+          style={{ bottom: actionBarHeight + 16 }}
         >
           <div className="absolute inset-x-0 inset-y-0 rounded-[1rem] bg-[linear-gradient(180deg,rgba(251,251,248,0),rgba(251,251,248,0.84)_42%,#fbfbf8_100%)]" />
           <Button

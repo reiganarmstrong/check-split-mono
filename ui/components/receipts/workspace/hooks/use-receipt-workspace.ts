@@ -103,7 +103,6 @@ export function useReceiptWorkspace({
     parseMessage: data.parseMessage,
     parseIssues: data.parseIssues,
     warningMessage: data.warningMessage,
-    footerOffset: layout.footerOffset,
     actionBarHeight: layout.actionBarHeight,
     actionBarActionsHeight: layout.actionBarActionsHeight,
     isMobileViewport: layout.isMobileViewport,

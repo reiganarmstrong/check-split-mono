@@ -67,10 +67,7 @@ export function ReceiptWorkspace({
   }
 
   return (
-    <main
-      className="flex-1 pt-4"
-      style={{ paddingBottom: Math.max(128, workspace.actionBarHeight + 24) }}
-    >
+    <main className="flex-1 pt-4">
       <section
         className={cn(
           "page-shell pb-12",
@@ -246,7 +243,6 @@ export function ReceiptWorkspace({
                 handleShareSummary={workspace.handleShareSummary}
                 scrollToFullSummary={workspace.scrollToFullSummary}
                 actionBarHeight={workspace.actionBarHeight}
-                footerOffset={workspace.footerOffset}
               />
             )}
           </div>
@@ -257,7 +253,6 @@ export function ReceiptWorkspace({
         <ReceiptActionBar
           actionBarRef={workspace.actionBarRef}
           actionBarActionsRef={workspace.actionBarActionsRef}
-          footerOffset={workspace.footerOffset}
           isCompactActionBar={workspace.isCompactActionBar}
           isMinimizedMobileActionBar={workspace.isMinimizedMobileActionBar}
           isMobileViewport={workspace.isMobileViewport}

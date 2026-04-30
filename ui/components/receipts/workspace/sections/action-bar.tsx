@@ -23,7 +23,6 @@ import type {
 export function ReceiptActionBar({
   actionBarRef,
   actionBarActionsRef,
-  footerOffset,
   isCompactActionBar,
   isMinimizedMobileActionBar,
   isMobileViewport,
@@ -50,7 +49,6 @@ export function ReceiptActionBar({
 }: {
   actionBarRef: RefObject<HTMLDivElement | null>;
   actionBarActionsRef: RefObject<HTMLDivElement | null>;
-  footerOffset: number;
   isCompactActionBar: boolean;
   isMinimizedMobileActionBar: boolean;
   isMobileViewport: boolean;
@@ -78,14 +76,9 @@ export function ReceiptActionBar({
   return (
     <div
       ref={actionBarRef}
-      className="fixed inset-x-0 bottom-0 z-20 px-4 py-4 sm:px-6 lg:px-8"
+      className="sticky inset-x-0 bottom-0 z-20 px-4 py-4 sm:px-6 lg:px-8"
     >
-      <div
-        style={{
-          transform: `translate3d(0, -${footerOffset}px, 0)`,
-          willChange: "transform",
-        }}
-      >
+      <div>
         <motion.div
           initial={
             isMobileViewport ? { y: 72, opacity: 0.01 } : { y: 96, opacity: 0 }
