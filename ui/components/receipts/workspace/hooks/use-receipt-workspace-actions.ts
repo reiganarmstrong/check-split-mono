@@ -61,6 +61,9 @@ export function useReceiptWorkspaceActions({
   const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
   const [isSharingSummary, setIsSharingSummary] = useState(false);
   const [isParsingReceipt, setIsParsingReceipt] = useState(false);
+  const [parsingReceiptFileName, setParsingReceiptFileName] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     setIsDeleteConfirming(false);
@@ -221,6 +224,7 @@ export function useReceiptWorkspaceActions({
     }
 
     setIsParsingReceipt(true);
+    setParsingReceiptFileName(file.name || "Receipt image");
     setSaveMessage(null);
     setShareMessage(null);
     setParseMessage(null);
@@ -254,6 +258,7 @@ export function useReceiptWorkspaceActions({
       }
     } finally {
       setIsParsingReceipt(false);
+      setParsingReceiptFileName(null);
     }
   }
 
@@ -386,6 +391,7 @@ export function useReceiptWorkspaceActions({
     isDeleteConfirming,
     isSharingSummary,
     isParsingReceipt,
+    parsingReceiptFileName,
     setIsDeleteConfirming,
     requestReceiptUpload,
     handleReceiptUpload,

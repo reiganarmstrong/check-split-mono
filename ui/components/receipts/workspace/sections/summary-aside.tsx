@@ -34,7 +34,6 @@ export function SummaryAside({
   handleShareSummary,
   scrollToFullSummary,
   actionBarHeight,
-  footerOffset,
 }: {
   summaryRef: RefObject<HTMLElement | null>;
   groups: EditableGroup[];
@@ -51,7 +50,6 @@ export function SummaryAside({
   handleShareSummary: () => Promise<void>;
   scrollToFullSummary: () => void;
   actionBarHeight: number;
-  footerOffset: number;
 }) {
   return (
     <motion.aside
@@ -59,7 +57,7 @@ export function SummaryAside({
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.08, duration: 0.35 }}
-      className="workspace-panel relative rounded-[1.75rem] p-6 lg:-mt-2 lg:sticky lg:top-28 lg:self-start"
+      className="workspace-panel relative rounded-[1rem] p-6 lg:-mt-2 lg:sticky lg:top-28 lg:self-start"
     >
       <div className="flex items-start justify-between gap-3">
         <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
@@ -70,7 +68,7 @@ export function SummaryAside({
             type="button"
             variant="outline"
             size="sm"
-            className="min-w-40 justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
+            className="min-w-40 justify-center rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-4 text-sm font-semibold text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
             onClick={() => void handleShareSummary()}
             disabled={isSharingSummary}
           >
@@ -112,14 +110,14 @@ export function SummaryAside({
       <div className="pointer-events-none hidden h-20 lg:block">
         <div
           className="sticky z-10 flex justify-center px-2 pt-4"
-          style={{ bottom: actionBarHeight + footerOffset + 16 }}
+          style={{ bottom: actionBarHeight + 16 }}
         >
-          <div className="absolute inset-x-0 inset-y-0 rounded-[1.5rem] bg-[linear-gradient(180deg,rgba(251,251,248,0),rgba(251,251,248,0.84)_42%,#fbfbf8_100%)]" />
+          <div className="absolute inset-x-0 inset-y-0 rounded-[1rem] bg-[linear-gradient(180deg,rgba(251,251,248,0),rgba(251,251,248,0.84)_42%,#fbfbf8_100%)]" />
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="pointer-events-auto relative h-11 rounded-full border border-[color-mix(in_oklab,var(--line)_85%,white)] bg-[color-mix(in_oklab,var(--panel)_88%,white)] px-5 text-sm font-medium text-[var(--foreground)] shadow-[0_14px_30px_rgba(14,18,24,0.08)] backdrop-blur-md hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
+            className="pointer-events-auto relative h-11 rounded-[0.8rem] border border-[color-mix(in_oklab,var(--line)_85%,white)] bg-[color-mix(in_oklab,var(--panel)_88%,white)] px-5 text-sm font-semibold text-[var(--foreground)] shadow-[0_8px_18px_rgba(14,18,24,0.05)] backdrop-blur-md hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
             onClick={scrollToFullSummary}
           >
             See full summary
@@ -156,7 +154,7 @@ export function SummaryAside({
               <div
                 key={group.id}
                 className={cn(
-                  "rounded-[1.1rem] border bg-[var(--surface)] px-4 py-3",
+                  "rounded-[0.85rem] border bg-[var(--surface)] px-4 py-3",
                   group.isPaid
                     ? "border-[color-mix(in_oklab,var(--accent)_45%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_12%,white)]"
                     : "border-[color-mix(in_oklab,var(--unpaid)_36%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_46%,white)]",
@@ -172,7 +170,7 @@ export function SummaryAside({
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <p className="text-xl font-medium text-[var(--foreground)]">
+                    <p className="text-xl font-semibold text-[var(--foreground)]">
                       {formatCurrency(share.amountCents)}
                     </p>
                     <Button
@@ -180,7 +178,7 @@ export function SummaryAside({
                       variant="outline"
                       size="xs"
                       className={cn(
-                        "rounded-full border px-3",
+                        "rounded-[0.7rem] border px-3",
                         group.isPaid
                           ? "border-[color-mix(in_oklab,var(--accent)_40%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_18%,transparent)] text-[var(--accent-foreground)] hover:border-[color-mix(in_oklab,var(--unpaid)_36%,var(--line))] hover:bg-[color-mix(in_oklab,var(--unpaid-soft)_72%,white)] hover:text-[var(--unpaid-foreground)]"
                           : "border-[color-mix(in_oklab,var(--unpaid)_40%,var(--line))] bg-[color-mix(in_oklab,var(--unpaid-soft)_64%,white)] text-[var(--unpaid-foreground)] hover:border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] hover:bg-[color-mix(in_oklab,var(--accent)_18%,white)] hover:text-[var(--accent-foreground)]",
@@ -238,7 +236,7 @@ export function SummaryAside({
                       {itemDetails.map((detail) => (
                         <div
                           key={`${group.id}-${detail.itemId}`}
-                          className="rounded-[0.9rem] border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2"
+                          className="rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-3 py-2"
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div>

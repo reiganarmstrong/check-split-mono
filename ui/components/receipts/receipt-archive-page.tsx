@@ -20,6 +20,11 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ReceiptApiError, listReceipts } from "@/lib/receipt-api";
+import {
+  getPaymentProgressLabel,
+  getReceiptPaymentState,
+  receiptMatchesArchiveSearch,
+} from "@/lib/receipt-archive-search";
 import { formatCurrency, formatReceiptDate } from "@/lib/receipt-editor";
 import type { ReceiptListItem } from "@/lib/receipt-types";
 import { cn } from "@/lib/utils";
@@ -49,29 +54,6 @@ const sortOptionLabels: Record<ReceiptSortOption, string> = {
   updated: "Recently updated",
 };
 
-function getReceiptPaymentState(receipt: ReceiptListItem) {
-  if (
-    receipt.participantCount > 0 &&
-    receipt.paidParticipantCount === receipt.participantCount
-  ) {
-    return "paid";
-  }
-
-  return "unpaid";
-}
-
-function getPaymentProgressLabel(receipt: ReceiptListItem) {
-  if (receipt.participantCount === 0) {
-    return "No groups";
-  }
-
-  if (receipt.paidParticipantCount === receipt.participantCount) {
-    return "All groups paid";
-  }
-
-  return `${receipt.paidParticipantCount} of ${receipt.participantCount} paid`;
-}
-
 function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
   const paymentProgressLabel = getPaymentProgressLabel(receipt);
   const paymentState = getReceiptPaymentState(receipt);
@@ -81,7 +63,7 @@ function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
       href={`/dashboard/receipt?receiptId=${encodeURIComponent(receipt.receiptId)}`}
       className="block"
     >
-      <article className="grid gap-4 rounded-[1.6rem] border border-[var(--line)] bg-white/90 px-5 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_36px_rgba(14,18,24,0.06)] md:grid-cols-[1.25fr_0.95fr_0.8fr_auto] md:items-center">
+      <article className="grid gap-4 rounded-[1rem] border border-[var(--line)] bg-white/90 px-5 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(14,18,24,0.04)] md:grid-cols-[1.25fr_0.95fr_0.8fr_auto] md:items-center">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span
@@ -148,7 +130,7 @@ function CreateReceiptButton() {
   return (
     <Button
       asChild
-      className="h-12 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90"
     >
       <Link href="/dashboard/new">
         <PencilLine className="h-4 w-4" />
@@ -225,17 +207,12 @@ export function ReceiptArchivePage() {
     );
   }
 
-  const normalizedQuery = searchValue.trim().toLowerCase();
-
   const filteredReceipts = receipts
     .filter((receipt) => {
       const paymentState = getReceiptPaymentState(receipt);
       const matchesStatus =
         statusFilter === "all" || paymentState === statusFilter;
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        receipt.merchantName.toLowerCase().includes(normalizedQuery) ||
-        receipt.locationName?.toLowerCase().includes(normalizedQuery);
+      const matchesQuery = receiptMatchesArchiveSearch(receipt, searchValue);
 
       return matchesStatus && matchesQuery;
     })
@@ -292,11 +269,11 @@ export function ReceiptArchivePage() {
           <section className="border-b border-[var(--line)] pb-8">
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
               <div>
-                <h1 className="max-w-3xl text-4xl leading-[0.92] text-[var(--foreground)] sm:text-5xl">
-                  Saved splits
+                <h1 className="max-w-3xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl">
+                  Your Dashboard
                 </h1>
-                <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)]">
-                  Start a new receipt or edit an old one.
+                <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
+                  Start a new split or edit an old one.
                 </p>
               </div>
 
@@ -304,20 +281,19 @@ export function ReceiptArchivePage() {
                 <CreateReceiptButton />
               </div>
             </div>
-
           </section>
 
-          <div className="workspace-panel rounded-[2rem] px-5 py-6 sm:px-6">
+          <div className="workspace-panel rounded-[1rem] px-5 py-6 sm:px-6">
             <div>
               <div>
-                <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
+                {/* <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
                   Receipts
-                </p>
+                </p> */}
                 <h2 className="mt-3 text-3xl leading-none text-[var(--foreground)]">
-                  Recent splits
+                  Saved Splits
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--muted-foreground)]">
-                  Search merchant or location, then sort by date, total, or
+                  Search visible split details, then sort by date, total, or
                   latest changes.
                 </p>
               </div>
@@ -329,8 +305,8 @@ export function ReceiptArchivePage() {
                 <Input
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
-                  placeholder="Search merchant or location"
-                  className="h-12 rounded-full border-[var(--line)] bg-white pl-11 pr-4 text-sm shadow-none"
+                  placeholder="Search split details"
+                  className="h-12 rounded-[0.8rem] border-[var(--line)] bg-white pl-11 pr-4 text-sm shadow-none"
                 />
               </label>
 
@@ -342,7 +318,7 @@ export function ReceiptArchivePage() {
                       type="button"
                       onClick={() => setStatusFilter(option.value)}
                       className={cn(
-                        "rounded-full border px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors",
+                        "rounded-[0.8rem] border px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors",
                         statusFilter === option.value
                           ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
                           : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]",
@@ -353,7 +329,7 @@ export function ReceiptArchivePage() {
                   ))}
                 </div>
 
-                <label className="flex cursor-pointer items-center gap-3 rounded-full border border-[var(--line)] bg-white px-4 py-3 text-sm uppercase tracking-[0.14em] text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]">
+                <label className="flex cursor-pointer items-center gap-3 rounded-[0.8rem] border border-[var(--line)] bg-white px-4 py-3 text-sm uppercase tracking-[0.14em] text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]">
                   <SlidersHorizontal className="h-4 w-4" />
                   <span>Sort</span>
                   <span className="relative ml-auto min-w-0 flex-1 pl-2">
@@ -364,11 +340,13 @@ export function ReceiptArchivePage() {
                       }
                       className="w-full cursor-pointer appearance-none bg-transparent pr-6 text-right text-sm font-medium text-[var(--foreground)] outline-none"
                     >
-                      {Object.entries(sortOptionLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
+                      {Object.entries(sortOptionLabels).map(
+                        ([value, label]) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ),
+                      )}
                     </select>
                     <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)]" />
                   </span>
@@ -378,7 +356,7 @@ export function ReceiptArchivePage() {
 
             {errorMessage ? (
               <div className="workspace-line mt-5 pt-5">
-                <div className="rounded-[1.25rem] border border-destructive/25 bg-destructive/10 px-4 py-4 text-sm text-destructive">
+                <div className="rounded-[0.9rem] border border-destructive/25 bg-destructive/10 px-4 py-4 text-sm text-destructive">
                   {errorMessage}
                 </div>
               </div>
@@ -386,7 +364,7 @@ export function ReceiptArchivePage() {
 
             {receipts.length === 0 ? (
               <div className="workspace-line mt-5 pt-5">
-                <div className="rounded-[1.6rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
+                <div className="rounded-[1rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
                     <ReceiptText className="h-6 w-6 text-[var(--foreground)]" />
                   </div>
@@ -399,14 +377,14 @@ export function ReceiptArchivePage() {
                   <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                     <Button
                       asChild
-                      className="h-12 rounded-full bg-[var(--foreground)] px-5 text-sm font-medium text-[var(--background)] hover:opacity-90"
+                      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90"
                     >
                       <Link href="/dashboard/new">Create custom receipt</Link>
                     </Button>
                     <Button
                       asChild
                       variant="outline"
-                      className="rounded-full border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
+                      className="rounded-[0.8rem] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
                     >
                       <Link href="/dashboard/new?prompt=upload">
                         Upload receipt
@@ -417,7 +395,7 @@ export function ReceiptArchivePage() {
               </div>
             ) : filteredReceipts.length === 0 ? (
               <div className="workspace-line mt-5 pt-5">
-                <div className="rounded-[1.6rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
+                <div className="rounded-[1rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
                     <Search className="h-5 w-5 text-[var(--foreground)]" />
                   </div>
@@ -436,7 +414,7 @@ export function ReceiptArchivePage() {
                         setStatusFilter("all");
                         setSortOption("newest");
                       }}
-                      className="h-12 rounded-full border border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
+                      className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
                     >
                       Reset filters
                     </Button>
@@ -465,7 +443,7 @@ export function ReceiptArchivePage() {
                     >
                       <div
                         className={cn(
-                          "flex flex-col gap-3 rounded-[1.6rem] border px-4 py-4 sm:flex-row sm:items-end sm:justify-between",
+                          "flex flex-col gap-3 rounded-[1rem] border px-4 py-4 sm:flex-row sm:items-end sm:justify-between",
                           group.key === "paid"
                             ? "border-emerald-200 bg-emerald-50"
                             : "border-amber-200 bg-amber-50",

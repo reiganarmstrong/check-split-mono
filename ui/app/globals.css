@@ -64,20 +64,22 @@
   --unpaid-stroke: rgba(180, 83, 9, 0.18);
   --destructive: #c64944;
   --destructive-foreground: #fff8f6;
-  --border: rgba(19, 24, 31, 0.12);
-  --line: rgba(19, 24, 31, 0.12);
-  --input: rgba(19, 24, 31, 0.16);
+  --border: rgba(19, 24, 31, 0.18);
+  --line: rgba(19, 24, 31, 0.18);
+  --input: rgba(19, 24, 31, 0.2);
   --ring: rgba(35, 55, 215, 0.35);
+  --dot-pattern: radial-gradient(#d4d9e7 1px, transparent 1px);
+  --dot-pattern-size: 22px 22px;
   --spotlight: radial-gradient(circle at top left, rgba(98, 118, 255, 0.2), transparent 38%);
   --grid: linear-gradient(rgba(19, 24, 31, 0.06) 1px, transparent 1px),
     linear-gradient(90deg, rgba(19, 24, 31, 0.06) 1px, transparent 1px);
   --grid-size: 112px 112px;
-  --shadow-soft: 0 20px 50px rgba(14, 18, 24, 0.08);
-  --shadow-strong: 0 28px 90px rgba(14, 18, 24, 0.12);
+  --shadow-soft: 0 10px 22px rgba(14, 18, 24, 0.05);
+  --shadow-strong: 0 14px 34px rgba(14, 18, 24, 0.07);
   --required-highlight: #c64944;
   --required-highlight-foreground: #fff8f6;
   --required-highlight-soft: rgba(198, 73, 68, 0.16);
-  --radius: 1.35rem;
+  --radius: 0.9rem;
 }
 
 @layer base {
@@ -109,6 +111,26 @@
     }
   }
 
+  @keyframes receiptScanLine {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, 250px, 0);
+    }
+  }
+
+  @keyframes landingReceiptScanLine {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, var(--receipt-scan-travel), 0);
+    }
+  }
+
   @keyframes backdropFloat {
     0%,
     100% {
@@ -132,7 +154,8 @@
     font-family: var(--font-sans);
     position: relative;
     min-height: 100vh;
-    background-image: none;
+    background-image: var(--dot-pattern);
+    background-size: var(--dot-pattern-size);
   }
 
   body::before {
@@ -140,7 +163,8 @@
     position: fixed;
     inset: 0;
     z-index: -2;
-    background: var(--background);
+    background-color: var(--background);
+    background-image: none;
     opacity: 1;
     animation: none;
     pointer-events: none;
@@ -169,7 +193,7 @@
   input,
   textarea,
   select {
-    border-radius: 1rem;
+    border-radius: 0.8rem;
   }
 
   input:-webkit-autofill {
@@ -213,31 +237,31 @@
   .topbar-surface {
     border: 1px solid var(--line);
     background: #f8f8f3;
-    box-shadow: 0 12px 28px rgba(14, 18, 24, 0.06);
+    box-shadow: 0 8px 20px rgba(14, 18, 24, 0.04);
   }
 
   .panel-surface {
     background: #ffffff;
     border: 1px solid var(--line);
-    box-shadow: 0 14px 34px rgba(14, 18, 24, 0.05);
+    box-shadow: 0 8px 18px rgba(14, 18, 24, 0.035);
   }
 
   .panel-surface-strong {
     background: #ffffff;
     border: 1px solid var(--line);
-    box-shadow: 0 18px 38px rgba(14, 18, 24, 0.08);
+    box-shadow: 0 10px 24px rgba(14, 18, 24, 0.05);
   }
 
   .marketing-frame {
     background: #fbfbf8;
     border: 1px solid var(--line);
-    box-shadow: 0 18px 40px rgba(14, 18, 24, 0.06);
+    box-shadow: 0 10px 24px rgba(14, 18, 24, 0.04);
   }
 
   .hero-preview-frame {
     background: #ffffff;
     border: 1px solid var(--line);
-    box-shadow: 0 12px 28px rgba(14, 18, 24, 0.05);
+    box-shadow: 0 8px 18px rgba(14, 18, 24, 0.035);
   }
 
   .metric-chip {
@@ -248,7 +272,7 @@
   .table-row-surface {
     background: #ffffff;
     border: 1px solid var(--line);
-    box-shadow: 0 8px 18px rgba(14, 18, 24, 0.04);
+    box-shadow: 0 4px 12px rgba(14, 18, 24, 0.025);
   }
 
   .table-row-surface:hover {
@@ -258,7 +282,7 @@
   .workspace-panel {
     background: #fbfbf8;
     border: 1px solid var(--line);
-    box-shadow: 0 16px 36px rgba(14, 18, 24, 0.06);
+    box-shadow: 0 8px 22px rgba(14, 18, 24, 0.04);
   }
 
   .workspace-line {
@@ -303,6 +327,16 @@
 
   .loading-sweep {
     animation: loadingSweep 1.4s linear infinite;
+  }
+
+  .receipt-scan-line {
+    animation: receiptScanLine 4.8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .landing-receipt-scan-line {
+    animation: landingReceiptScanLine 4.8s ease-in-out infinite;
+    will-change: transform;
   }
 
   .required-highlight-fill {

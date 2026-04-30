@@ -10,7 +10,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCardShell } from "@/components/auth/auth-card-shell";
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
-import { SocialAuthButtons } from "@/components/auth/social-auth-buttons";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { validateLoginFormField } from "@/lib/auth-form-schemas";
@@ -21,16 +20,20 @@ function LoginPageContent() {
   const searchParams = useSearchParams();
   const { status, refreshSession } = useAuth();
   const seededEmail = searchParams.get("email") ?? "";
-  const confirmedMessage =
-    searchParams.get("confirmed") === "1"
+  const sessionMessage =
+    searchParams.get("deleted") === "1"
+      ? "Account deleted."
+      : searchParams.get("confirmed") === "1"
       ? "Email verified. You can log in now."
+      : searchParams.get("reset") === "1"
+        ? "Password reset. Log in with your new password."
       : searchParams.get("created") === "1"
         ? "Account created successfully. Log in to continue."
         : null;
 
   const [authError, setAuthError] = useState<string | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(
-    confirmedMessage,
+    sessionMessage,
   );
 
   useEffect(() => {
@@ -161,8 +164,14 @@ function LoginPageContent() {
                     autoComplete="current-password"
                     labelAside={
                       <Link
-                        href="#"
-                        className="text-sm font-bold text-[var(--accent)] hover:underline underline-offset-4"
+                        href={
+                          form.state.values.email
+                            ? `/forgot-password?email=${encodeURIComponent(
+                                form.state.values.email,
+                              )}`
+                            : "/forgot-password"
+                        }
+                        className="text-sm font-semibold text-[var(--accent)] underline-offset-4 hover:underline"
                       >
                         Forgot password?
                       </Link>
@@ -173,13 +182,13 @@ function LoginPageContent() {
             </div>
 
             {authError ? (
-              <p className="rounded-[1rem] border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+              <p className="rounded-[0.8rem] border border-destructive/25 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
                 {authError}
               </p>
             ) : null}
 
             {authMessage ? (
-              <p className="rounded-[1rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+              <p className="rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
                 {authMessage}
               </p>
             ) : null}
@@ -194,14 +203,12 @@ function LoginPageContent() {
                 <Button
                   type="submit"
                   disabled={!canSubmit || isSubmitting}
-                  className="h-14 w-full rounded-[1rem] bg-foreground text-base font-medium text-background transition-opacity hover:opacity-90 hover:bg-accent hover:text-accent-foreground active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+                  className="h-14 w-full rounded-[0.8rem] bg-foreground text-base font-semibold text-background transition-opacity hover:bg-accent hover:text-accent-foreground hover:opacity-90 active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
                 >
                   {isSubmitting ? "Logging in..." : "Log in"}
                 </Button>
               )}
             </form.Subscribe>
-
-            <SocialAuthButtons tone="secondary" />
           </form>
         </AuthCardShell>
       </motion.div>

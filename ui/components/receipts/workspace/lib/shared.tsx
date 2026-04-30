@@ -13,12 +13,16 @@ export function SectionShell({
   eyebrow,
   icon: Icon,
   tone = "default",
+  className,
+  contentClassName,
 }: {
   children: ReactNode;
   title: string;
   eyebrow: string;
   icon?: LucideIcon;
   tone?: "default" | "primary" | "secondary" | "accent";
+  className?: string;
+  contentClassName?: string;
 }) {
   const iconCircleClassName =
     tone === "primary"
@@ -30,10 +34,15 @@ export function SectionShell({
           : "border-[var(--line)] bg-[var(--surface)]";
 
   return (
-    <section className="workspace-panel rounded-[1.75rem] px-5 py-5 sm:px-6 sm:py-6">
+    <section
+      className={cn(
+        "workspace-panel rounded-[1rem] px-5 py-5 sm:px-6 sm:py-6",
+        className,
+      )}
+    >
       <div className="flex items-start gap-3">
         {Icon ? (
-          <div className={cn("rounded-[1rem] border p-3", iconCircleClassName)}>
+          <div className={cn("rounded-[0.8rem] border p-3", iconCircleClassName)}>
             <Icon className="h-4 w-4 text-[var(--foreground)]" />
           </div>
         ) : null}
@@ -41,12 +50,14 @@ export function SectionShell({
           <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
             {eyebrow}
           </p>
-          <h2 className="mt-2 text-3xl font-semibold leading-none text-[var(--foreground)] sm:text-4xl">
+          <h2 className="mt-2 text-3xl leading-none text-[var(--foreground)] sm:text-4xl">
             {title}
           </h2>
         </div>
       </div>
-      <div className="workspace-line mt-5 pt-5">{children}</div>
+      <div className={cn("workspace-line mt-5 pt-5", contentClassName)}>
+        {children}
+      </div>
     </section>
   );
 }
@@ -66,8 +77,8 @@ export function SummaryRow({
       <span
         className={
           emphasis
-            ? "text-xl font-medium text-[var(--foreground)]"
-            : "text-sm font-medium text-[var(--foreground)]"
+            ? "text-xl font-semibold text-[var(--foreground)]"
+            : "text-sm font-semibold text-[var(--foreground)]"
         }
       >
         {value}
@@ -90,13 +101,13 @@ export function GroupChip({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full p-0 transition-all duration-150 ease-out",
+        "rounded-[0.75rem] p-0 transition-all duration-150 ease-out",
         active ? "bg-[var(--secondary)]" : "bg-transparent",
       )}
     >
       <span
         className={cn(
-          "block rounded-full border border-[var(--foreground)] px-3 py-2 text-sm font-medium transition-all duration-150 ease-out",
+          "block rounded-[0.75rem] border border-[var(--foreground)] px-3 py-2 text-sm font-medium transition-all duration-150 ease-out",
           active
             ? "-translate-x-0.5 -translate-y-0.5 bg-[var(--foreground)] text-[var(--background)] hover:-translate-x-px hover:-translate-y-px"
             : "bg-[var(--panel-strong)] text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]",
@@ -124,7 +135,7 @@ export function EditorNotice({
 
   return (
     <div
-      className={`rounded-[1.2rem] border px-4 py-3 text-sm font-medium ${className}`}
+      className={`rounded-[0.85rem] border px-4 py-3 text-sm font-medium ${className}`}
     >
       {message}
     </div>

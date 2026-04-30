@@ -46,7 +46,7 @@ export function ItemListSection({
           return (
             <div
               key={item.id}
-              className="rounded-[1.4rem] border border-[var(--line)] bg-[var(--panel-strong)] p-5"
+              className="rounded-[0.9rem] border border-[var(--line)] bg-[var(--panel-strong)] p-5"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2">
@@ -61,7 +61,7 @@ export function ItemListSection({
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="rounded-full border border-[var(--line)] !bg-[var(--foreground)] !text-[var(--background)] hover:!bg-[#ff0000] hover:!text-[#fff8f6] disabled:!bg-[var(--muted)] disabled:!text-[var(--muted-foreground)]"
+                  className="rounded-[0.7rem] border border-[var(--line)] !bg-[var(--foreground)] !text-[var(--background)] hover:!bg-[#ff0000] hover:!text-[#fff8f6] disabled:!bg-[var(--muted)] disabled:!text-[var(--muted-foreground)]"
                   onClick={() => removeItem(item.id)}
                   disabled={items.length === 1}
                 >
@@ -83,7 +83,7 @@ export function ItemListSection({
                       })
                     }
                     placeholder="Shared fries"
-                    className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+                    className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
                     style={
                       itemValidation?.descriptionMissing
                         ? requiredHighlightSoftStyle
@@ -104,7 +104,7 @@ export function ItemListSection({
                       })
                     }
                     placeholder="Optional"
-                    className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+                    className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
                   />
                 </label>
 
@@ -121,7 +121,7 @@ export function ItemListSection({
                         quantity: event.target.value,
                       })
                     }
-                    className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+                    className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
                     style={
                       itemValidation?.quantityInvalid
                         ? requiredHighlightSoftStyle
@@ -143,7 +143,7 @@ export function ItemListSection({
                         unitPrice: event.target.value,
                       })
                     }
-                    className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+                    className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
                     style={
                       itemValidation?.unitPriceInvalid
                         ? requiredHighlightSoftStyle
@@ -164,14 +164,14 @@ export function ItemListSection({
                         discount: event.target.value,
                       })
                     }
-                    className="h-12 rounded-[1rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
+                    className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
                   />
                 </label>
               </div>
 
               <div
                 className={cn(
-                  "mt-5 rounded-[1.1rem] border px-4 py-4",
+                  "mt-5 rounded-[0.85rem] border px-4 py-4",
                   itemValidation?.missingGroupAssignment
                     ? "border-[var(--line)]"
                     : "border-[var(--line)] bg-[var(--surface)]",
@@ -221,7 +221,7 @@ export function ItemListSection({
       <Button
         type="button"
         variant="outline"
-        className="mt-5 rounded-full border border-[var(--line)] bg-[var(--panel)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
+        className="mt-5 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] px-5 text-sm font-medium text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
         onClick={addItem}
       >
         <Plus className="h-4 w-4" />
