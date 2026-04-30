@@ -1,4 +1,5 @@
 export type AllocationPolicy = "EVEN" | "PROPORTIONAL"
+export type TipInputMode = "amount" | "percent"
 
 export type ReceiptListItem = {
   locationName: string | null
@@ -107,6 +108,8 @@ export type ReceiptEditorState = {
   receiptOccurredAt: string
   tax: string
   tip: string
+  tipInputMode: TipInputMode
+  tipPercentage: string
   version: number | null
 }
 
