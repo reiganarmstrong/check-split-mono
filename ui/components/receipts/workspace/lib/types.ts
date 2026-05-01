@@ -75,6 +75,7 @@ export type ReceiptWorkspaceController = {
   merchantNameMissing: boolean;
   receiptDateMissing: boolean;
   unnamedGroupIds: Set<string>;
+  invalidGroupWeightIds: Set<string>;
   itemValidationById: Map<string, ReceiptWorkspaceItemValidation>;
   hasSavedReceipt: boolean;
   heading: string;

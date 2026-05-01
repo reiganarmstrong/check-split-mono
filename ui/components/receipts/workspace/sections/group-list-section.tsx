@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Trash2, Users } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Trash2, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { EditableGroup } from "@/lib/receipt-types";
@@ -11,16 +11,47 @@ import { FieldLabel, SectionShell } from "../lib/shared";
 export function GroupListSection({
   groups,
   unnamedGroupIds,
+  invalidGroupWeightIds,
   updateGroup,
   addGroup,
   removeGroup,
 }: {
   groups: EditableGroup[];
   unnamedGroupIds: Set<string>;
+  invalidGroupWeightIds: Set<string>;
   updateGroup: (groupId: string, updates: Partial<EditableGroup>) => void;
   addGroup: () => void;
   removeGroup: (groupId: string) => void;
 }) {
+  function getWeightValue(value: string) {
+    const parsedValue = Number.parseInt(value, 10);
+
+    if (!Number.isFinite(parsedValue) || parsedValue < 1) {
+      return 1;
+    }
+
+    return parsedValue;
+  }
+
+  function handleWeightChange(groupId: string, value: string) {
+    const digitsOnly = value.replace(/\D/g, "").replace(/^0+/, "");
+
+    updateGroup(groupId, {
+      shareWeight: digitsOnly,
+    });
+  }
+
+  function stepWeight(group: EditableGroup, direction: 1 | -1) {
+    const nextWeight = Math.max(
+      getWeightValue(group.shareWeight) + direction,
+      1,
+    );
+
+    updateGroup(group.id, {
+      shareWeight: String(nextWeight),
+    });
+  }
+
   return (
     <SectionShell
       title="Split groups"
@@ -29,7 +60,7 @@ export function GroupListSection({
       tone="primary"
     >
       <p className="mb-4 text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-        Name each group
+        Name and weight each group
       </p>
       <div className="space-y-4">
         {groups.map((group, index) => (
@@ -55,7 +86,7 @@ export function GroupListSection({
               </div>
             </div>
 
-            <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,0.8fr)_minmax(8rem,0.4fr)_minmax(0,1.2fr)]">
               <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
                 <FieldLabel
                   label="Group name"
@@ -76,6 +107,52 @@ export function GroupListSection({
                       : undefined
                   }
                 />
+              </label>
+
+              <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
+                <FieldLabel
+                  label="Weight"
+                  showRequired={invalidGroupWeightIds.has(group.id)}
+                />
+                <div
+                  className="grid h-12 grid-cols-[minmax(0,1fr)_2.5rem] overflow-hidden rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)]"
+                  style={
+                    invalidGroupWeightIds.has(group.id)
+                      ? requiredHighlightSoftStyle
+                      : undefined
+                  }
+                >
+                  <input
+                    value={group.shareWeight}
+                    onChange={(event) =>
+                      handleWeightChange(group.id, event.target.value)
+                    }
+                    inputMode="numeric"
+                    min="1"
+                    step="1"
+                    placeholder="1"
+                    className="min-w-0 border-0 bg-transparent px-4 font-medium text-[var(--foreground)] outline-none"
+                  />
+                  <div className="grid border-l border-[var(--line)]">
+                    <button
+                      type="button"
+                      className="flex items-center justify-center border-[var(--line)] text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)]"
+                      onClick={() => stepWeight(group, 1)}
+                      aria-label={`Increase weight for ${group.displayName || `group ${index + 1}`}`}
+                    >
+                      <ChevronUp className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      className="flex items-center justify-center text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_12%,white)] disabled:text-[var(--muted-foreground)] disabled:hover:bg-transparent"
+                      onClick={() => stepWeight(group, -1)}
+                      disabled={getWeightValue(group.shareWeight) <= 1}
+                      aria-label={`Decrease weight for ${group.displayName || `group ${index + 1}`}`}
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
               </label>
 
               <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">

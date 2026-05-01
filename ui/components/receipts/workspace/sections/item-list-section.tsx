@@ -198,7 +198,7 @@ export function ItemListSection({
                     </p>
                   </div>
                   <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                    Equal split across selected groups
+                    Weighted split across selected groups
                   </p>
                 </div>
 
