@@ -339,20 +339,18 @@ function AssignGroupsFigure() {
   const groups = [
     {
       label: "Couple tab",
-      note: "2 members, 1 group share",
+      note: "2 people counted together",
+      weight: "Weight 2",
       people: [
         { name: "Alex", active: true },
         { name: "Nina", active: true },
       ],
     },
     {
-      label: "Family tab",
-      note: "3 members, 1 group share",
-      people: [
-        { name: "Mom", active: true },
-        { name: "Dad", active: true },
-        { name: "Me", active: true },
-      ],
+      label: "Solo tab",
+      note: "1 person counted alone",
+      weight: "Weight 1",
+      people: [{ name: "Me", active: true }],
     },
   ];
 
@@ -376,8 +374,10 @@ function AssignGroupsFigure() {
                     {group.note}
                   </p>
                 </div>
-                <span className="rounded-full bg-[#edf0ff] px-2.5 py-1 text-xs font-semibold text-[#4053ff]">
-                  1 share
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-semibold bg-[#edf0ff] text-[#4053ff]`}
+                >
+                  {group.weight}
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 lg:mt-8">
@@ -405,7 +405,7 @@ function AssignGroupsFigure() {
                   House noodles
                 </p>
                 <p className="mt-2 text-xs text-[var(--muted-foreground)]">
-                  Assigned to 2 groups
+                  Assigned to 2 groups, 3 weight shares
                 </p>
               </div>
               <span className="rounded-full bg-[#e2f5e8] px-3 py-1.5 text-xs font-semibold text-[#116149]">
@@ -416,15 +416,15 @@ function AssignGroupsFigure() {
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Per group
+                Couple
               </p>
-              <p className="mt-2 text-xl font-semibold">$9.25</p>
+              <p className="mt-2 text-xl font-semibold">$12.33</p>
             </div>
             <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Groups
+                Solo
               </p>
-              <p className="mt-2 text-xl font-semibold">2</p>
+              <p className="mt-2 text-xl font-semibold">$6.17</p>
             </div>
           </div>
           <div className="mt-auto rounded-[0.7rem] border border-[#c5ead6] bg-[#e7f7ed] p-4 text-[#116149]">
@@ -432,7 +432,7 @@ function AssignGroupsFigure() {
               Allocation
             </p>
             <p className="mt-2 text-sm font-semibold">
-              Each selected group gets one equal share.
+              Split by group weights: 2/3 to Couple, 1/3 to Solo.
             </p>
           </div>
         </div>
@@ -440,7 +440,7 @@ function AssignGroupsFigure() {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-1 lg:grid-rows-2">
           {[
             ["Groups", "2"],
-            ["People", "5"],
+            ["Weights", "3"],
           ].map(([label, value]) => (
             <div
               key={label}
@@ -847,7 +847,7 @@ export default function Home() {
             revealOnScroll={revealWorkflowOnScroll}
             eyebrow="Make groups"
             title="Split items by the groups sharing them."
-            description="Build groups for couples, friends, or a whole table. Every selected group counts as one share."
+            description="Build groups for couples, friends, or a whole table. Give each group a weight so shared items split by the shares they represent."
             sidebar={<GroupIconGrid />}
           >
             <AssignGroupsFigure />
