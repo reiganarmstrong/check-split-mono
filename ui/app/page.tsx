@@ -283,7 +283,7 @@ function ReceiptScanFigure() {
           </p>
         </div>
 
-        <div className="order-3 col-span-2 rounded-[0.8rem] border border-[var(--line)] bg-white p-4 sm:order-none sm:col-span-1">
+        <div className="order-3 col-span-2 hidden rounded-[0.8rem] border border-[var(--line)] bg-white p-4 sm:order-none sm:col-span-1 sm:block">
           <Eyebrow>Extracted</Eyebrow>
           <div className="mt-3 flex flex-wrap gap-2 text-xs sm:mt-4 sm:block sm:space-y-2 sm:text-sm">
             {["Tax $3.10", "Tip $4.00", "Total $104.50"].map((item) => (
@@ -335,23 +335,23 @@ function GroupIconGrid() {
   );
 }
 
-function AssignPeopleFigure() {
+function AssignGroupsFigure() {
   const groups = [
     {
       label: "Couple tab",
-      note: "House noodles split",
+      note: "2 members, 1 group share",
       people: [
         { name: "Alex", active: true },
         { name: "Nina", active: true },
       ],
     },
     {
-      label: "Friends tab",
-      note: "Shared plates ready",
+      label: "Family tab",
+      note: "3 members, 1 group share",
       people: [
-        { name: "June", active: false },
-        { name: "Maya", active: false },
-        { name: "Kai", active: false },
+        { name: "Mom", active: true },
+        { name: "Dad", active: true },
+        { name: "Me", active: true },
       ],
     },
   ];
@@ -359,7 +359,7 @@ function AssignPeopleFigure() {
   return (
     <div className="rounded-[0.9rem] border border-[var(--line)] bg-white p-4 shadow-[0_16px_36px_rgba(14,18,24,0.04)] sm:p-6 lg:min-h-[34rem]">
       <h3 className="text-2xl leading-none text-[var(--foreground)] sm:text-3xl">
-        Assign people
+        Assign groups
       </h3>
 
       <div className="mt-4 grid gap-3 sm:mt-5 sm:gap-5 lg:min-h-[27rem] lg:grid-cols-[1fr_0.72fr_8.5rem] lg:items-stretch">
@@ -377,7 +377,7 @@ function AssignPeopleFigure() {
                   </p>
                 </div>
                 <span className="rounded-full bg-[#edf0ff] px-2.5 py-1 text-xs font-semibold text-[#4053ff]">
-                  {group.people.filter((person) => person.active).length}
+                  1 share
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 lg:mt-8">
@@ -405,7 +405,7 @@ function AssignPeopleFigure() {
                   House noodles
                 </p>
                 <p className="mt-2 text-xs text-[var(--muted-foreground)]">
-                  Assigned to Couple tab
+                  Assigned to 2 groups
                 </p>
               </div>
               <span className="rounded-full bg-[#e2f5e8] px-3 py-1.5 text-xs font-semibold text-[#116149]">
@@ -416,13 +416,13 @@ function AssignPeopleFigure() {
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Share
+                Per group
               </p>
               <p className="mt-2 text-xl font-semibold">$9.25</p>
             </div>
             <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                People
+                Groups
               </p>
               <p className="mt-2 text-xl font-semibold">2</p>
             </div>
@@ -432,7 +432,7 @@ function AssignPeopleFigure() {
               Allocation
             </p>
             <p className="mt-2 text-sm font-semibold">
-              Alex and Nina split this item evenly.
+              Each selected group gets one equal share.
             </p>
           </div>
         </div>
@@ -625,9 +625,7 @@ function WorkflowBand({
       <motion.div
         data-workflow-card
         className="lg:sticky lg:translate-y-0"
-        initial={
-          isReady ? false : { opacity: 0, y: 20, scale: 0.985 }
-        }
+        initial={isReady ? false : { opacity: 0, y: 20, scale: 0.985 }}
         animate={
           isReady
             ? { opacity: 1, y: 0, scale: 1 }
@@ -848,11 +846,11 @@ export default function Home() {
             isReady={workflowReady}
             revealOnScroll={revealWorkflowOnScroll}
             eyebrow="Make groups"
-            title="Split items by the people sharing them."
-            description="Build groups for couples, friends, or a whole table before saving the final split."
+            title="Split items by the groups sharing them."
+            description="Build groups for couples, friends, or a whole table. Every selected group counts as one share."
             sidebar={<GroupIconGrid />}
           >
-            <AssignPeopleFigure />
+            <AssignGroupsFigure />
           </WorkflowBand>
 
           <WorkflowBand
