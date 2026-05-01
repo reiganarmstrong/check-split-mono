@@ -70,7 +70,7 @@ export function ItemListSection({
               </div>
 
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <label className="space-y-2 md:col-span-2">
+                <label className="grid gap-2 md:col-span-2 md:grid-rows-[1.5rem_3rem]">
                   <FieldLabel
                     label="Description"
                     showRequired={itemValidation?.descriptionMissing ?? false}
@@ -92,8 +92,8 @@ export function ItemListSection({
                   />
                 </label>
 
-                <label className="space-y-2">
-                  <span className="text-sm font-medium text-[var(--foreground)]">
+                <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
+                  <span className="inline-flex h-6 items-center text-sm font-medium text-[var(--foreground)]">
                     Category
                   </span>
                   <Input
@@ -108,7 +108,7 @@ export function ItemListSection({
                   />
                 </label>
 
-                <label className="space-y-2">
+                <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
                   <FieldLabel
                     label="Quantity"
                     showRequired={itemValidation?.quantityInvalid ?? false}
@@ -130,7 +130,7 @@ export function ItemListSection({
                   />
                 </label>
 
-                <label className="space-y-2">
+                <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
                   <FieldLabel
                     label="Unit price"
                     showRequired={itemValidation?.unitPriceInvalid ?? false}
@@ -152,8 +152,8 @@ export function ItemListSection({
                   />
                 </label>
 
-                <label className="space-y-2">
-                  <span className="text-sm font-medium text-[var(--foreground)]">
+                <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
+                  <span className="inline-flex h-6 items-center text-sm font-medium text-[var(--foreground)]">
                     Line discount
                   </span>
                   <Input

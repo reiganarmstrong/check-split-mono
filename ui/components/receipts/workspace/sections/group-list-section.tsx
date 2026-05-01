@@ -56,7 +56,7 @@ export function GroupListSection({
             </div>
 
             <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-              <label className="space-y-2">
+              <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
                 <FieldLabel
                   label="Group name"
                   showRequired={unnamedGroupIds.has(group.id)}
@@ -78,8 +78,8 @@ export function GroupListSection({
                 />
               </label>
 
-              <label className="space-y-2">
-                <span className="text-sm font-medium text-[var(--foreground)]">
+              <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
+                <span className="inline-flex h-6 items-center text-sm font-medium text-[var(--foreground)]">
                   Member notes
                 </span>
                 <input

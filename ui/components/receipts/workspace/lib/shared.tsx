@@ -150,7 +150,7 @@ export function FieldLabel({
   showRequired?: boolean;
 }) {
   return (
-    <span className="inline-flex items-center gap-2 text-sm font-medium text-[var(--foreground)]">
+    <span className="inline-flex min-h-6 items-center gap-2 text-sm font-medium text-[var(--foreground)]">
       {label}
       {showRequired ? (
         <span
