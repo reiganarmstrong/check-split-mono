@@ -141,7 +141,7 @@ export function GroupListSection({
                       inputMode="numeric"
                       min="1"
                       step="1"
-                      placeholder="1"
+                      placeholder="EX: 1"
                       className="h-full min-w-0 rounded-none border-0 bg-transparent px-4 font-medium text-[var(--foreground)] shadow-none focus-visible:border-0 focus-visible:ring-0"
                     />
                     <div className="grid border-l border-[var(--line)]">
