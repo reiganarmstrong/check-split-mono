@@ -282,13 +282,14 @@ export function Navbar() {
             aria-label="Marketing"
             className="hidden items-center gap-12 text-sm font-medium text-[var(--foreground)] md:flex"
           >
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={scrollToFeatures}
-              className="cursor-pointer transition-colors hover:text-[var(--primary)]"
+              className="h-auto rounded-none bg-transparent p-0 text-sm font-medium text-[var(--foreground)] shadow-none hover:bg-transparent hover:text-[var(--primary)] active:bg-transparent"
             >
               How it works
-            </button>
+            </Button>
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
@@ -345,8 +346,9 @@ export function Navbar() {
                   ref={accountMenuRef}
                   className="relative inline-flex shrink-0"
                 >
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     aria-haspopup="menu"
                     aria-expanded={isAccountMenuOpen}
                     onClick={() => setIsAccountMenuOpen((isOpen) => !isOpen)}
@@ -357,7 +359,7 @@ export function Navbar() {
                     <ChevronDown
                       className={`h-4 w-4 shrink-0 text-[#050506] transition-transform duration-200 ${isAccountMenuOpen ? "rotate-180" : ""}`}
                     />
-                  </button>
+                  </Button>
 
                   <motion.div
                     role="menu"
@@ -397,8 +399,9 @@ export function Navbar() {
                         <CircleUserRound className="h-4 w-4" />
                         Manage account
                       </Link>
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
                         role="menuitem"
                         onClick={() => void handleSignOut()}
                         disabled={isSigningOut}
@@ -406,7 +409,7 @@ export function Navbar() {
                       >
                         <LogOut className="h-4 w-4" />
                         {isSigningOut ? "Signing out..." : "Sign out"}
-                      </button>
+                      </Button>
                     </div>
                   </motion.div>
                 </div>

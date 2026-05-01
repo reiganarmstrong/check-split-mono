@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 import { requiredHighlightFillStyle } from "./constants";
@@ -97,12 +99,15 @@ export function GroupChip({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onClick}
       className={cn(
-        "rounded-[0.75rem] p-0 transition-all duration-150 ease-out",
-        active ? "bg-[var(--secondary)]" : "bg-transparent",
+        "h-auto rounded-[0.75rem] p-0 transition-all duration-150 ease-out",
+        active
+          ? "bg-[var(--secondary)] hover:bg-[var(--secondary)] active:bg-[var(--secondary)]"
+          : "bg-transparent hover:bg-transparent active:bg-transparent",
       )}
     >
       <span
@@ -115,7 +120,7 @@ export function GroupChip({
       >
         {label}
       </span>
-    </button>
+    </Button>
   );
 }
 
@@ -143,14 +148,24 @@ export function EditorNotice({
 }
 
 export function FieldLabel({
+  htmlFor,
   label,
   showRequired = false,
+  className,
 }: {
+  htmlFor?: string;
   label: string;
   showRequired?: boolean;
+  className?: string;
 }) {
   return (
-    <span className="inline-flex min-h-6 items-center gap-2 text-sm font-medium text-[var(--foreground)]">
+    <Label
+      htmlFor={htmlFor}
+      className={cn(
+        "inline-flex min-h-6 items-center gap-2 text-sm font-medium text-[var(--foreground)]",
+        className,
+      )}
+    >
       {label}
       {showRequired ? (
         <span
@@ -160,6 +175,6 @@ export function FieldLabel({
           Required
         </span>
       ) : null}
-    </span>
+    </Label>
   );
 }

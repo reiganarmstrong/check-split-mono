@@ -187,6 +187,7 @@ export function ReceiptWorkspace({
                     <GroupListSection
                       groups={workspace.editorState.groups}
                       unnamedGroupIds={workspace.unnamedGroupIds}
+                      invalidGroupWeightIds={workspace.invalidGroupWeightIds}
                       updateGroup={workspace.updateGroup}
                       addGroup={workspace.addGroup}
                       removeGroup={workspace.removeGroup}

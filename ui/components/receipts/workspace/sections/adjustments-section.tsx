@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   centsToInputValue,
   formatCurrency,
@@ -34,6 +35,10 @@ export function AdjustmentsSection({
 }) {
   const subtotalCents = getReceiptSubtotalCents(editorState);
   const tipCents = getReceiptTipCents(editorState);
+  const tipInputId =
+    editorState.tipInputMode === "percent"
+      ? "receipt-tip-percentage"
+      : "receipt-tip-amount";
 
   function selectTipInputMode(mode: TipInputMode) {
     if (mode === editorState.tipInputMode) {
@@ -60,22 +65,29 @@ export function AdjustmentsSection({
   return (
     <SectionShell title="Adjustments" eyebrow="Receipt totals">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <label className="space-y-2">
-          <span className="flex h-8 items-center text-sm font-medium text-[var(--foreground)]">
+        <div className="space-y-2">
+          <Label
+            htmlFor="receipt-tax"
+            className="flex h-8 items-center text-sm font-medium text-[var(--foreground)]"
+          >
             Tax
-          </span>
+          </Label>
           <Input
+            id="receipt-tax"
             inputMode="decimal"
             value={editorState.tax}
             onChange={(event) => updateField("tax", event.target.value)}
             className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
           />
-        </label>
+        </div>
         <div className="space-y-2 sm:col-span-2 lg:col-span-1">
           <div className="flex h-8 items-center justify-between gap-3">
-            <span className="text-sm font-medium text-[var(--foreground)]">
+            <Label
+              htmlFor={tipInputId}
+              className="text-sm font-medium text-[var(--foreground)]"
+            >
               Tip
-            </span>
+            </Label>
             <div
               role="group"
               className="grid grid-cols-2 rounded-[0.75rem] border border-[var(--line)] bg-[var(--surface)] p-0.5"
@@ -106,6 +118,7 @@ export function AdjustmentsSection({
             <div className="space-y-2">
               <div className="relative">
                 <Input
+                  id="receipt-tip-percentage"
                   inputMode="decimal"
                   value={editorState.tipPercentage}
                   onChange={(event) => updateField("tipPercentage", event.target.value)}
@@ -141,6 +154,7 @@ export function AdjustmentsSection({
             </div>
           ) : (
             <Input
+              id="receipt-tip-amount"
               inputMode="decimal"
               value={editorState.tip}
               onChange={(event) => updateField("tip", event.target.value)}
@@ -148,28 +162,36 @@ export function AdjustmentsSection({
             />
           )}
         </div>
-        <label className="space-y-2">
-          <span className="flex h-8 items-center text-sm font-medium text-[var(--foreground)]">
+        <div className="space-y-2">
+          <Label
+            htmlFor="receipt-fee"
+            className="flex h-8 items-center text-sm font-medium text-[var(--foreground)]"
+          >
             Fee
-          </span>
+          </Label>
           <Input
+            id="receipt-fee"
             inputMode="decimal"
             value={editorState.fee}
             onChange={(event) => updateField("fee", event.target.value)}
             className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
           />
-        </label>
-        <label className="space-y-2">
-          <span className="flex h-8 items-center text-sm font-medium text-[var(--foreground)]">
+        </div>
+        <div className="space-y-2">
+          <Label
+            htmlFor="receipt-discount"
+            className="flex h-8 items-center text-sm font-medium text-[var(--foreground)]"
+          >
             Discount
-          </span>
+          </Label>
           <Input
+            id="receipt-discount"
             inputMode="decimal"
             value={editorState.discount}
             onChange={(event) => updateField("discount", event.target.value)}
             className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
           />
-        </label>
+        </div>
       </div>
     </SectionShell>
   );

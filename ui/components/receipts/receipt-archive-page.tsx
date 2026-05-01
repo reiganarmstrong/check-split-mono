@@ -19,6 +19,7 @@ import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ReceiptApiError, listReceipts } from "@/lib/receipt-api";
 import {
   getPaymentProgressLabel,
@@ -300,32 +301,37 @@ export function ReceiptArchivePage() {
             </div>
 
             <div className="workspace-line mt-6 grid gap-4 pt-6 lg:grid-cols-[minmax(0,1.2fr)_auto] lg:items-center">
-              <label className="relative order-2 block lg:order-1">
+              <div className="relative order-2 block lg:order-1">
+                <Label htmlFor="receipt-archive-search" className="sr-only">
+                  Search saved splits
+                </Label>
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <Input
+                  id="receipt-archive-search"
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
                   placeholder="Search split details"
                   className="h-12 rounded-[0.8rem] border-[var(--line)] bg-white pl-11 pr-4 text-sm shadow-none"
                 />
-              </label>
+              </div>
 
               <div className="order-1 flex w-full flex-wrap items-center justify-center gap-3 lg:order-2 lg:justify-end">
                 <div className="inline-flex shrink-0 rounded-[0.9rem] border border-[var(--line)] bg-[var(--surface)] p-1">
                   {statusFilterOptions.map((option) => (
-                    <button
+                    <Button
                       key={option.value}
                       type="button"
+                      variant="ghost"
                       onClick={() => setStatusFilter(option.value)}
                       className={cn(
-                        "rounded-[0.65rem] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors",
+                        "h-auto rounded-[0.65rem] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors",
                         statusFilter === option.value
-                          ? "bg-[var(--foreground)] text-[var(--background)]"
+                          ? "bg-[var(--foreground)] text-[var(--background)] hover:bg-[var(--foreground)] hover:text-[var(--background)] active:bg-[var(--foreground)]"
                           : "text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]",
                       )}
                     >
                       {option.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
 

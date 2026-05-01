@@ -8,8 +8,8 @@ import {
   hasAmplifyDataConfig,
 } from "@/lib/amplify-auth"
 import {
-  buildEqualAllocationInput,
   buildReceiptSavePlan,
+  buildWeightedAllocationInput,
   getItemLineSubtotalCents,
   getReceiptEditorValidation,
   getReceiptSubtotalCents,
@@ -17,6 +17,7 @@ import {
   getReceiptTotalCents,
   parseMoneyInputToCents,
   parseQuantityInput,
+  parseShareWeightInput,
   toAwsDateTime,
 } from "@/lib/receipt-editor"
 import type {
@@ -317,19 +318,35 @@ function didItemChange(item: EditableItem, serverItem: ReceiptItem | undefined) 
   )
 }
 
-function didAllocationsChange(item: EditableItem, serverItem: ReceiptItem | undefined, participantIds: string[]) {
+function didAllocationsChange(
+  item: EditableItem,
+  serverItem: ReceiptItem | undefined,
+  allocations: Array<{ participantId: string; shareWeight: string }>,
+) {
   if (!serverItem) {
     return true
   }
 
-  const existing = serverItem.allocations.map((allocation) => allocation.participantId).sort()
-  const next = [...participantIds].sort()
+  const existing = [...serverItem.allocations].sort((left, right) =>
+    left.participantId.localeCompare(right.participantId),
+  )
+  const next = [...allocations].sort((left, right) =>
+    left.participantId.localeCompare(right.participantId),
+  )
 
   if (existing.length !== next.length) {
     return true
   }
 
-  return existing.some((value, index) => value !== next[index])
+  return existing.some((allocation, index) => {
+    const nextAllocation = next[index]
+
+    return (
+      !nextAllocation ||
+      allocation.participantId !== nextAllocation.participantId ||
+      allocation.shareWeight !== parseShareWeightInput(nextAllocation.shareWeight)
+    )
+  })
 }
 
 const listReceiptsQuery = /* GraphQL */ `
@@ -867,6 +884,7 @@ async function persistAllocations(
   itemIdByEditorId: Map<string, string>,
 ) {
   const itemsById = new Map(receipt?.items.map((item) => [item.itemId, item]) ?? [])
+  const groupsById = new Map(state.groups.map((group) => [group.id, group]))
   let nextVersion = version
 
   for (const item of state.items) {
@@ -876,18 +894,34 @@ async function persistAllocations(
       continue
     }
 
-    const participantIds = item.selectedGroupIds
-      .map((groupId) => participantIdByGroupId.get(groupId) ?? null)
-      .filter((groupId): groupId is string => Boolean(groupId))
+    const allocations = item.selectedGroupIds
+      .map((groupId) => {
+        const participantId = participantIdByGroupId.get(groupId)
+
+        if (!participantId) {
+          return null
+        }
+
+        return {
+          participantId,
+          shareWeight: groupsById.get(groupId)?.shareWeight ?? "1",
+        }
+      })
+      .filter(
+        (
+          allocation,
+        ): allocation is { participantId: string; shareWeight: string } =>
+          Boolean(allocation),
+      )
 
     const existing = itemsById.get(itemId)
 
-    if (!didAllocationsChange(item, existing, participantIds)) {
+    if (!didAllocationsChange(item, existing, allocations)) {
       continue
     }
 
     const result = await setItemAllocations({
-      allocations: buildEqualAllocationInput(participantIds),
+      allocations: buildWeightedAllocationInput(allocations),
       expectedVersion: nextVersion,
       itemId,
       receiptId,

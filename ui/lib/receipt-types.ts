@@ -80,6 +80,7 @@ export type EditableGroup = {
   participantId: string | null
   displayName: string
   notes: string
+  shareWeight: string
 }
 
 export type EditableItem = {

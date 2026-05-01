@@ -122,6 +122,7 @@ export function useReceiptWorkspace({
     merchantNameMissing: derived.merchantNameMissing,
     receiptDateMissing: derived.receiptDateMissing,
     unnamedGroupIds: derived.unnamedGroupIds,
+    invalidGroupWeightIds: derived.invalidGroupWeightIds,
     itemValidationById:
       derived.itemValidationById as Map<string, ReceiptWorkspaceItemValidation>,
     hasSavedReceipt: derived.hasSavedReceipt,

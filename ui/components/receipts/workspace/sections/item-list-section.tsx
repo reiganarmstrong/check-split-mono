@@ -4,6 +4,7 @@ import { ArrowUpDown, MapPin, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { formatCurrency, getItemLineSubtotalCents } from "@/lib/receipt-editor";
 import type { EditableGroup, EditableItem } from "@/lib/receipt-types";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,11 @@ export function ItemListSection({
       <div className="space-y-5">
         {items.map((item, index) => {
           const itemValidation = itemValidationById.get(item.id);
+          const itemDescriptionInputId = `receipt-item-${item.id}-description`;
+          const itemCategoryInputId = `receipt-item-${item.id}-category`;
+          const itemQuantityInputId = `receipt-item-${item.id}-quantity`;
+          const itemUnitPriceInputId = `receipt-item-${item.id}-unit-price`;
+          const itemDiscountInputId = `receipt-item-${item.id}-discount`;
 
           return (
             <div
@@ -70,12 +76,14 @@ export function ItemListSection({
               </div>
 
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <label className="grid gap-2 md:col-span-2 md:grid-rows-[1.5rem_3rem]">
+                <div className="grid gap-2 md:col-span-2 md:grid-rows-[1.5rem_3rem]">
                   <FieldLabel
+                    htmlFor={itemDescriptionInputId}
                     label="Description"
                     showRequired={itemValidation?.descriptionMissing ?? false}
                   />
                   <Input
+                    id={itemDescriptionInputId}
                     value={item.description}
                     onChange={(event) =>
                       updateItem(item.id, {
@@ -90,13 +98,17 @@ export function ItemListSection({
                         : undefined
                     }
                   />
-                </label>
+                </div>
 
-                <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
-                  <span className="inline-flex h-6 items-center text-sm font-medium text-[var(--foreground)]">
+                <div className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
+                  <Label
+                    htmlFor={itemCategoryInputId}
+                    className="inline-flex h-6 items-center text-sm font-medium text-[var(--foreground)]"
+                  >
                     Category
-                  </span>
+                  </Label>
                   <Input
+                    id={itemCategoryInputId}
                     value={item.category}
                     onChange={(event) =>
                       updateItem(item.id, {
@@ -106,14 +118,16 @@ export function ItemListSection({
                     placeholder="Optional"
                     className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
                   />
-                </label>
+                </div>
 
-                <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
+                <div className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
                   <FieldLabel
+                    htmlFor={itemQuantityInputId}
                     label="Quantity"
                     showRequired={itemValidation?.quantityInvalid ?? false}
                   />
                   <Input
+                    id={itemQuantityInputId}
                     inputMode="numeric"
                     value={item.quantity}
                     onChange={(event) =>
@@ -128,14 +142,16 @@ export function ItemListSection({
                         : undefined
                     }
                   />
-                </label>
+                </div>
 
-                <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
+                <div className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
                   <FieldLabel
+                    htmlFor={itemUnitPriceInputId}
                     label="Unit price"
                     showRequired={itemValidation?.unitPriceInvalid ?? false}
                   />
                   <Input
+                    id={itemUnitPriceInputId}
                     inputMode="decimal"
                     value={item.unitPrice}
                     onChange={(event) =>
@@ -150,13 +166,17 @@ export function ItemListSection({
                         : undefined
                     }
                   />
-                </label>
+                </div>
 
-                <label className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
-                  <span className="inline-flex h-6 items-center text-sm font-medium text-[var(--foreground)]">
+                <div className="grid gap-2 md:grid-rows-[1.5rem_3rem]">
+                  <Label
+                    htmlFor={itemDiscountInputId}
+                    className="inline-flex h-6 items-center text-sm font-medium text-[var(--foreground)]"
+                  >
                     Line discount
-                  </span>
+                  </Label>
                   <Input
+                    id={itemDiscountInputId}
                     inputMode="decimal"
                     value={item.discount}
                     onChange={(event) =>
@@ -166,7 +186,7 @@ export function ItemListSection({
                     }
                     className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium"
                   />
-                </label>
+                </div>
               </div>
 
               <div
@@ -198,7 +218,7 @@ export function ItemListSection({
                     </p>
                   </div>
                   <p className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                    Equal split across selected groups
+                    Weighted split across selected groups
                   </p>
                 </div>
 
