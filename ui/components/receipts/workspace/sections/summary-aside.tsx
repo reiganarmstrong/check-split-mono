@@ -26,6 +26,7 @@ import type {
 } from "../hooks/use-receipt-workspace";
 
 export function SummaryAside({
+  summaryAnchorRef,
   summaryRef,
   groups,
   editorState,
@@ -39,6 +40,7 @@ export function SummaryAside({
   scrollToFullSummary,
   actionBarHeight,
 }: {
+  summaryAnchorRef: RefObject<HTMLDivElement | null>;
   summaryRef: RefObject<HTMLElement | null>;
   groups: EditableGroup[];
   editorState: ReceiptEditorState;
@@ -56,13 +58,17 @@ export function SummaryAside({
   actionBarHeight: number;
 }) {
   return (
-    <motion.aside
+    <aside
       ref={summaryRef}
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.08, duration: 0.35 }}
-      className="workspace-panel relative rounded-[1rem] p-6 lg:-mt-2 lg:sticky lg:top-28 lg:self-start"
+      className="relative lg:-mt-2 lg:sticky lg:top-28 lg:self-start"
     >
+      <div ref={summaryAnchorRef} className="scroll-mt-28" />
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08, duration: 0.35 }}
+        className="workspace-panel rounded-[1rem] p-6"
+      >
       <div className="flex items-start justify-between gap-3">
         <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-[var(--muted-foreground)]">
           Receipt summary
@@ -274,6 +280,7 @@ export function SummaryAside({
           group&apos;s item subtotal.
         </p>
       </div>
-    </motion.aside>
+      </motion.div>
+    </aside>
   );
 }

@@ -89,8 +89,6 @@ export function ReceiptActionBar({
             delay: isMobileViewport ? 0 : 0.2,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className="transform-gpu [backface-visibility:hidden]"
-          style={{ willChange: "transform, opacity" }}
         >
           <div
             className={cn(

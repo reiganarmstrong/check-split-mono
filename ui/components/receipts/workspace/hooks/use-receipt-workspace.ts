@@ -83,6 +83,7 @@ export function useReceiptWorkspace({
   return {
     status: status as ReceiptWorkspaceAuthStatus,
     receiptId,
+    summaryAnchorRef: layout.summaryAnchorRef,
     summaryRef: layout.summaryRef,
     actionBarRef: layout.actionBarRef,
     actionBarActionsRef: layout.actionBarActionsRef,

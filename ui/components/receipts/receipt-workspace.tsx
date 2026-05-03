@@ -239,6 +239,7 @@ export function ReceiptWorkspace({
 
             {workspace.shouldShowUploadGate ? null : (
               <SummaryAside
+                summaryAnchorRef={workspace.summaryAnchorRef}
                 summaryRef={workspace.summaryRef}
                 groups={workspace.editorState.groups}
                 editorState={workspace.editorState}

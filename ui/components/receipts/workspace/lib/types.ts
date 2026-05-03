@@ -34,6 +34,7 @@ export type ReceiptWorkspaceAuthStatus = ReturnType<typeof useAuth>["status"];
 export type ReceiptWorkspaceController = {
   status: ReceiptWorkspaceAuthStatus;
   receiptId?: string;
+  summaryAnchorRef: RefObject<HTMLDivElement | null>;
   summaryRef: RefObject<HTMLElement | null>;
   actionBarRef: RefObject<HTMLDivElement | null>;
   actionBarActionsRef: RefObject<HTMLDivElement | null>;

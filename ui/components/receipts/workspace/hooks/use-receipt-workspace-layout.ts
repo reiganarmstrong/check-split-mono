@@ -15,6 +15,7 @@ export function useReceiptWorkspaceLayout({
   isSaving: boolean;
   sourceReceiptId?: string;
 }) {
+  const summaryAnchorRef = useRef<HTMLDivElement | null>(null);
   const summaryRef = useRef<HTMLElement | null>(null);
   const actionBarRef = useRef<HTMLDivElement | null>(null);
   const actionBarActionsRef = useRef<HTMLDivElement | null>(null);
@@ -143,7 +144,7 @@ export function useReceiptWorkspaceLayout({
   }
 
   function scrollToSummary() {
-    summaryRef.current?.scrollIntoView({
+    summaryAnchorRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
@@ -157,6 +158,7 @@ export function useReceiptWorkspaceLayout({
   }
 
   return {
+    summaryAnchorRef,
     summaryRef,
     actionBarRef,
     actionBarActionsRef,
