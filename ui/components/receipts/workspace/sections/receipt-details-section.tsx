@@ -1,6 +1,7 @@
 "use client";
 
-import { ReceiptText } from "lucide-react";
+import { useEffect } from "react";
+import { ChevronDown, ReceiptText } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,8 @@ type UpdateField = <K extends keyof ReceiptEditorState>(
   value: ReceiptEditorState[K],
 ) => void;
 
+const currencyOptions = [{ value: "USD", label: "USD" }] as const;
+
 export function ReceiptDetailsSection({
   editorState,
   merchantNameMissing,
@@ -26,6 +29,12 @@ export function ReceiptDetailsSection({
   receiptDateMissing: boolean;
   updateField: UpdateField;
 }) {
+  useEffect(() => {
+    if (editorState.currencyCode !== "USD") {
+      updateField("currencyCode", "USD");
+    }
+  }, [editorState.currencyCode, updateField]);
+
   return (
     <SectionShell
       title="Receipt details"
@@ -94,15 +103,21 @@ export function ReceiptDetailsSection({
           >
             Currency
           </Label>
-          <Input
-            id="receipt-currency-code"
-            value={editorState.currencyCode}
-            onChange={(event) =>
-              updateField("currencyCode", event.target.value.toUpperCase())
-            }
-            className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 font-medium uppercase"
-            maxLength={3}
-          />
+          <div className="relative">
+            <select
+              id="receipt-currency-code"
+              value={editorState.currencyCode === "USD" ? "USD" : ""}
+              onChange={() => updateField("currencyCode", "USD")}
+              className="h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 pr-10 font-medium uppercase text-[var(--foreground)] outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {currencyOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
+          </div>
         </div>
 
         <div className="space-y-2 md:col-span-2">
