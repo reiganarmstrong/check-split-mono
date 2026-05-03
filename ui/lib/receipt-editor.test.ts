@@ -6,7 +6,10 @@ import {
   getGroupItemShareDetails,
   getGroupShareSummaries,
   getReceiptTotalCents,
+  getReceiptEditorValidation,
+  isValidShareWeightInput,
   mapReceiptToEditorState,
+  parseShareWeightInput,
 } from "./receipt-editor"
 
 function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorState {
@@ -23,6 +26,7 @@ function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorStat
         isPaid: false,
         notes: "",
         participantId: null,
+        shareWeight: "1",
       },
       {
         displayName: "Blair",
@@ -30,6 +34,7 @@ function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorStat
         isPaid: false,
         notes: "",
         participantId: null,
+        shareWeight: "1",
       },
     ],
     items: [
@@ -266,6 +271,65 @@ describe("getGroupShareSummaries", () => {
     ])
   })
 
+  it("uses group weights when splitting shared items", () => {
+    const summaries = getGroupShareSummaries(
+      createState({
+        groups: [
+          {
+            displayName: "Alex",
+            id: "group-a",
+            isPaid: false,
+            notes: "",
+            participantId: null,
+            shareWeight: "1",
+          },
+          {
+            displayName: "Blair + Casey",
+            id: "group-b",
+            isPaid: false,
+            notes: "",
+            participantId: null,
+            shareWeight: "2",
+          },
+        ],
+        items: [
+          {
+            category: "",
+            description: "Shared",
+            discount: "0.00",
+            id: "shared-item",
+            itemId: null,
+            quantity: "1",
+            selectedGroupIds: ["group-a", "group-b"],
+            unitPrice: "12.00",
+          },
+        ],
+        tax: "1.20",
+      }),
+    )
+
+    expect(summaries).toEqual([
+      {
+        amountCents: 440,
+        discountShareCents: 0,
+        feeShareCents: 0,
+        groupId: "group-a",
+        itemSubtotalCents: 400,
+        taxShareCents: 40,
+        tipShareCents: 0,
+      },
+      {
+        amountCents: 880,
+        discountShareCents: 0,
+        feeShareCents: 0,
+        groupId: "group-b",
+        itemSubtotalCents: 800,
+        taxShareCents: 80,
+        tipShareCents: 0,
+      },
+    ])
+  })
+
   it("reconciles rounding so distributed shares exactly match the receipt total", () => {
     const state = createState({
       discount: "0.01",
@@ -405,6 +469,57 @@ describe("getGroupShareSummaries", () => {
   })
 })
 
+describe("group weight validation", () => {
+  it("accepts positive integer weights only", () => {
+    expect(isValidShareWeightInput("1")).toBe(true)
+    expect(isValidShareWeightInput("12")).toBe(true)
+    expect(isValidShareWeightInput("0")).toBe(false)
+    expect(isValidShareWeightInput("1.5")).toBe(false)
+    expect(isValidShareWeightInput("abc")).toBe(false)
+  })
+
+  it("blocks saving groups with zero or decimal weights", () => {
+    expect(
+      getReceiptEditorValidation(
+        createState({
+          groups: [
+            {
+              displayName: "Alex",
+              id: "group-a",
+              isPaid: false,
+              notes: "",
+              participantId: null,
+              shareWeight: "0",
+            },
+          ],
+        }),
+      ).canSave,
+    ).toBe(false)
+
+    expect(
+      getReceiptEditorValidation(
+        createState({
+          groups: [
+            {
+              displayName: "Alex",
+              id: "group-a",
+              isPaid: false,
+              notes: "",
+              participantId: null,
+              shareWeight: "1.5",
+            },
+          ],
+        }),
+      ).canSave,
+    ).toBe(false)
+  })
+
+  it("falls back to one when parsing invalid weights for calculations", () => {
+    expect(parseShareWeightInput("0")).toBe(1)
+    expect(parseShareWeightInput("1.5")).toBe(1)
+  })
+})
+
 describe("payment state editor mapping", () => {
   it("maps receipt participant paid state into editable groups", () => {
     const editorState = mapReceiptToEditorState(
@@ -432,8 +547,42 @@ describe("payment state editor mapping", () => {
         isPaid: true,
         notes: "",
         participantId: "participant-a",
+        shareWeight: "1",
       },
     ])
+  })
+
+  it("maps saved allocation weights back onto editable groups", () => {
+    const editorState = mapReceiptToEditorState(
+      createReceipt({
+        items: [
+          {
+            allocations: [
+              {
+                createdAt: "2025-01-01T00:00:00.000Z",
+                itemId: "item-a",
+                participantId: "participant-a",
+                shareWeight: 2,
+                updatedAt: "2025-01-01T00:00:00.000Z",
+              },
+            ],
+            category: null,
+            createdAt: "2025-01-01T00:00:00.000Z",
+            description: "Item A",
+            discountCents: 0,
+            itemId: "item-a",
+            lineSubtotalCents: 1000,
+            quantity: 1,
+            scanConfidence: null,
+            sourceLineNumber: null,
+            unitPriceCents: 1000,
+            updatedAt: "2025-01-01T00:00:00.000Z",
+          },
+        ],
+      }),
+    )
+
+    expect(editorState.groups[0]?.shareWeight).toBe("2")
   })
 })
 
@@ -450,6 +599,22 @@ describe("buildReceiptSavePlan", () => {
 
     expect(buildReceiptSavePlan(state, receipt)).toMatchObject({
       saveParticipantCount: 1,
+    })
+  })
+
+  it("marks allocation save when a selected group's weight changes", () => {
+    const receipt = createReceipt()
+    const state = mapReceiptToEditorState(receipt)
+
+    state.groups = state.groups.map((group) =>
+      group.participantId === "participant-a"
+        ? { ...group, shareWeight: "2" }
+        : group,
+    )
+
+    expect(buildReceiptSavePlan(state, receipt)).toMatchObject({
+      saveParticipantCount: 0,
+      setAllocationCount: 1,
     })
   })
 })
@@ -507,6 +672,62 @@ describe("getGroupItemShareDetails", () => {
         lineSubtotalCents: 500,
         ratioLabel: "1/1",
         shareCents: 500,
+      },
+    ])
+  })
+
+  it("reports weighted item ratios for shared rows", () => {
+    const details = getGroupItemShareDetails(
+      createState({
+        groups: [
+          {
+            displayName: "Alex",
+            id: "group-a",
+            isPaid: false,
+            notes: "",
+            participantId: null,
+            shareWeight: "1",
+          },
+          {
+            displayName: "Blair + Casey",
+            id: "group-b",
+            isPaid: false,
+            notes: "",
+            participantId: null,
+            shareWeight: "2",
+          },
+        ],
+        items: [
+          {
+            category: "",
+            description: "Pizza",
+            discount: "0.00",
+            id: "item-pizza",
+            itemId: null,
+            quantity: "1",
+            selectedGroupIds: ["group-a", "group-b"],
+            unitPrice: "9.00",
+          },
+        ],
+      }),
+    )
+
+    expect(details).toEqual([
+      {
+        description: "Pizza",
+        groupId: "group-a",
+        itemId: "item-pizza",
+        lineSubtotalCents: 900,
+        ratioLabel: "1/3",
+        shareCents: 300,
+      },
+      {
+        description: "Pizza",
+        groupId: "group-b",
+        itemId: "item-pizza",
+        lineSubtotalCents: 900,
+        ratioLabel: "2/3",
+        shareCents: 600,
       },
     ])
   })

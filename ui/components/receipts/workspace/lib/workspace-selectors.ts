@@ -9,6 +9,7 @@ import {
   getReceiptSubtotalCents,
   getReceiptTipCents,
   getReceiptTotalCents,
+  isValidShareWeightInput,
   isMeaningfullyDirty,
   parseMoneyInputToCents,
 } from "@/lib/receipt-editor";
@@ -81,6 +82,15 @@ export function getReceiptWorkspaceDerivedState({
       .filter((group) => group.displayName.trim().length === 0)
       .map((group) => group.id),
   );
+  const invalidGroupWeightIds = new Set(
+    editorState.groups
+      .filter(
+        (group) =>
+          group.shareWeight.trim().length === 0 ||
+          !isValidShareWeightInput(group.shareWeight),
+      )
+      .map((group) => group.id),
+  );
   const itemValidationById = new Map(
     editorState.items.map((item) => [
       item.id,
@@ -112,6 +122,7 @@ export function getReceiptWorkspaceDerivedState({
     merchantNameMissing,
     receiptDateMissing,
     unnamedGroupIds,
+    invalidGroupWeightIds,
     itemValidationById,
     heading,
     workspaceDescription,

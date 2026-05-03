@@ -283,7 +283,7 @@ function ReceiptScanFigure() {
           </p>
         </div>
 
-        <div className="order-3 col-span-2 rounded-[0.8rem] border border-[var(--line)] bg-white p-4 sm:order-none sm:col-span-1">
+        <div className="order-3 col-span-2 hidden rounded-[0.8rem] border border-[var(--line)] bg-white p-4 sm:order-none sm:col-span-1 sm:block">
           <Eyebrow>Extracted</Eyebrow>
           <div className="mt-3 flex flex-wrap gap-2 text-xs sm:mt-4 sm:block sm:space-y-2 sm:text-sm">
             {["Tax $3.10", "Tip $4.00", "Total $104.50"].map((item) => (
@@ -335,31 +335,29 @@ function GroupIconGrid() {
   );
 }
 
-function AssignPeopleFigure() {
+function AssignGroupsFigure() {
   const groups = [
     {
       label: "Couple tab",
-      note: "House noodles split",
+      note: "2 people counted together",
+      weight: "Weight 2",
       people: [
         { name: "Alex", active: true },
         { name: "Nina", active: true },
       ],
     },
     {
-      label: "Friends tab",
-      note: "Shared plates ready",
-      people: [
-        { name: "June", active: false },
-        { name: "Maya", active: false },
-        { name: "Kai", active: false },
-      ],
+      label: "Solo tab",
+      note: "1 person counted alone",
+      weight: "Weight 1",
+      people: [{ name: "Me", active: true }],
     },
   ];
 
   return (
     <div className="rounded-[0.9rem] border border-[var(--line)] bg-white p-4 shadow-[0_16px_36px_rgba(14,18,24,0.04)] sm:p-6 lg:min-h-[34rem]">
       <h3 className="text-2xl leading-none text-[var(--foreground)] sm:text-3xl">
-        Assign people
+        Assign groups
       </h3>
 
       <div className="mt-4 grid gap-3 sm:mt-5 sm:gap-5 lg:min-h-[27rem] lg:grid-cols-[1fr_0.72fr_8.5rem] lg:items-stretch">
@@ -376,8 +374,10 @@ function AssignPeopleFigure() {
                     {group.note}
                   </p>
                 </div>
-                <span className="rounded-full bg-[#edf0ff] px-2.5 py-1 text-xs font-semibold text-[#4053ff]">
-                  {group.people.filter((person) => person.active).length}
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-semibold bg-[#edf0ff] text-[#4053ff]`}
+                >
+                  {group.weight}
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 lg:mt-8">
@@ -405,7 +405,7 @@ function AssignPeopleFigure() {
                   House noodles
                 </p>
                 <p className="mt-2 text-xs text-[var(--muted-foreground)]">
-                  Assigned to Couple tab
+                  Assigned to 2 groups, 3 weight shares
                 </p>
               </div>
               <span className="rounded-full bg-[#e2f5e8] px-3 py-1.5 text-xs font-semibold text-[#116149]">
@@ -416,15 +416,15 @@ function AssignPeopleFigure() {
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Share
+                Couple
               </p>
-              <p className="mt-2 text-xl font-semibold">$9.25</p>
+              <p className="mt-2 text-xl font-semibold">$12.33</p>
             </div>
             <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                People
+                Solo
               </p>
-              <p className="mt-2 text-xl font-semibold">2</p>
+              <p className="mt-2 text-xl font-semibold">$6.17</p>
             </div>
           </div>
           <div className="mt-auto rounded-[0.7rem] border border-[#c5ead6] bg-[#e7f7ed] p-4 text-[#116149]">
@@ -432,7 +432,7 @@ function AssignPeopleFigure() {
               Allocation
             </p>
             <p className="mt-2 text-sm font-semibold">
-              Alex and Nina split this item evenly.
+              Split by group weights: 2/3 to Couple, 1/3 to Solo.
             </p>
           </div>
         </div>
@@ -440,7 +440,7 @@ function AssignPeopleFigure() {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-1 lg:grid-rows-2">
           {[
             ["Groups", "2"],
-            ["People", "5"],
+            ["Weights", "3"],
           ].map(([label, value]) => (
             <div
               key={label}
@@ -625,9 +625,7 @@ function WorkflowBand({
       <motion.div
         data-workflow-card
         className="lg:sticky lg:translate-y-0"
-        initial={
-          isReady ? false : { opacity: 0, y: 20, scale: 0.985 }
-        }
+        initial={isReady ? false : { opacity: 0, y: 20, scale: 0.985 }}
         animate={
           isReady
             ? { opacity: 1, y: 0, scale: 1 }
@@ -848,11 +846,11 @@ export default function Home() {
             isReady={workflowReady}
             revealOnScroll={revealWorkflowOnScroll}
             eyebrow="Make groups"
-            title="Split items by the people sharing them."
-            description="Build groups for couples, friends, or a whole table before saving the final split."
+            title="Split items by the groups sharing them."
+            description="Build groups for couples, friends, or a whole table. Give each group a weight so shared items split by the shares they represent."
             sidebar={<GroupIconGrid />}
           >
-            <AssignPeopleFigure />
+            <AssignGroupsFigure />
           </WorkflowBand>
 
           <WorkflowBand

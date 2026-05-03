@@ -19,6 +19,7 @@ import { AuthSessionScreen } from "@/components/auth/auth-session-screen";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ReceiptApiError, listReceipts } from "@/lib/receipt-api";
 import {
   getPaymentProgressLabel,
@@ -299,58 +300,61 @@ export function ReceiptArchivePage() {
               </div>
             </div>
 
-            <div className="workspace-line mt-6 grid gap-4 pt-6 xl:grid-cols-[minmax(0,1.2fr)_auto] xl:items-center">
-              <label className="relative block">
+            <div className="workspace-line mt-6 grid gap-4 pt-6 lg:grid-cols-[minmax(0,1.2fr)_auto] lg:items-center">
+              <div className="relative order-2 block lg:order-1">
+                <Label htmlFor="receipt-archive-search" className="sr-only">
+                  Search saved splits
+                </Label>
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <Input
+                  id="receipt-archive-search"
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
                   placeholder="Search split details"
                   className="h-12 rounded-[0.8rem] border-[var(--line)] bg-white pl-11 pr-4 text-sm shadow-none"
                 />
-              </label>
+              </div>
 
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
-                <div className="flex flex-wrap gap-2">
+              <div className="order-1 flex w-full flex-wrap items-center justify-center gap-3 lg:order-2 lg:justify-end">
+                <div className="inline-flex shrink-0 rounded-[0.9rem] border border-[var(--line)] bg-[var(--surface)] p-1">
                   {statusFilterOptions.map((option) => (
-                    <button
+                    <Button
                       key={option.value}
                       type="button"
+                      variant="ghost"
                       onClick={() => setStatusFilter(option.value)}
                       className={cn(
-                        "rounded-[0.8rem] border px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors",
+                        "h-auto rounded-[0.65rem] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em]",
                         statusFilter === option.value
-                          ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
-                          : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]",
+                          ? "bg-[var(--foreground)] text-[var(--background)] hover:bg-[var(--foreground)] hover:text-[var(--background)] active:bg-[var(--foreground)]"
+                          : "text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]",
                       )}
                     >
                       {option.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
 
-                <label className="flex cursor-pointer items-center gap-3 rounded-[0.8rem] border border-[var(--line)] bg-white px-4 py-3 text-sm uppercase tracking-[0.14em] text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]">
-                  <SlidersHorizontal className="h-4 w-4" />
-                  <span>Sort</span>
-                  <span className="relative ml-auto min-w-0 flex-1 pl-2">
+                <div className="relative min-w-56 flex-1">
+                  <div className="relative">
+                    <SlidersHorizontal className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
                     <select
+                      aria-label="Sort saved splits"
                       value={sortOption}
                       onChange={(event) =>
                         setSortOption(event.target.value as ReceiptSortOption)
                       }
-                      className="w-full cursor-pointer appearance-none bg-transparent pr-6 text-right text-sm font-medium text-[var(--foreground)] outline-none"
+                      className="min-h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-white py-3 pl-11 pr-10 text-xs font-medium uppercase tracking-[0.18em] text-[var(--foreground)] outline-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:pr-14"
                     >
-                      {Object.entries(sortOptionLabels).map(
-                        ([value, label]) => (
-                          <option key={value} value={value}>
-                            {label}
-                          </option>
-                        ),
-                      )}
+                      {Object.entries(sortOptionLabels).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
                     </select>
-                    <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)]" />
-                  </span>
-                </label>
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)] md:right-6" />
+                  </div>
+                </div>
               </div>
             </div>
 

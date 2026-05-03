@@ -35,9 +35,15 @@ const quantityInputSchema = z
   .trim()
   .regex(/^[1-9]\d*$/, "Quantity must be a whole number greater than 0.")
 
+export const shareWeightInputSchema = z
+  .string()
+  .trim()
+  .regex(/^[1-9]\d*$/, "Group weight must be a whole number greater than 0.")
+
 const groupSchema = z.object({
   displayName: z.string().trim().min(1, "Group name is required."),
   notes: z.string(),
+  shareWeight: shareWeightInputSchema,
 })
 
 const itemSchema = z.object({
@@ -128,6 +134,7 @@ export function createEditableGroup(group?: Partial<EditableGroup>): EditableGro
     isPaid: group?.isPaid ?? false,
     notes: group?.notes ?? "",
     participantId: group?.participantId ?? null,
+    shareWeight: group?.shareWeight ?? "1",
   }
 }
 
@@ -187,6 +194,25 @@ export function parseQuantityInput(value: string) {
   }
 
   return numericValue
+}
+
+export function parseShareWeightInput(value: string) {
+  const normalized = value.trim()
+  const numericValue = Number(normalized)
+
+  if (
+    !/^[1-9]\d*$/.test(normalized) ||
+    !Number.isFinite(numericValue) ||
+    numericValue <= 0
+  ) {
+    return 1
+  }
+
+  return numericValue
+}
+
+export function isValidShareWeightInput(value: string) {
+  return shareWeightInputSchema.safeParse(value).success
 }
 
 export function parsePercentageInput(value: string) {
@@ -358,6 +384,26 @@ function distributeCentsByWeight(
   return distributed
 }
 
+function getSelectedGroupWeights(
+  state: ReceiptEditorState,
+  selectedGroupIds: string[],
+) {
+  const groupsById = new Map(state.groups.map((group) => [group.id, group]))
+
+  return selectedGroupIds.map((groupId) => ({
+    recipientId: groupId,
+    weight: parseShareWeightInput(groupsById.get(groupId)?.shareWeight ?? "1"),
+  }))
+}
+
+function formatShareWeightInput(value: number | undefined) {
+  if (!Number.isFinite(value) || !value || value <= 0) {
+    return "1"
+  }
+
+  return String(value)
+}
+
 export function getGroupShareSummaries(
   state: ReceiptEditorState,
 ): GroupShareSummary[] {
@@ -378,8 +424,9 @@ export function getGroupShareSummaries(
     }
 
     const lineSubtotal = getItemLineSubtotalCents(item)
-    const distributedLineSubtotal = distributeCentsAcrossRecipients(
+    const distributedLineSubtotal = distributeCentsByWeight(
       lineSubtotal,
+      getSelectedGroupWeights(state, item.selectedGroupIds),
       item.selectedGroupIds,
     )
 
@@ -444,19 +491,31 @@ export function getGroupItemShareDetails(
     }
 
     const lineSubtotalCents = getItemLineSubtotalCents(item)
-    const distributedLineSubtotal = distributeCentsAcrossRecipients(
+    const selectedGroupWeights = getSelectedGroupWeights(state, item.selectedGroupIds)
+    const totalSelectedWeight = selectedGroupWeights.reduce(
+      (sum, group) => sum + group.weight,
+      0,
+    )
+    const distributedLineSubtotal = distributeCentsByWeight(
       lineSubtotalCents,
+      selectedGroupWeights,
       item.selectedGroupIds,
     )
-    const ratioLabel = `1/${item.selectedGroupIds.length}`
 
     for (const [groupId, shareCents] of distributedLineSubtotal.entries()) {
+      const groupWeight =
+        selectedGroupWeights.find((group) => group.recipientId === groupId)
+          ?.weight ?? 1
+
       details.push({
         description: item.description.trim() || "Untitled item",
         groupId,
         itemId: item.id,
         lineSubtotalCents,
-        ratioLabel,
+        ratioLabel:
+          totalSelectedWeight > 0
+            ? `${groupWeight}/${totalSelectedWeight}`
+            : `1/${item.selectedGroupIds.length}`,
         shareCents,
       })
     }
@@ -475,6 +534,7 @@ export function getReceiptEditorValidation(
     groups: state.groups.map((group) => ({
       displayName: group.displayName,
       notes: group.notes,
+      shareWeight: group.shareWeight,
     })),
     items: state.items.map((item) => ({
       description: item.description,
@@ -507,7 +567,7 @@ export function getReceiptEditorValidation(
     }
 
     if (issue.path[0] === "groups") {
-      issues.add("Every split group needs a name, and the receipt needs at least one group.")
+      issues.add("Every split group needs a name and a positive weight.")
       continue
     }
 
@@ -526,6 +586,23 @@ export function getReceiptEditorValidation(
 }
 
 export function mapReceiptToEditorState(receipt: Receipt): ReceiptEditorState {
+  const shareWeightByParticipantId = new Map<string, number>()
+
+  for (const item of receipt.items) {
+    for (const allocation of item.allocations) {
+      if (
+        !shareWeightByParticipantId.has(allocation.participantId) &&
+        Number.isFinite(allocation.shareWeight) &&
+        allocation.shareWeight > 0
+      ) {
+        shareWeightByParticipantId.set(
+          allocation.participantId,
+          allocation.shareWeight,
+        )
+      }
+    }
+  }
+
   const groups = receipt.participants.map((participant) =>
     createEditableGroup({
       displayName: participant.displayName,
@@ -533,6 +610,9 @@ export function mapReceiptToEditorState(receipt: Receipt): ReceiptEditorState {
       isPaid: participant.isPaid,
       notes: participant.notes ?? "",
       participantId: participant.participantId,
+      shareWeight: formatShareWeightInput(
+        shareWeightByParticipantId.get(participant.participantId),
+      ),
     }),
   )
 
@@ -570,10 +650,12 @@ export function mapReceiptToEditorState(receipt: Receipt): ReceiptEditorState {
   }
 }
 
-export function buildEqualAllocationInput(participantIds: string[]) {
-  return participantIds.map((participantId) => ({
-    participantId,
-    shareWeight: 1,
+export function buildWeightedAllocationInput(
+  allocations: Array<{ participantId: string; shareWeight: string }>,
+) {
+  return allocations.map((allocation) => ({
+    participantId: allocation.participantId,
+    shareWeight: parseShareWeightInput(allocation.shareWeight),
   }))
 }
 
@@ -667,8 +749,32 @@ export function buildReceiptSavePlan(
       return true
     }
 
-    const existingParticipantIds = existing.allocations.map((allocation) => allocation.participantId)
-    return !equalIdSets(existingParticipantIds, item.selectedGroupIds)
+    const existingAllocationsByParticipantId = new Map(
+      existing.allocations.map((allocation) => [
+        allocation.participantId,
+        allocation,
+      ]),
+    )
+
+    if (
+      !equalIdSets(
+        existing.allocations.map((allocation) => allocation.participantId),
+        item.selectedGroupIds,
+      )
+    ) {
+      return true
+    }
+
+    return item.selectedGroupIds.some((groupId) => {
+      const group = state.groups.find((currentGroup) => currentGroup.id === groupId)
+      const existingAllocation = existingAllocationsByParticipantId.get(groupId)
+
+      return (
+        !existingAllocation ||
+        existingAllocation.shareWeight !==
+          parseShareWeightInput(group?.shareWeight ?? "1")
+      )
+    })
   }).length
 
   return {

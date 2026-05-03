@@ -5,7 +5,8 @@ import { AuthProvider } from "@/components/auth/auth-provider";
 
 export const metadata: Metadata = {
   title: "CheckSplit",
-  description: "Snap your receipt, let AI extract the items, and easily assign who pays.",
+  description:
+    "Snap your receipt, let AI extract the items, and easily assign who pays.",
   icons: {
     icon: [
       {
@@ -24,8 +25,8 @@ export const metadata: Metadata = {
   },
 };
 
-import { Navbar } from "@/components/landing/navbar";
-import { SiteFooter } from "@/components/landing/site-footer";
+import { Navbar } from "@/components/layout/navbar";
+import { SiteFooter } from "@/components/layout/site-footer";
 
 export default function RootLayout({
   children,
