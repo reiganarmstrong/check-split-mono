@@ -19,10 +19,18 @@ export function SiteFooter() {
             />
 
             <div className="flex shrink-0 items-center justify-end gap-5 text-right text-sm text-[var(--muted-foreground)]">
-              <Link href="/privacy" className="transition-colors hover:text-[var(--foreground)]">
+              <Link
+                href="/privacy"
+                scroll
+                className="transition-colors hover:text-[var(--foreground)]"
+              >
                 Privacy
               </Link>
-              <Link href="/contact" className="transition-colors hover:text-[var(--foreground)]">
+              <Link
+                href="/contact"
+                scroll
+                className="transition-colors hover:text-[var(--foreground)]"
+              >
                 Contact
               </Link>
             </div>
