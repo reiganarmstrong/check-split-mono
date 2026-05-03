@@ -118,8 +118,11 @@ function ConfirmSignupPageContent() {
         className="page-shell my-8 w-full"
       >
         <AuthCardShell
-          icon={<BadgeCheck className="h-8 w-8 text-primary" />}
+          icon={<BadgeCheck className="h-8 w-8 text-[var(--foreground)]" />}
           iconWrapperClassName="bg-[color-mix(in_oklab,var(--primary)_18%,transparent)]"
+          bandStyle={{
+            background: "color-mix(in oklab, var(--primary) 7%, white)",
+          }}
           title="Verify your email"
           description="Enter confirmation code from Cognito, finish setup, then log in."
           footerPrompt="Already verified?"
@@ -208,7 +211,7 @@ function ConfirmSignupPageContent() {
                     onClick={() => {
                       void handleResendCode()
                     }}
-                    className="h-12 w-full rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] font-semibold text-[var(--foreground)] hover:bg-[var(--surface)]"
+                    className="h-12 w-full rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel)] font-semibold text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
                   >
                     {isResending ? "Sending new code..." : "Resend code"}
                   </Button>

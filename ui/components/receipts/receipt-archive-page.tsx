@@ -346,11 +346,13 @@ export function ReceiptArchivePage() {
                       }
                       className="min-h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-white py-3 pl-11 pr-10 text-xs font-medium uppercase tracking-[0.18em] text-[var(--foreground)] outline-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:pr-14"
                     >
-                      {Object.entries(sortOptionLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
+                      {Object.entries(sortOptionLabels).map(
+                        ([value, label]) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ),
+                      )}
                     </select>
                     <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)] md:right-6" />
                   </div>
@@ -376,24 +378,10 @@ export function ReceiptArchivePage() {
                     No saved splits yet
                   </h3>
                   <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[var(--muted-foreground)]">
-                    Create one, split it by group, and it will appear here.
+                    Create one now!
                   </p>
                   <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                    <Button
-                      asChild
-                      className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90"
-                    >
-                      <Link href="/dashboard/new">Create custom receipt</Link>
-                    </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="rounded-[0.8rem] border border-dashed border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
-                    >
-                      <Link href="/dashboard/new?prompt=upload">
-                        Upload receipt
-                      </Link>
-                    </Button>
+                    <CreateReceiptButton />
                   </div>
                 </div>
               </div>
