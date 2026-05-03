@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  memo,
   useEffect,
   useRef,
   useState,
@@ -189,7 +190,7 @@ function HeroVisual() {
   );
 }
 
-function HeroProof() {
+const HeroProof = memo(function HeroProof() {
   const items = [
     { icon: Zap, label: "Fast", detail: "Scan in seconds" },
     { icon: Users, label: "Easy", detail: "Simple groups" },
@@ -197,16 +198,22 @@ function HeroProof() {
   ];
 
   return (
-    <div className="mt-9 grid w-full max-w-[36rem] grid-cols-3 gap-2 border-t border-[var(--line)] pt-7 sm:gap-4">
+    <div className="mt-9 grid w-full max-w-[36rem] grid-cols-3 gap-2 border-t border-[var(--line)] pt-7 [contain:layout_paint] sm:gap-4">
       {items.map((item) => {
         const Icon = item.icon;
 
         return (
           <div
             key={item.label}
-            className="flex min-w-0 items-start justify-center gap-2 text-left sm:gap-3"
+            className="grid min-w-0 justify-items-center gap-2 text-center sm:flex sm:items-start sm:justify-center sm:gap-3 sm:text-left"
           >
-            <Icon className="mt-0.5 h-6 w-6 shrink-0 text-[#4252d7] sm:h-7 sm:w-7" />
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:translate3d(0,0,0)] sm:h-8 sm:w-8">
+              <Icon
+                aria-hidden="true"
+                className="block h-6 w-6 shrink-0 text-[#4252d7] [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:translate3d(0,0,0)] sm:h-7 sm:w-7"
+                focusable="false"
+              />
+            </span>
             <div className="min-w-0">
               <p className="text-xs font-semibold text-[var(--foreground)] sm:text-sm">
                 {item.label}
@@ -220,7 +227,7 @@ function HeroProof() {
       })}
     </div>
   );
-}
+});
 
 function Checklist({ items }: { items: string[] }) {
   return (
