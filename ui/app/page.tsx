@@ -826,7 +826,7 @@ export default function Home() {
             isReady={workflowReady}
             revealOnScroll={revealWorkflowOnScroll}
             eyebrow="Parse receipt"
-            title="Turn receipt into clean line items."
+            title="Turn your receipt into clean line items."
             description="Pull totals, tax, tip, and items into a format ready for assigning."
             sidebar={
               <Checklist
