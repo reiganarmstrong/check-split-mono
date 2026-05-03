@@ -405,7 +405,7 @@ export function Navbar() {
                         role="menuitem"
                         onClick={() => void handleSignOut()}
                         disabled={isSigningOut}
-                        className="inline-flex h-10 w-full items-center justify-start gap-2 rounded-[0.7rem] px-3 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-60"
+                        className="inline-flex h-10 w-full items-center justify-start gap-2 rounded-[0.7rem] px-3 text-sm font-medium text-destructive transition-colors hover:text-destructive hover:bg-destructive/10 disabled:opacity-60"
                       >
                         <LogOut className="h-4 w-4" />
                         {isSigningOut ? "Signing out..." : "Sign out"}
