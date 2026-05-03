@@ -47,12 +47,21 @@ export function response(ctx) {
   const orderedReceiptIds = ctx.stash.listReceiptOrder ?? [];
   const rootsByReceiptId = {};
 
-  for (const root of roots) {
-    if (root.owner_user_id !== userSub) {
-      util.error('Unauthorized', 'Unauthorized');
-    }
+  if (orderedReceiptIds.length === 0) {
+    return {
+      items: [],
+      nextToken: ctx.stash.listReceiptsNextToken ?? null,
+    };
+  }
 
-    rootsByReceiptId[root.receipt_id] = root;
+  for (const root of roots) {
+    if (root !== null) {
+      if (root.owner_user_id !== userSub) {
+        util.error('Unauthorized', 'Unauthorized');
+      }
+
+      rootsByReceiptId[root.receipt_id] = root;
+    }
   }
 
   return {

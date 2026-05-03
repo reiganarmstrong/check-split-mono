@@ -350,3 +350,82 @@ test('batchGetReceiptRoots preserves queried order', () => {
     nextToken: 'next-token',
   });
 });
+
+test('batchGetReceiptRoots returns empty archive for user with no receipts', () => {
+  const resolver = loadResolver('batch-get-receipt-roots.js.tftpl');
+  const ctx = {
+    identity: {
+      sub: 'user-1',
+    },
+    result: {
+      data: {
+        '${table_name}': [null],
+      },
+    },
+    stash: {
+      listReceiptOrder: [],
+      listReceiptsNextToken: null,
+      receiptRootKeys: [
+        {
+          pk: '__NO_RECEIPTS__',
+          sk: 'RECEIPT',
+        },
+      ],
+    },
+  };
+
+  const result = resolver.response(ctx);
+
+  assert.deepEqual(normalize(result), {
+    items: [],
+    nextToken: null,
+  });
+});
+
+test('batchGetReceiptRoots skips missing roots in batch response', () => {
+  const resolver = loadResolver('batch-get-receipt-roots.js.tftpl');
+  const ctx = {
+    identity: {
+      sub: 'user-1',
+    },
+    result: {
+      data: {
+        '${table_name}': [
+          null,
+          {
+            location_name: null,
+            merchant_name: 'Cafe',
+            owner_user_id: 'user-1',
+            receipt_id: 'receipt-1',
+            receipt_occurred_at: '2026-04-20T18:00:00.000Z',
+            total_cents: 1000,
+            updated_at: '2026-04-20T19:00:00.000Z',
+          },
+        ],
+      },
+    },
+    stash: {
+      listReceiptOrder: ['receipt-missing', 'receipt-1'],
+      listReceiptsNextToken: null,
+      receiptRootKeys: [],
+    },
+  };
+
+  const result = resolver.response(ctx);
+
+  assert.deepEqual(normalize(result), {
+    items: [
+      {
+        locationName: null,
+        merchantName: 'Cafe',
+        paidParticipantCount: 0,
+        participantCount: 0,
+        receiptId: 'receipt-1',
+        receiptOccurredAt: '2026-04-20T18:00:00.000Z',
+        totalCents: 1000,
+        updatedAt: '2026-04-20T19:00:00.000Z',
+      },
+    ],
+    nextToken: null,
+  });
+});
