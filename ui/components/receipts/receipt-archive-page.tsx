@@ -127,7 +127,7 @@ function ReceiptArchiveRow({ receipt }: { receipt: ReceiptListItem }) {
   );
 }
 
-function CreateReceiptButton() {
+function CreateSplitButton() {
   return (
     <Button
       asChild
@@ -135,7 +135,7 @@ function CreateReceiptButton() {
     >
       <Link href="/dashboard/new">
         <PencilLine className="h-4 w-4" />
-        Create new receipt
+        Create new split
       </Link>
     </Button>
   );
@@ -279,7 +279,7 @@ export function ReceiptArchivePage() {
               </div>
 
               <div className="flex xl:justify-end">
-                <CreateReceiptButton />
+                <CreateSplitButton />
               </div>
             </div>
           </section>
@@ -377,11 +377,8 @@ export function ReceiptArchivePage() {
                   <h3 className="mt-6 text-3xl leading-none text-[var(--foreground)]">
                     No saved splits yet
                   </h3>
-                  <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[var(--muted-foreground)]">
-                    Create one now!
-                  </p>
                   <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                    <CreateReceiptButton />
+                    <CreateSplitButton />
                   </div>
                 </div>
               </div>
