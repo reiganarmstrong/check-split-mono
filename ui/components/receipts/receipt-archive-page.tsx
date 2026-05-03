@@ -377,6 +377,9 @@ export function ReceiptArchivePage() {
                   <h3 className="mt-6 text-3xl leading-none text-[var(--foreground)]">
                     No saved splits yet
                   </h3>
+                  <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[var(--muted-foreground)]">
+                    Upload a receipt, make groups, split costs.
+                  </p>
                   <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                     <CreateSplitButton />
                   </div>
