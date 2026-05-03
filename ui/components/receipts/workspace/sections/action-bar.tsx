@@ -255,7 +255,7 @@ export function ReceiptActionBar({
                         onClick={() => void handleDelete()}
                         disabled={isSaving || isDeleting || isParsingReceipt}
                         className={cn(
-                          "h-11 rounded-[0.8rem] bg-[#ff0000] px-5 text-sm font-semibold text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
+                          "h-11 rounded-[0.8rem] bg-[#ff0000] px-5 text-sm font-semibold text-[#fff8f6] hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
                           isCompactActionBar &&
                             "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
                         )}
@@ -287,7 +287,7 @@ export function ReceiptActionBar({
                       isParsingReceipt
                     }
                     className={cn(
-                      "h-11 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
+                      "h-11 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
                       isCompactActionBar &&
                         "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
                     )}
@@ -383,7 +383,7 @@ export function ReceiptActionBar({
                       onClick={() => void handleDelete()}
                       disabled={isSaving || isDeleting || isParsingReceipt}
                       className={cn(
-                        "h-11 rounded-[0.8rem] bg-[#ff0000] px-5 text-sm font-semibold text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
+                        "h-11 rounded-[0.8rem] bg-[#ff0000] px-5 text-sm font-semibold text-[#fff8f6] hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:opacity-50",
                         isCompactActionBar &&
                           "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
                       )}
@@ -415,7 +415,7 @@ export function ReceiptActionBar({
                     isParsingReceipt
                   }
                   className={cn(
-                    "h-11 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] transition-opacity hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
+                    "h-11 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90 disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]",
                     isCompactActionBar &&
                       "min-w-[calc(50%-0.375rem)] flex-1 justify-center px-4",
                   )}

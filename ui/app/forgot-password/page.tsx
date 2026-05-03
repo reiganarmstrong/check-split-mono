@@ -303,7 +303,7 @@ function ForgotPasswordPageContent() {
                   <Button
                     type="submit"
                     disabled={!canSubmit || isSubmitting || isResending}
-                    className="h-14 w-full rounded-[0.8rem] bg-foreground text-base font-semibold text-background transition-opacity hover:bg-accent hover:text-accent-foreground hover:opacity-90 active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+                    className="h-14 w-full rounded-[0.8rem] bg-foreground text-base font-semibold text-background hover:bg-accent hover:text-accent-foreground hover:opacity-90 active:bg-[color-mix(in_srgb,var(--accent)_88%,black)] active:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:ring-[color-mix(in_srgb,var(--accent)_32%,transparent)] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
                   >
                     {isSubmitting
                       ? resetStep === "request"

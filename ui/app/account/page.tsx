@@ -289,7 +289,7 @@ export default function AccountPage() {
                   <Button
                     type="submit"
                     disabled={!canSubmit || isSubmitting}
-                    className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
+                    className="h-12 rounded-[0.8rem] bg-[var(--foreground)] px-5 text-sm font-semibold text-[var(--background)] hover:opacity-90 disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
                   >
                     {isSubmitting ? "Updating password..." : "Update password"}
                   </Button>
@@ -393,7 +393,7 @@ export default function AccountPage() {
                     <Button
                       type="submit"
                       disabled={!canSubmit || isSubmitting}
-                      className="h-12 rounded-[0.8rem] bg-[#ff0000] px-5 text-sm font-semibold text-[#fff8f6] transition-opacity hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
+                      className="h-12 rounded-[0.8rem] bg-[#ff0000] px-5 text-sm font-semibold text-[#fff8f6] hover:bg-[#cc0000] hover:opacity-90 active:bg-[#cc0000] disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
                     >
                       <Trash2 className="h-4 w-4" />
                       {isSubmitting ? "Deleting account..." : "Delete account"}

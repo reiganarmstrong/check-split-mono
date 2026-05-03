@@ -324,7 +324,7 @@ export function ReceiptArchivePage() {
                       variant="ghost"
                       onClick={() => setStatusFilter(option.value)}
                       className={cn(
-                        "h-auto rounded-[0.65rem] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-colors",
+                        "h-auto rounded-[0.65rem] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em]",
                         statusFilter === option.value
                           ? "bg-[var(--foreground)] text-[var(--background)] hover:bg-[var(--foreground)] hover:text-[var(--background)] active:bg-[var(--foreground)]"
                           : "text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]",

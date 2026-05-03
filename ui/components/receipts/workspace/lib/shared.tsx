@@ -104,7 +104,7 @@ export function GroupChip({
       variant="ghost"
       onClick={onClick}
       className={cn(
-        "h-auto rounded-[0.75rem] p-0 transition-all duration-150 ease-out",
+        "h-auto rounded-[0.75rem] p-0 duration-150 ease-out",
         active
           ? "bg-[var(--secondary)] hover:bg-[var(--secondary)] active:bg-[var(--secondary)]"
           : "bg-transparent hover:bg-transparent active:bg-transparent",
