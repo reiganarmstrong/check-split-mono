@@ -83,6 +83,7 @@ export function useReceiptWorkspace({
   return {
     status: status as ReceiptWorkspaceAuthStatus,
     receiptId,
+    summaryAnchorRef: layout.summaryAnchorRef,
     summaryRef: layout.summaryRef,
     actionBarRef: layout.actionBarRef,
     actionBarActionsRef: layout.actionBarActionsRef,
@@ -122,6 +123,7 @@ export function useReceiptWorkspace({
     merchantNameMissing: derived.merchantNameMissing,
     receiptDateMissing: derived.receiptDateMissing,
     unnamedGroupIds: derived.unnamedGroupIds,
+    invalidGroupWeightIds: derived.invalidGroupWeightIds,
     itemValidationById:
       derived.itemValidationById as Map<string, ReceiptWorkspaceItemValidation>,
     hasSavedReceipt: derived.hasSavedReceipt,

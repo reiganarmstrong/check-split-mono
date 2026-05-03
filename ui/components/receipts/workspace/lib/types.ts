@@ -34,6 +34,7 @@ export type ReceiptWorkspaceAuthStatus = ReturnType<typeof useAuth>["status"];
 export type ReceiptWorkspaceController = {
   status: ReceiptWorkspaceAuthStatus;
   receiptId?: string;
+  summaryAnchorRef: RefObject<HTMLDivElement | null>;
   summaryRef: RefObject<HTMLElement | null>;
   actionBarRef: RefObject<HTMLDivElement | null>;
   actionBarActionsRef: RefObject<HTMLDivElement | null>;
@@ -75,6 +76,7 @@ export type ReceiptWorkspaceController = {
   merchantNameMissing: boolean;
   receiptDateMissing: boolean;
   unnamedGroupIds: Set<string>;
+  invalidGroupWeightIds: Set<string>;
   itemValidationById: Map<string, ReceiptWorkspaceItemValidation>;
   hasSavedReceipt: boolean;
   heading: string;

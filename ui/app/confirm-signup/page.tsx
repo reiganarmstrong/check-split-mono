@@ -197,7 +197,7 @@ function ConfirmSignupPageContent() {
                   <Button
                     type="submit"
                     disabled={!canSubmit || isSubmitting}
-                    className="h-14 w-full rounded-[0.8rem] bg-[var(--foreground)] text-base font-semibold text-[var(--background)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
+                    className="h-14 w-full rounded-[0.8rem] bg-[var(--foreground)] text-base font-semibold text-[var(--background)] hover:opacity-90 disabled:cursor-not-allowed disabled:bg-[var(--muted)] disabled:text-[var(--muted-foreground)]"
                   >
                     {isSubmitting ? "Verifying..." : "Verify email"}
                   </Button>

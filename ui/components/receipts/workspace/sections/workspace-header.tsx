@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 import { formatReceiptDate } from "@/lib/receipt-editor";
@@ -26,7 +27,12 @@ export function WorkspaceHeader({
   canSave: boolean;
 }) {
   return (
-    <div className="workspace-panel overflow-hidden rounded-[1rem] px-6 py-6 sm:px-8 sm:py-8">
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      className="workspace-panel overflow-hidden rounded-[1rem] px-6 py-6 sm:px-8 sm:py-8"
+    >
       <h1 className="mt-4 max-w-4xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl">
         {heading}
       </h1>
@@ -68,6 +74,6 @@ export function WorkspaceHeader({
           {itemCount} item{itemCount === 1 ? "" : "s"}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

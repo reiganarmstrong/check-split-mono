@@ -187,6 +187,7 @@ export function ReceiptWorkspace({
                     <GroupListSection
                       groups={workspace.editorState.groups}
                       unnamedGroupIds={workspace.unnamedGroupIds}
+                      invalidGroupWeightIds={workspace.invalidGroupWeightIds}
                       updateGroup={workspace.updateGroup}
                       addGroup={workspace.addGroup}
                       removeGroup={workspace.removeGroup}
@@ -238,6 +239,7 @@ export function ReceiptWorkspace({
 
             {workspace.shouldShowUploadGate ? null : (
               <SummaryAside
+                summaryAnchorRef={workspace.summaryAnchorRef}
                 summaryRef={workspace.summaryRef}
                 groups={workspace.editorState.groups}
                 editorState={workspace.editorState}

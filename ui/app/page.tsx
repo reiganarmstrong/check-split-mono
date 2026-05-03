@@ -5,10 +5,11 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   Camera,
@@ -50,7 +51,7 @@ const workflowChrome = [
   {
     step: "03",
     rail: "bg-[#050506]",
-    tab: "border-[#c7ccd8] bg-[#f0f2f7] text-[#13181f]",
+    tab: "border-[#d5d7dc] bg-[#f3f4f5] text-[#13181f]",
   },
 ];
 
@@ -74,6 +75,22 @@ function SectionReveal({
     >
       {children}
     </motion.div>
+  );
+}
+
+function useMediaQuery(query: string) {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const mediaQueryList = window.matchMedia(query);
+
+      mediaQueryList.addEventListener("change", onStoreChange);
+
+      return () => {
+        mediaQueryList.removeEventListener("change", onStoreChange);
+      };
+    },
+    () => window.matchMedia(query).matches,
+    () => false,
   );
 }
 
@@ -266,13 +283,13 @@ function ReceiptScanFigure() {
           </p>
         </div>
 
-        <div className="order-3 col-span-2 rounded-[0.8rem] border border-[var(--line)] bg-white p-4 sm:order-none sm:col-span-1">
+        <div className="order-3 col-span-2 hidden rounded-[0.8rem] border border-[var(--line)] bg-white p-4 sm:order-none sm:col-span-1 sm:block">
           <Eyebrow>Extracted</Eyebrow>
           <div className="mt-3 flex flex-wrap gap-2 text-xs sm:mt-4 sm:block sm:space-y-2 sm:text-sm">
             {["Tax $3.10", "Tip $4.00", "Total $104.50"].map((item) => (
               <p
                 key={item}
-                className={`rounded-full border border-[var(--line)] px-3 py-1.5 sm:py-2 ${item.startsWith("Total") ? "bg-[#9bdab5]" : "bg-white"}`}
+                className={`rounded-full border px-3 py-1.5 sm:py-2 ${item.startsWith("Total") ? "border-[#b8e8cd] bg-[#c8efd9] text-[#116149]" : "border-[var(--line)] bg-white"}`}
               >
                 {item}
               </p>
@@ -298,7 +315,7 @@ function GroupIconGrid() {
   const items = [
     { label: "Couples", icon: Users, color: "text-[#4053ff]" },
     { label: "Friends", icon: Users, color: "text-[#16a765]" },
-    { label: "Teams", icon: Users, color: "text-[#4053ff]" },
+    { label: "Teams", icon: Users, color: "text-[#050506]" },
     { label: "Any group size", icon: Users, color: "text-[#ffab18]" },
   ];
 
@@ -318,31 +335,29 @@ function GroupIconGrid() {
   );
 }
 
-function AssignPeopleFigure() {
+function AssignGroupsFigure() {
   const groups = [
     {
       label: "Couple tab",
-      note: "House noodles split",
+      note: "2 people counted together",
+      weight: "Weight 2",
       people: [
         { name: "Alex", active: true },
         { name: "Nina", active: true },
       ],
     },
     {
-      label: "Team tab",
-      note: "Shared plates ready",
-      people: [
-        { name: "June", active: false },
-        { name: "Maya", active: false },
-        { name: "Kai", active: false },
-      ],
+      label: "Solo tab",
+      note: "1 person counted alone",
+      weight: "Weight 1",
+      people: [{ name: "Me", active: true }],
     },
   ];
 
   return (
     <div className="rounded-[0.9rem] border border-[var(--line)] bg-white p-4 shadow-[0_16px_36px_rgba(14,18,24,0.04)] sm:p-6 lg:min-h-[34rem]">
       <h3 className="text-2xl leading-none text-[var(--foreground)] sm:text-3xl">
-        Assign people
+        Assign groups
       </h3>
 
       <div className="mt-4 grid gap-3 sm:mt-5 sm:gap-5 lg:min-h-[27rem] lg:grid-cols-[1fr_0.72fr_8.5rem] lg:items-stretch">
@@ -359,8 +374,10 @@ function AssignPeopleFigure() {
                     {group.note}
                   </p>
                 </div>
-                <span className="rounded-full bg-[#edf0ff] px-2.5 py-1 text-xs font-semibold text-[#4053ff]">
-                  {group.people.filter((person) => person.active).length}
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-semibold bg-[#edf0ff] text-[#4053ff]`}
+                >
+                  {group.weight}
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 lg:mt-8">
@@ -388,7 +405,7 @@ function AssignPeopleFigure() {
                   House noodles
                 </p>
                 <p className="mt-2 text-xs text-[var(--muted-foreground)]">
-                  Assigned to Couple tab
+                  Assigned to 2 groups, 3 weight shares
                 </p>
               </div>
               <span className="rounded-full bg-[#e2f5e8] px-3 py-1.5 text-xs font-semibold text-[#116149]">
@@ -399,15 +416,15 @@ function AssignPeopleFigure() {
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Share
+                Couple
               </p>
-              <p className="mt-2 text-xl font-semibold">$9.25</p>
+              <p className="mt-2 text-xl font-semibold">$12.33</p>
             </div>
             <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                People
+                Solo
               </p>
-              <p className="mt-2 text-xl font-semibold">2</p>
+              <p className="mt-2 text-xl font-semibold">$6.17</p>
             </div>
           </div>
           <div className="mt-auto rounded-[0.7rem] border border-[#c5ead6] bg-[#e7f7ed] p-4 text-[#116149]">
@@ -415,7 +432,7 @@ function AssignPeopleFigure() {
               Allocation
             </p>
             <p className="mt-2 text-sm font-semibold">
-              Alex and Nina split this item evenly.
+              Split by group weights: 2/3 to Couple, 1/3 to Solo.
             </p>
           </div>
         </div>
@@ -423,7 +440,7 @@ function AssignPeopleFigure() {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-1 lg:grid-rows-2">
           {[
             ["Groups", "2"],
-            ["People", "5"],
+            ["Weights", "3"],
           ].map(([label, value]) => (
             <div
               key={label}
@@ -480,9 +497,7 @@ function SavedSplitFigure() {
             <p className="mt-1.5 text-sm font-semibold sm:mt-3 sm:text-base">
               Everyone paid
             </p>
-            <p className="mt-1 text-xs font-medium sm:mt-2">
-              3 of 3 settled
-            </p>
+            <p className="mt-1 text-xs font-medium sm:mt-2">3 of 3 settled</p>
           </div>
         </div>
 
@@ -540,6 +555,8 @@ function WorkflowBand({
   children,
   sidebar,
   stackIndex,
+  isReady = true,
+  revealOnScroll = false,
 }: {
   eyebrow: string;
   title: string;
@@ -547,6 +564,8 @@ function WorkflowBand({
   children: ReactNode;
   sidebar?: ReactNode;
   stackIndex?: number;
+  isReady?: boolean;
+  revealOnScroll?: boolean;
 }) {
   const isStacked = stackIndex !== undefined;
   const chrome = isStacked ? workflowChrome[stackIndex] : undefined;
@@ -582,28 +601,70 @@ function WorkflowBand({
   );
 
   if (isStacked) {
+    if (revealOnScroll) {
+      return (
+        <motion.div
+          data-workflow-card
+          className="lg:sticky lg:translate-y-0"
+          initial={{ opacity: 0, y: 18, scale: 0.988 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            top: "5.75rem",
+            zIndex: 20 + stackIndex,
+            willChange: "transform, opacity",
+          }}
+        >
+          {content}
+        </motion.div>
+      );
+    }
+
     return (
-      <div
+      <motion.div
         data-workflow-card
         className="lg:sticky lg:translate-y-0"
+        initial={isReady ? false : { opacity: 0, y: 20, scale: 0.985 }}
+        animate={
+          isReady
+            ? { opacity: 1, y: 0, scale: 1 }
+            : { opacity: 0, y: 20, scale: 0.985 }
+        }
+        transition={{
+          delay: isReady ? 0.1 + stackIndex * 0.09 : 0,
+          duration: 0.46,
+          ease: [0.16, 1, 0.3, 1],
+        }}
         style={{
           top: "5.75rem",
           zIndex: 20 + stackIndex,
+          willChange: "transform, opacity",
         }}
       >
         {content}
-      </div>
+      </motion.div>
     );
   }
 
   return <SectionReveal>{content}</SectionReveal>;
 }
 
-function WorkflowProgressRail({ progress }: { progress: number }) {
+function WorkflowProgressRail({
+  progress,
+  isReady,
+}: {
+  progress: number;
+  isReady: boolean;
+}) {
   return (
-    <div
+    <motion.div
       aria-hidden="true"
-      className="pointer-events-none absolute bottom-24 -left-12 top-0 hidden w-7 xl:-left-14 lg:block"
+      className="pointer-events-none absolute bottom-24 left-0 top-0 hidden w-7 lg:block 2xl:-left-14"
+      initial={isReady ? false : { opacity: 0, x: -14 }}
+      animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -14 }}
+      transition={{ delay: 0.02, duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+      style={{ willChange: "transform, opacity" }}
     >
       <div className="sticky top-[5.75rem] flex h-[calc(100svh-7.75rem)] min-h-[34rem] w-7 items-center justify-center">
         <div className="relative h-[78%] w-px bg-[#cdd3df]">
@@ -627,15 +688,20 @@ function WorkflowProgressRail({ progress }: { progress: number }) {
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export default function Home() {
   const router = useRouter();
   const { status } = useAuth();
+  const shouldReduceMotion = useReducedMotion();
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
   const workflowRef = useRef<HTMLDivElement>(null);
   const [workflowProgress, setWorkflowProgress] = useState(0);
+  const [heroLoaded, setHeroLoaded] = useState(false);
+  const workflowReady = heroLoaded || shouldReduceMotion === true;
+  const revealWorkflowOnScroll = !isDesktop && shouldReduceMotion !== true;
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -715,6 +781,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28, ease: "easeOut" }}
+            onAnimationComplete={() => setHeroLoaded(true)}
             className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:pt-10"
           >
             <div className="mx-auto max-w-[42rem] text-center lg:mx-0 lg:text-left">
@@ -748,11 +815,16 @@ export default function Home() {
       <div id="features" className="page-shell pt-4">
         <div
           ref={workflowRef}
-          className="relative flex flex-col gap-8 pb-16 lg:gap-32 lg:pb-24"
+          className="relative flex flex-col gap-8 pb-16 lg:gap-32 lg:pb-24 lg:pl-12 2xl:pl-0"
         >
-          <WorkflowProgressRail progress={workflowProgress} />
+          <WorkflowProgressRail
+            progress={workflowProgress}
+            isReady={workflowReady}
+          />
           <WorkflowBand
             stackIndex={0}
+            isReady={workflowReady}
+            revealOnScroll={revealWorkflowOnScroll}
             eyebrow="Parse receipt"
             title="Turn receipt into clean line items."
             description="Pull totals, tax, tip, and items into a format ready for assigning."
@@ -771,16 +843,20 @@ export default function Home() {
 
           <WorkflowBand
             stackIndex={1}
+            isReady={workflowReady}
+            revealOnScroll={revealWorkflowOnScroll}
             eyebrow="Make groups"
-            title="Split items by the people sharing them."
-            description="Build groups for couples, friends, or a whole table before saving the final split."
+            title="Split items by the groups sharing them."
+            description="Build groups for couples, friends, or a whole table. Give each group a weight so shared items split by the shares they represent."
             sidebar={<GroupIconGrid />}
           >
-            <AssignPeopleFigure />
+            <AssignGroupsFigure />
           </WorkflowBand>
 
           <WorkflowBand
             stackIndex={2}
+            isReady={workflowReady}
+            revealOnScroll={revealWorkflowOnScroll}
             eyebrow="Saved splits"
             title="Keep every split in one place."
             description="Review finished dinners, confirm who paid, and keep split totals readable."
