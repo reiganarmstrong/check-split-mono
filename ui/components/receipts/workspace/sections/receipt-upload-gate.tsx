@@ -4,7 +4,6 @@ import { useEffect, useRef, type ChangeEvent } from "react";
 import { Camera, LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 import { SectionShell } from "../lib/shared";
 
@@ -91,7 +90,7 @@ export function ReceiptUploadGate({
         </div>
       </div>
 
-      <Input
+      <input
         ref={inputRef}
         type="file"
         accept="image/jpeg,image/png,image/heic,image/heif,.jpg,.jpeg,.png,.heic,.heif"
