@@ -612,11 +612,16 @@ function WorkflowBand({
       return (
         <motion.div
           data-workflow-card
-          className="lg:sticky lg:translate-y-0"
-          initial={{ opacity: 0, y: 18, scale: 0.988 }}
+          className="transform-gpu lg:sticky lg:translate-y-0"
+          initial={{ opacity: 0, y: 28, scale: 0.982 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+          viewport={{ once: true, amount: 0.03, margin: "0px 0px 0% 0px" }}
+          transition={{
+            duration: 0.68,
+            ease: [0.22, 1, 0.36, 1],
+            opacity: { duration: 0.5, ease: "easeOut" },
+            scale: { duration: 0.72, ease: [0.22, 1, 0.36, 1] },
+          }}
           style={{
             top: "5.75rem",
             zIndex: 20 + stackIndex,
