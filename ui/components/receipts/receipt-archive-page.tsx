@@ -343,7 +343,7 @@ export function ReceiptArchivePage() {
                       onChange={(event) =>
                         setSortOption(event.target.value as ReceiptSortOption)
                       }
-                      className="min-h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-white py-3 pl-11 pr-10 text-xs font-medium uppercase tracking-[0.18em] text-[var(--foreground)] outline-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:pr-14"
+                      className="min-h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-white py-3 pl-11 pr-10 text-xs font-medium uppercase tracking-[0.18em] text-[var(--foreground)] outline-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                     >
                       {Object.entries(sortOptionLabels).map(
                         ([value, label]) => (
@@ -353,7 +353,7 @@ export function ReceiptArchivePage() {
                         ),
                       )}
                     </select>
-                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)] md:right-6" />
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)]" />
                   </div>
                 </div>
               </div>
