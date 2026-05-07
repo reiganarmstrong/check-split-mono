@@ -271,12 +271,65 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
   }
 
   statement {
+    sid    = "AllowManageAppSyncServiceRoles"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:GetRole",
+      "iam:GetRolePolicy",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListInstanceProfilesForRole",
+      "iam:ListRolePolicies",
+      "iam:ListRoleTags",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/checksplit-receipt-api-${var.environment}-*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowReadAppSyncManagedPolicies"
+    effect = "Allow"
+    actions = [
+      "iam:GetPolicy",
+      "iam:GetPolicyVersion",
+      "iam:ListPolicies"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+
+}
+
+data "aws_iam_policy_document" "github_actions_receipt_api_autoscaling_permissions" {
+  statement {
+    sid     = "AllowReadDynamoDbCapacityLimits"
+    effect  = "Allow"
+    actions = ["dynamodb:DescribeLimits"]
+
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "AllowManageReceiptTableAutoscaling"
     effect = "Allow"
     actions = [
       "application-autoscaling:DeleteScalingPolicy",
       "application-autoscaling:DeregisterScalableTarget",
       "application-autoscaling:DescribeScalableTargets",
+      "application-autoscaling:DescribeScalingActivities",
       "application-autoscaling:DescribeScalingPolicies",
       "application-autoscaling:ListTagsForResource",
       "application-autoscaling:PutScalingPolicy",
@@ -293,9 +346,7 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
     effect  = "Allow"
     actions = ["iam:CreateServiceLinkedRole"]
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/dynamodb.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_DynamoDBTable"
-    ]
+    resources = ["*"]
 
     condition {
       test     = "StringEquals"
@@ -328,53 +379,19 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
   }
 
   statement {
-    sid     = "AllowReadReceiptTableAutoscalingAlarms"
-    effect  = "Allow"
-    actions = ["cloudwatch:DescribeAlarms"]
+    sid    = "AllowReadReceiptTableAutoscalingAlarms"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:DescribeAlarmsForMetric",
+      "cloudwatch:ListTagsForResource"
+    ]
 
     resources = ["*"]
   }
+}
 
-  statement {
-    sid    = "AllowManageAppSyncServiceRoles"
-    effect = "Allow"
-    actions = [
-      "iam:AttachRolePolicy",
-      "iam:CreateRole",
-      "iam:DeleteRole",
-      "iam:DeleteRolePolicy",
-      "iam:DetachRolePolicy",
-      "iam:GetRole",
-      "iam:GetRolePolicy",
-      "iam:ListAttachedRolePolicies",
-      "iam:ListRolePolicies",
-      "iam:ListRoleTags",
-      "iam:PassRole",
-      "iam:PutRolePolicy",
-      "iam:TagRole",
-      "iam:UntagRole",
-      "iam:UpdateAssumeRolePolicy"
-    ]
-
-    resources = [
-      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/checksplit-receipt-api-${var.environment}-*"
-    ]
-  }
-
-  statement {
-    sid    = "AllowReadAppSyncManagedPolicies"
-    effect = "Allow"
-    actions = [
-      "iam:GetPolicy",
-      "iam:GetPolicyVersion",
-      "iam:ListPolicies"
-    ]
-
-    resources = [
-      "*"
-    ]
-  }
-
+data "aws_iam_policy_document" "github_actions_account_data_deletion_permissions" {
   statement {
     sid     = "AllowCreateAccountDataDeletionQueues"
     effect  = "Allow"
@@ -390,7 +407,9 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
       "sqs:DeleteQueue",
       "sqs:GetQueueAttributes",
       "sqs:GetQueueUrl",
+      "sqs:ListDeadLetterSourceQueues",
       "sqs:ListQueueTags",
+      "sqs:PurgeQueue",
       "sqs:SetQueueAttributes",
       "sqs:TagQueue",
       "sqs:UntagQueue"
@@ -400,6 +419,14 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
       "arn:${data.aws_partition.current.partition}:sqs:us-east-1:${data.aws_caller_identity.current.account_id}:checksplit-account-data-deletion-${var.environment}",
       "arn:${data.aws_partition.current.partition}:sqs:us-east-1:${data.aws_caller_identity.current.account_id}:checksplit-account-data-deletion-dlq-${var.environment}"
     ]
+  }
+
+  statement {
+    sid     = "AllowListAccountDataDeletionQueues"
+    effect  = "Allow"
+    actions = ["sqs:ListQueues"]
+
+    resources = ["*"]
   }
 
   statement {
@@ -413,6 +440,10 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
       "lambda:GetFunctionCodeSigningConfig",
       "lambda:GetFunctionConfiguration",
       "lambda:GetPolicy",
+      "lambda:GetRuntimeManagementConfig",
+      "lambda:ListAliases",
+      "lambda:ListFunctionEventInvokeConfigs",
+      "lambda:ListProvisionedConcurrencyConfigs",
       "lambda:ListTags",
       "lambda:ListVersionsByFunction",
       "lambda:RemovePermission",
@@ -435,6 +466,9 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
       "lambda:DeleteEventSourceMapping",
       "lambda:GetEventSourceMapping",
       "lambda:ListEventSourceMappings",
+      "lambda:ListTags",
+      "lambda:TagResource",
+      "lambda:UntagResource",
       "lambda:UpdateEventSourceMapping"
     ]
 
@@ -453,6 +487,7 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
       "iam:GetRole",
       "iam:GetRolePolicy",
       "iam:ListAttachedRolePolicies",
+      "iam:ListInstanceProfilesForRole",
       "iam:ListRolePolicies",
       "iam:ListRoleTags",
       "iam:PassRole",
@@ -482,6 +517,14 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
     resources = [
       "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-account-data-deletion-worker-${var.environment}"
     ]
+  }
+
+  statement {
+    sid     = "AllowReadAccountDataDeletionWorkerLogGroups"
+    effect  = "Allow"
+    actions = ["logs:DescribeLogGroups"]
+
+    resources = ["*"]
   }
 }
 
@@ -606,6 +649,16 @@ resource "aws_iam_policy" "github_actions_receipt_api_permissions" {
   policy = data.aws_iam_policy_document.github_actions_receipt_api_permissions.json
 }
 
+resource "aws_iam_policy" "github_actions_receipt_api_autoscaling_permissions" {
+  name   = "${var.repo_name}-${var.environment}-github-actions-receipt-api-autoscaling-permissions"
+  policy = data.aws_iam_policy_document.github_actions_receipt_api_autoscaling_permissions.json
+}
+
+resource "aws_iam_policy" "github_actions_account_data_deletion_permissions" {
+  name   = "${var.repo_name}-${var.environment}-github-actions-account-data-deletion-permissions"
+  policy = data.aws_iam_policy_document.github_actions_account_data_deletion_permissions.json
+}
+
 resource "aws_iam_policy" "github_actions_receipt_ingestion_permissions" {
   name   = "${var.repo_name}-${var.environment}-github-actions-receipt-ingestion-permissions"
   policy = data.aws_iam_policy_document.github_actions_receipt_ingestion_permissions.json
@@ -620,6 +673,16 @@ resource "aws_iam_role_policy_attachment" "github_actions_foundation_permissions
 resource "aws_iam_role_policy_attachment" "github_actions_receipt_api_permissions" {
   role       = aws_iam_role.github_actions_role.name
   policy_arn = aws_iam_policy.github_actions_receipt_api_permissions.arn
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_receipt_api_autoscaling_permissions" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = aws_iam_policy.github_actions_receipt_api_autoscaling_permissions.arn
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_account_data_deletion_permissions" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = aws_iam_policy.github_actions_account_data_deletion_permissions.arn
 }
 
 resource "aws_iam_role_policy_attachment" "github_actions_receipt_ingestion_permissions" {
