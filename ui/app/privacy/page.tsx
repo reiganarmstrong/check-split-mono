@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 const privacySections = [
   {
     title: "Information we collect",
-    body: "CheckSplit collects only the account details you provide, the receipt images you upload, extracted receipt data, split details you save, and basic device or usage information needed to keep product reliable and secure.",
+    body: "CheckSplit collects only the account details you provide, the receipt images you upload, extracted receipt data, the split details you save, and basic device or usage information needed to keep the product reliable and secure.",
   },
   {
     title: "How we use information",
-    body: "CheckSplit uses collected information to create and save splits, protect accounts, and prevent abuse of our service.",
+    body: "CheckSplit uses the information it collects to create and save splits, protect accounts, and prevent abuse of our service.",
   },
   {
     title: "Sharing",
@@ -23,7 +23,7 @@ const privacySections = [
   },
   {
     title: "Retention",
-    body: "Your account and saved split data are stored while your account is active. If you delete your account, we will delete all the information we have stored that is linked to your account.",
+    body: "Your account and saved split data are stored while your account is active. If you delete your account, we will delete all the stored information linked to your account.",
   },
 ];
 
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-foreground)]">
-            Effective May 03, 2026. This page explains what information
+            Effective May 3, 2026. This page explains what information
             CheckSplit collects, how it is used, and how it will be deleted.
           </p>
         </PageEntrance>
