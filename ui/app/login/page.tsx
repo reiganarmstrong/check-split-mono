@@ -20,10 +20,11 @@ function LoginPageContent() {
   const searchParams = useSearchParams();
   const { status, refreshSession } = useAuth();
   const seededEmail = searchParams.get("email") ?? "";
+  const isEmailConfirmed = searchParams.get("confirmed") === "1";
   const sessionMessage =
     searchParams.get("deleted") === "1"
       ? "Account deleted."
-      : searchParams.get("confirmed") === "1"
+      : isEmailConfirmed
       ? "Email verified. You can log in now."
       : searchParams.get("reset") === "1"
         ? "Password reset. Log in with your new password."
@@ -188,7 +189,13 @@ function LoginPageContent() {
             ) : null}
 
             {authMessage ? (
-              <p className="rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]">
+              <p
+                className={
+                  isEmailConfirmed
+                    ? "rounded-[0.8rem] border border-[color-mix(in_oklab,var(--accent)_42%,var(--line))] bg-[color-mix(in_oklab,var(--accent)_24%,white)] px-4 py-3 text-sm font-medium text-[var(--accent-foreground)]"
+                    : "rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-sm font-medium text-[var(--foreground)]"
+                }
+              >
                 {authMessage}
               </p>
             ) : null}

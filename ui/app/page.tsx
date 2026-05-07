@@ -16,6 +16,7 @@ import {
   Camera,
   Check,
   Link2,
+  ScanLine,
   ShieldCheck,
   Users,
   Zap,
@@ -246,39 +247,42 @@ function Checklist({ items }: { items: string[] }) {
 
 function ReceiptScanFigure() {
   return (
-    <div className="grid gap-3 sm:gap-5 lg:grid-cols-[1fr_10rem]">
-      <div className="rounded-[0.9rem] border border-[var(--line)] bg-white p-4 shadow-[0_16px_36px_rgba(14,18,24,0.04)] sm:p-5">
+    <div className="grid gap-3 sm:gap-5 lg:min-h-[34rem] lg:grid-cols-[1fr_10rem] lg:items-stretch">
+      <div className="rounded-[0.9rem] border border-[var(--line)] bg-white p-4 shadow-[0_16px_36px_rgba(14,18,24,0.04)] sm:p-5 lg:flex lg:flex-col">
         <div className="flex items-center justify-between">
           <h3 className="text-2xl leading-none text-[var(--foreground)] sm:text-3xl">
             Receipt scan
           </h3>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] sm:h-11 sm:w-11">
-            <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
-          </div>
+          <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
         </div>
 
-        <div className="relative mt-4 h-48 overflow-hidden rounded-[0.85rem] border border-[var(--line)] bg-[#fbfbfd] px-4 py-4 sm:mt-6 sm:h-[18rem] sm:px-5 sm:py-5">
-          <div className="space-y-2 sm:space-y-3">
-            {Array.from({ length: 9 }).map((_, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between border-b border-[#eef0f4] pb-2 last:border-b-0 sm:pb-3"
-              >
-                <span
-                  className="h-2.5 rounded-full bg-[#e6e8ef] sm:h-3"
-                  style={{ width: `${4.4 + (index % 4) * 1.35}rem` }}
-                />
-                <span
-                  className="h-2.5 rounded-full bg-[#d8dbe4] sm:h-3"
-                  style={{ width: `${2.2 + (index % 3) * 0.9}rem` }}
-                />
-              </div>
-            ))}
-          </div>
+        <div className="mt-4 sm:mt-6 lg:flex lg:min-h-0 lg:flex-1 lg:items-center lg:justify-center">
+          <div className="relative h-48 w-full overflow-hidden rounded-[0.85rem] border border-[var(--line)] bg-[#fbfbfd] px-4 py-4 sm:h-[18rem] sm:px-5 sm:py-5 lg:h-full lg:min-h-[22rem] lg:max-h-[29rem] lg:max-w-[34rem]">
+            <div className="space-y-2 sm:space-y-3 lg:flex lg:h-full lg:flex-col lg:justify-between lg:space-y-0">
+              {Array.from({ length: 9 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between border-b border-[#eef0f4] pb-2 last:border-b-0 sm:pb-3"
+                >
+                  <span
+                    className="h-2.5 rounded-full bg-[#e6e8ef] sm:h-3"
+                    style={{ width: `${4.4 + (index % 4) * 1.35}rem` }}
+                  />
+                  <span
+                    className="h-2.5 rounded-full bg-[#d8dbe4] sm:h-3"
+                    style={{ width: `${2.2 + (index % 3) * 0.9}rem` }}
+                  />
+                </div>
+              ))}
+            </div>
 
-          <div className="pointer-events-none absolute inset-x-8 top-16 h-7 rounded-full bg-[#efedff]/80 sm:inset-x-11 sm:top-[5.2rem] sm:h-9" />
-          <div className="pointer-events-none absolute inset-x-9 top-[6.75rem] h-8 rounded-full bg-[#dff4e8]/90 sm:inset-x-12 sm:top-[9.25rem] sm:h-10" />
-          <div className="landing-receipt-scan-line pointer-events-none absolute inset-x-4 top-4 h-1.5 transform-gpu rounded-full bg-[#050506]/80 shadow-[0_0_24px_rgba(5,5,6,0.2)] [--receipt-scan-travel:9.625rem] sm:top-5 sm:[--receipt-scan-travel:15.125rem]" />
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <ScanLine className="h-9 w-9 text-[#4053ff] sm:h-10 sm:w-10" />
+            </div>
+            <div className="landing-receipt-scan-track pointer-events-none absolute inset-x-4 top-4 h-[calc(100%_-_2.375rem)] transform-gpu sm:top-5 sm:h-[calc(100%_-_2.875rem)]">
+              <div className="h-1.5 rounded-full bg-[#050506]/80 shadow-[0_0_24px_rgba(5,5,6,0.2)]" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -367,7 +371,7 @@ function AssignGroupsFigure() {
         Assign groups
       </h3>
 
-      <div className="mt-4 grid gap-3 sm:mt-5 sm:gap-5 lg:min-h-[27rem] lg:grid-cols-[1fr_0.72fr_8.5rem] lg:items-stretch">
+      <div className="mt-4 grid gap-3 sm:mt-5 sm:gap-5 lg:min-h-[27rem] lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.82fr)] lg:items-stretch xl:grid-cols-[minmax(0,1fr)_minmax(17rem,0.72fr)_8.5rem]">
         <div className="space-y-3 sm:space-y-4 lg:grid lg:grid-rows-2 lg:gap-4 lg:space-y-0">
           {groups.map((group) => (
             <div
@@ -401,13 +405,13 @@ function AssignGroupsFigure() {
           ))}
         </div>
 
-        <div className="relative hidden rounded-[0.8rem] border border-[var(--line)] bg-[#fbfbfd] p-5 lg:flex lg:flex-col">
+        <div className="relative hidden rounded-[0.8rem] border border-[var(--line)] bg-[#fbfbfd] p-5 lg:flex lg:min-w-0 lg:flex-col lg:gap-5">
           <div className="absolute -left-5 top-1/2 h-px w-5 bg-[var(--line)]" />
-          <div className="absolute -right-5 top-1/2 h-px w-5 bg-[var(--line)]" />
+          <div className="absolute -right-5 top-1/2 hidden h-px w-5 bg-[var(--line)] xl:block" />
           <Eyebrow>Selected item</Eyebrow>
-          <div className="mt-6 rounded-[0.7rem] border border-[var(--line)] bg-white p-5">
+          <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-5">
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0">
                 <p className="text-lg font-semibold leading-none">
                   House noodles
                 </p>
@@ -420,14 +424,14 @@ function AssignGroupsFigure() {
               </span>
             </div>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="min-w-0 rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
                 Couple
               </p>
               <p className="mt-2 text-xl font-semibold">$12.33</p>
             </div>
-            <div className="rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
+            <div className="min-w-0 rounded-[0.7rem] border border-[var(--line)] bg-white p-4">
               <p className="text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
                 Solo
               </p>
@@ -444,7 +448,7 @@ function AssignGroupsFigure() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-1 lg:grid-rows-2">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-1 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:grid-cols-1 xl:grid-rows-2">
           {[
             ["Groups", "2"],
             ["Weights", "3"],
@@ -797,8 +801,7 @@ export default function Home() {
             className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:pt-10"
           >
             <div className="mx-auto max-w-[42rem] text-center lg:mx-0 lg:text-left">
-              <Eyebrow>Receipt workspace</Eyebrow>
-              <h1 className="mx-auto mt-7 max-w-[41rem] text-6xl leading-[0.95] text-[var(--foreground)] sm:text-7xl lg:mx-0 lg:text-[5.15rem]">
+              <h1 className="mx-auto max-w-[41rem] text-6xl leading-[0.95] text-[var(--foreground)] sm:text-7xl lg:mx-0 lg:text-[5.15rem]">
                 Split receipt costs by group.
               </h1>
               <p className="mx-auto mt-7 max-w-md text-base leading-7 text-[#273246] sm:text-lg lg:mx-0">

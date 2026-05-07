@@ -23,8 +23,8 @@ const contactSections = [
         >
           LinkedIn
         </a>{" "}
-        is best place to start. It has my background and easiest path to reach
-        out.
+        is the best place to start. It has my background and the easiest path
+        to reach out.
       </>
     ),
   },
@@ -32,7 +32,7 @@ const contactSections = [
     title: "Source code",
     body: (
       <>
-        Source for project is on{" "}
+        The source for this project is on{" "}
         <a
           href="https://github.com/reiganarmstrong/check-split-mono"
           target="_blank"
@@ -41,7 +41,7 @@ const contactSections = [
         >
           GitHub
         </a>{" "}
-        if you want to look through code, UI decisions, infrastructure, or
+        if you want to look through the code, UI decisions, infrastructure, or
         commit history.
       </>
     ),
@@ -86,8 +86,8 @@ export default function ContactPage() {
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-foreground)]">
             Hi! I&apos;m Reagan. I built CheckSplit as a solo dev. If you want to
-            learn more about me or look through code behind this project, links
-            below are best places to go.
+            learn more about me or look through the code behind this project,
+            the links below are the best places to go.
           </p>
         </PageEntrance>
       </section>

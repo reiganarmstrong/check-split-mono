@@ -10,7 +10,6 @@ import {
   ChevronDown,
   Clock3,
   PencilLine,
-  ReceiptText,
   Search,
   SlidersHorizontal,
 } from "lucide-react";
@@ -324,7 +323,7 @@ export function ReceiptArchivePage() {
                       variant="ghost"
                       onClick={() => setStatusFilter(option.value)}
                       className={cn(
-                        "h-auto rounded-[0.65rem] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em]",
+                        "h-auto rounded-[0.65rem] px-4 py-2 text-sm font-medium",
                         statusFilter === option.value
                           ? "bg-[var(--foreground)] text-[var(--background)] hover:bg-[var(--foreground)] hover:text-[var(--background)] active:bg-[var(--foreground)]"
                           : "text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]",
@@ -344,7 +343,7 @@ export function ReceiptArchivePage() {
                       onChange={(event) =>
                         setSortOption(event.target.value as ReceiptSortOption)
                       }
-                      className="min-h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-white py-3 pl-11 pr-10 text-xs font-medium uppercase tracking-[0.18em] text-[var(--foreground)] outline-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:pr-14"
+                      className="min-h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-white py-3 pl-11 pr-10 text-sm font-medium text-[var(--foreground)] outline-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                     >
                       {Object.entries(sortOptionLabels).map(
                         ([value, label]) => (
@@ -354,7 +353,7 @@ export function ReceiptArchivePage() {
                         ),
                       )}
                     </select>
-                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)] md:right-6" />
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground)]" />
                   </div>
                 </div>
               </div>
@@ -371,9 +370,7 @@ export function ReceiptArchivePage() {
             {receipts.length === 0 ? (
               <div className="workspace-line mt-5 pt-5">
                 <div className="rounded-[1rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
-                    <ReceiptText className="h-6 w-6 text-[var(--foreground)]" />
-                  </div>
+                  {/* <ReceiptText className="mx-auto h-6 w-6 text-[var(--foreground)]" /> */}
                   <h3 className="mt-6 text-3xl leading-none text-[var(--foreground)]">
                     No saved splits yet
                   </h3>

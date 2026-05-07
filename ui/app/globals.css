@@ -121,13 +121,13 @@
     }
   }
 
-  @keyframes landingReceiptScanLine {
+  @keyframes landingReceiptScanTrack {
     0%,
     100% {
       transform: translate3d(0, 0, 0);
     }
     50% {
-      transform: translate3d(0, var(--receipt-scan-travel), 0);
+      transform: translate3d(0, 100%, 0);
     }
   }
 
@@ -334,8 +334,8 @@
     will-change: transform;
   }
 
-  .landing-receipt-scan-line {
-    animation: landingReceiptScanLine 4.8s ease-in-out infinite;
+  .landing-receipt-scan-track {
+    animation: landingReceiptScanTrack 4.8s ease-in-out infinite;
     will-change: transform;
   }
 
