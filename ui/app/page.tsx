@@ -252,9 +252,7 @@ function ReceiptScanFigure() {
           <h3 className="text-2xl leading-none text-[var(--foreground)] sm:text-3xl">
             Receipt scan
           </h3>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] sm:h-11 sm:w-11">
-            <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
-          </div>
+          <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
         </div>
 
         <div className="relative mt-4 h-48 overflow-hidden rounded-[0.85rem] border border-[var(--line)] bg-[#fbfbfd] px-4 py-4 sm:mt-6 sm:h-[18rem] sm:px-5 sm:py-5">
