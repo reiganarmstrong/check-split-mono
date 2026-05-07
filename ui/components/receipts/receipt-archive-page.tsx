@@ -323,7 +323,7 @@ export function ReceiptArchivePage() {
                       variant="ghost"
                       onClick={() => setStatusFilter(option.value)}
                       className={cn(
-                        "h-auto rounded-[0.65rem] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em]",
+                        "h-auto rounded-[0.65rem] px-4 py-2 text-sm font-medium",
                         statusFilter === option.value
                           ? "bg-[var(--foreground)] text-[var(--background)] hover:bg-[var(--foreground)] hover:text-[var(--background)] active:bg-[var(--foreground)]"
                           : "text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] hover:text-[var(--foreground)]",
@@ -343,7 +343,7 @@ export function ReceiptArchivePage() {
                       onChange={(event) =>
                         setSortOption(event.target.value as ReceiptSortOption)
                       }
-                      className="min-h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-white py-3 pl-11 pr-10 text-xs font-medium uppercase tracking-[0.18em] text-[var(--foreground)] outline-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                      className="min-h-12 w-full cursor-pointer appearance-none rounded-[0.8rem] border border-[var(--line)] bg-white py-3 pl-11 pr-10 text-sm font-medium text-[var(--foreground)] outline-none transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                     >
                       {Object.entries(sortOptionLabels).map(
                         ([value, label]) => (
