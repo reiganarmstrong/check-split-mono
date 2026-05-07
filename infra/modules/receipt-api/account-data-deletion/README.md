@@ -33,9 +33,13 @@ It is a direct child module of `receipt-api`, following the same shape as `stati
 | DLQ retention               | `1209600` seconds, 14 days    |
 | Redrive max receive count   | `5`                           |
 | Default visibility timeout  | Lambda timeout plus 5 seconds |
+| Event source batch size     | `1`                           |
+| Event source max concurrency | `2`                           |
 | Throttle visibility timeout | `21600` seconds, 6 hours      |
 
 Repeated throttling reaches the DLQ after roughly `5 receives * 6 hours`, plus queue overhead.
+
+The worker does not use Lambda reserved concurrency. Some AWS accounts have a concurrency quota low enough that reserving even `1` concurrency would reduce unreserved account concurrency below AWS's required floor of `10`, causing `terraform apply` to fail. The SQS event source mapping caps worker fan-out instead.
 
 ## Worker Behavior
 

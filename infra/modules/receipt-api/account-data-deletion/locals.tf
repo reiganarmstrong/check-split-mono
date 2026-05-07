@@ -7,6 +7,7 @@ locals {
   lambda_zip_path                  = "${path.module}/lambda/build/account-data-deletion.zip"
   message_retention_seconds        = 1209600
   throttle_visibility_seconds      = 21600
+  worker_maximum_concurrency       = 2
   worker_timeout_seconds           = 30
   queue_visibility_timeout_seconds = local.worker_timeout_seconds + 5
 }

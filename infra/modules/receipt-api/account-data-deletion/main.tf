@@ -110,16 +110,15 @@ resource "aws_iam_role_policy" "worker" {
 }
 
 resource "aws_lambda_function" "worker" {
-  architectures                  = ["arm64"]
-  filename                       = data.archive_file.this.output_path
-  function_name                  = local.worker_lambda_function_name
-  handler                        = "index.workerHandler"
-  memory_size                    = 128
-  reserved_concurrent_executions = 1
-  role                           = aws_iam_role.worker.arn
-  runtime                        = "nodejs24.x"
-  source_code_hash               = data.archive_file.this.output_base64sha256
-  timeout                        = local.worker_timeout_seconds
+  architectures    = ["arm64"]
+  filename         = data.archive_file.this.output_path
+  function_name    = local.worker_lambda_function_name
+  handler          = "index.workerHandler"
+  memory_size      = 128
+  role             = aws_iam_role.worker.arn
+  runtime          = "nodejs24.x"
+  source_code_hash = data.archive_file.this.output_base64sha256
+  timeout          = local.worker_timeout_seconds
 
   environment {
     variables = {
@@ -142,6 +141,10 @@ resource "aws_lambda_event_source_mapping" "worker" {
   function_name                      = aws_lambda_function.worker.arn
   function_response_types            = ["ReportBatchItemFailures"]
   maximum_batching_window_in_seconds = 0
+
+  scaling_config {
+    maximum_concurrency = local.worker_maximum_concurrency
+  }
 
   depends_on = [aws_iam_role_policy.worker]
 }
