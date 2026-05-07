@@ -5,6 +5,17 @@ locals {
   resolver_path              = "${path.module}/resolvers"
   table_name                 = "${var.application_name}-receipts-${var.environment}"
 
+  receipt_gsi_max_read_capacity    = 5
+  receipt_gsi_max_write_capacity   = 5
+  receipt_gsi_min_read_capacity    = 1
+  receipt_gsi_min_write_capacity   = 1
+  receipt_table_max_read_capacity  = 20
+  receipt_table_max_write_capacity = 20
+  receipt_table_min_read_capacity  = 1
+  receipt_table_min_write_capacity = 1
+  receipt_table_target_utilization = 70
+  receipt_gsi_target_utilization   = 70
+
   function_definitions = {
     add_participant = {
       name = "addParticipant"

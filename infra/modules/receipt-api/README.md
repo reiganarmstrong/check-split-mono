@@ -2,19 +2,23 @@
 
 This module provisions a Cognito-protected AppSync GraphQL API backed by a single DynamoDB table for receipt storage.
 
-It packages three concerns into one deployable unit:
+It packages four concerns into one deployable unit:
 
 - the DynamoDB persistence layer
 - the AppSync API, datasource, and pipeline resolvers
+- the account data deletion request resolver
+- the `account-data-deletion` submodule for SQS and worker Lambda cleanup processing
 - the IAM roles AppSync needs for DynamoDB access and CloudWatch logging
 
 ## How It Works
 
-1. `aws_dynamodb_table.receipts` creates a pay-per-request table with point-in-time recovery, server-side encryption, and one GSI for owner-based listing.
+1. `aws_dynamodb_table.receipts` creates a provisioned-capacity table with point-in-time recovery, server-side encryption, and one GSI for owner-based listing.
 2. `aws_appsync_graphql_api.this` creates a Cognito-authenticated GraphQL API using the schema in `graphql/schema.graphql`.
 3. `aws_appsync_datasource.receipts` points AppSync at the DynamoDB table.
 4. `aws_appsync_function.this` renders APPSYNC_JS functions from the templates declared in `locals.tf`.
 5. `aws_appsync_resolver.this` assembles those functions into pipeline resolvers, all using the shared `pipeline.js.tftpl` response wrapper.
+6. `module.account_data_deletion` provisions the source queue, DLQ, worker Lambda, and IAM required for account cleanup.
+7. `aws_appsync_resolver.account_data_deletion_request` sends a signed SQS `SendMessage` request through an HTTP datasource.
 
 ## Example
 
@@ -40,6 +44,27 @@ A single-table design keeps those reads efficient without joins or scans:
 - `getReceipt` queries one receipt partition keyed by `RECEIPT#<receipt_id>`
 
 That keeps the storage footprint small, limits index count to one, and makes the DynamoDB cost model predictable.
+
+## Capacity Model
+
+The receipt table uses provisioned billing so low traffic can stay inside free-tier-friendly capacity where practical.
+
+| Resource | Minimum | Autoscaling maximum | Target utilization |
+| --- | --- | --- | --- |
+| Table read capacity | `1 RCU` | `20 RCU` | `70%` |
+| Table write capacity | `1 WCU` | `20 WCU` | `70%` |
+| GSI read capacity | `1 RCU` | `5 RCU` | `70%` |
+| GSI write capacity | `1 WCU` | `5 WCU` | `70%` |
+
+The combined autoscaling maximum is `25 RCU / 25 WCU` across table plus GSI.
+
+## Account Data Deletion
+
+Frontend account deletion first calls `requestAccountDataDeletion`, then deletes the Cognito user only after cleanup queueing succeeds.
+
+`requestAccountDataDeletion` has no user ID input. The AppSync resolver reads `ctx.identity.sub` and sends one signed SQS `SendMessage` request through an HTTP datasource. The worker Lambda in the `account-data-deletion` submodule deletes receipt rows incrementally and can resume from duplicate or partial messages.
+
+See [account-data-deletion/README.md](account-data-deletion/README.md) for queue and worker behavior.
 
 ## Key Mapping
 
@@ -68,16 +93,24 @@ flowchart LR
   C["Cognito user"] --> A["AppSync GraphQL API"]
   A --> R["APPSYNC_JS pipeline resolvers"]
   R --> D["DynamoDB receipt table"]
+  A --> H["Signed SQS HTTP datasource"]
+  H --> Q["SQS deletion queue"]
+  Q --> WL["Account deletion worker Lambda"]
+  WL --> D
   A --> L["CloudWatch logs"]
 
   classDef cognito fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
   classDef appsync fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
   classDef dynamodb fill:#C925D1,stroke:#8E1AA1,color:#FFFFFF,stroke-width:2px;
+  classDef lambda fill:#FF9900,stroke:#C77700,color:#111827,stroke-width:2px;
+  classDef sqs fill:#FF4F8B,stroke:#C81E5B,color:#FFFFFF,stroke-width:2px;
   classDef cloudwatch fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
 
   class C cognito;
-  class A,R appsync;
+  class A,R,H appsync;
   class D dynamodb;
+  class WL lambda;
+  class Q sqs;
   class L cloudwatch;
 ```
 
@@ -190,13 +223,16 @@ flowchart LR
   L3["mutations"] --> Q3["Read current receipt state"]
   Q3 --> O3["Conditional or transactional write"]
 
+  L4["requestAccountDataDeletion"] --> Q4["Queue cleanup for ctx.identity.sub"]
+  Q4 --> O4["SQS message"]
+
   classDef query fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
   classDef access fill:#F3F4F6,stroke:#6B7280,color:#111827,stroke-width:2px;
   classDef result fill:#F3E8FF,stroke:#8E1AA1,color:#581C87,stroke-width:2px;
 
-  class L1,L2,L3 access;
-  class Q1,Q1B,Q2,Q3 query;
-  class O1,O2,O3 result;
+  class L1,L2,L3,L4 access;
+  class Q1,Q1B,Q2,Q3,Q4 query;
+  class O1,O2,O3,O4 result;
 ```
 
 ## Authorization Flow
@@ -253,6 +289,7 @@ The resolver layout is declared in `locals.tf`.
 | `listReceipts` | `Query` | `list_receipts`, `batch_get_receipt_roots` |
 | `removeReceiptItem` | `Mutation` | `query_item_allocations`, `commit_remove_item` |
 | `removeParticipant` | `Mutation` | `lookup_participant`, `query_participant_allocations`, `commit_remove_participant` |
+| `requestAccountDataDeletion` | `Mutation` | Unit resolver to signed SQS HTTP datasource |
 | `setItemAllocations` | `Mutation` | `query_item_allocations`, `commit_set_item_allocations` |
 | `updateParticipant` | `Mutation` | `lookup_participant`, `update_participant` |
 | `updateReceiptMetadata` | `Mutation` | `update_receipt_metadata` |

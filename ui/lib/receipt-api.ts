@@ -143,6 +143,11 @@ const allocationMutationResultSchema = z.object({
   version: z.number(),
 })
 
+const accountDataDeletionRequestSchema = z.object({
+  queuedAt: z.string(),
+  status: z.string(),
+})
+
 type GraphQLErrorPayload = {
   errorType?: string
   message?: string
@@ -617,6 +622,15 @@ const removeReceiptItemMutation = /* GraphQL */ `
   }
 `
 
+const requestAccountDataDeletionMutation = /* GraphQL */ `
+  mutation RequestAccountDataDeletion {
+    requestAccountDataDeletion {
+      queuedAt
+      status
+    }
+  }
+`
+
 export async function listReceipts(limit = 24): Promise<{
   items: ReceiptListItem[]
   nextToken: string | null
@@ -646,6 +660,16 @@ export async function getReceipt(receiptId: string): Promise<Receipt | null> {
   )
 
   return data.getReceipt
+}
+
+export async function requestAccountDataDeletion(): Promise<void> {
+  await graphQLRequest(
+    requestAccountDataDeletionMutation,
+    undefined,
+    z.object({
+      requestAccountDataDeletion: accountDataDeletionRequestSchema,
+    }),
+  )
 }
 
 async function mutateReceiptMetadata(input: Record<string, unknown>) {
