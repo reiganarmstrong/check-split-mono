@@ -271,6 +271,71 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
   }
 
   statement {
+    sid    = "AllowManageReceiptTableAutoscaling"
+    effect = "Allow"
+    actions = [
+      "application-autoscaling:DeleteScalingPolicy",
+      "application-autoscaling:DeregisterScalableTarget",
+      "application-autoscaling:DescribeScalableTargets",
+      "application-autoscaling:DescribeScalingPolicies",
+      "application-autoscaling:ListTagsForResource",
+      "application-autoscaling:PutScalingPolicy",
+      "application-autoscaling:RegisterScalableTarget",
+      "application-autoscaling:TagResource",
+      "application-autoscaling:UntagResource"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid     = "AllowManageReceiptTableAutoscalingServiceRole"
+    effect  = "Allow"
+    actions = ["iam:CreateServiceLinkedRole"]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/dynamodb.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_DynamoDBTable"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values   = ["dynamodb.application-autoscaling.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid     = "AllowReadReceiptTableAutoscalingServiceRole"
+    effect  = "Allow"
+    actions = ["iam:GetRole"]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/dynamodb.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_DynamoDBTable"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageReceiptTableAutoscalingAlarms"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DeleteAlarms",
+      "cloudwatch:PutMetricAlarm"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:cloudwatch:us-east-1:${data.aws_caller_identity.current.account_id}:alarm:TargetTracking-table/checksplit-receipts-${var.environment}*"
+    ]
+  }
+
+  statement {
+    sid     = "AllowReadReceiptTableAutoscalingAlarms"
+    effect  = "Allow"
+    actions = ["cloudwatch:DescribeAlarms"]
+
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "AllowManageAppSyncServiceRoles"
     effect = "Allow"
     actions = [
@@ -307,6 +372,115 @@ data "aws_iam_policy_document" "github_actions_receipt_api_permissions" {
 
     resources = [
       "*"
+    ]
+  }
+
+  statement {
+    sid     = "AllowCreateAccountDataDeletionQueues"
+    effect  = "Allow"
+    actions = ["sqs:CreateQueue"]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowManageAccountDataDeletionQueues"
+    effect = "Allow"
+    actions = [
+      "sqs:DeleteQueue",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ListQueueTags",
+      "sqs:SetQueueAttributes",
+      "sqs:TagQueue",
+      "sqs:UntagQueue"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:sqs:us-east-1:${data.aws_caller_identity.current.account_id}:checksplit-account-data-deletion-${var.environment}",
+      "arn:${data.aws_partition.current.partition}:sqs:us-east-1:${data.aws_caller_identity.current.account_id}:checksplit-account-data-deletion-dlq-${var.environment}"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageAccountDataDeletionWorker"
+    effect = "Allow"
+    actions = [
+      "lambda:AddPermission",
+      "lambda:CreateFunction",
+      "lambda:DeleteFunction",
+      "lambda:GetFunction",
+      "lambda:GetFunctionCodeSigningConfig",
+      "lambda:GetFunctionConfiguration",
+      "lambda:GetPolicy",
+      "lambda:ListTags",
+      "lambda:ListVersionsByFunction",
+      "lambda:RemovePermission",
+      "lambda:TagResource",
+      "lambda:UntagResource",
+      "lambda:UpdateFunctionCode",
+      "lambda:UpdateFunctionConfiguration"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:lambda:us-east-1:${data.aws_caller_identity.current.account_id}:function:checksplit-account-data-deletion-worker-${var.environment}"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageAccountDataDeletionWorkerEventSourceMappings"
+    effect = "Allow"
+    actions = [
+      "lambda:CreateEventSourceMapping",
+      "lambda:DeleteEventSourceMapping",
+      "lambda:GetEventSourceMapping",
+      "lambda:ListEventSourceMappings",
+      "lambda:UpdateEventSourceMapping"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowManageAccountDataDeletionWorkerRole"
+    effect = "Allow"
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:GetRole",
+      "iam:GetRolePolicy",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies",
+      "iam:ListRoleTags",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole",
+      "iam:UntagRole",
+      "iam:UpdateAssumeRolePolicy"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/checksplit-account-data-deletion-worker-${var.environment}-lambda"
+    ]
+  }
+
+  statement {
+    sid    = "AllowManageAccountDataDeletionWorkerLogGroups"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:DeleteLogGroup",
+      "logs:ListTagsForResource",
+      "logs:PutRetentionPolicy",
+      "logs:TagResource",
+      "logs:UntagResource"
+    ]
+
+    resources = [
+      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-account-data-deletion-worker-${var.environment}"
     ]
   }
 }
