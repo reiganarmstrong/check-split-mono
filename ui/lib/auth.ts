@@ -15,6 +15,7 @@ import {
   configureAmplifyAuth,
   hasAmplifyAuthConfig,
 } from "@/lib/amplify-auth"
+import { requestAccountDataDeletion } from "@/lib/receipt-api"
 import type {
   ChangePasswordFormValues,
   ConfirmPasswordResetFormValues,
@@ -383,6 +384,18 @@ export async function deleteCurrentUserAccount(
   }
 
   configureAmplifyAuth()
+
+  try {
+    await requestAccountDataDeletion()
+  } catch (error) {
+    const message = getErrorMessage(error)
+
+    throw new Error(
+      message
+        ? `Unable to queue saved receipt deletion: ${message}`
+        : "Unable to queue saved receipt deletion. Account was not deleted.",
+    )
+  }
 
   try {
     await deleteUser()
