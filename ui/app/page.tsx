@@ -16,6 +16,7 @@ import {
   Camera,
   Check,
   Link2,
+  ScanLine,
   ShieldCheck,
   Users,
   Zap,
@@ -246,8 +247,8 @@ function Checklist({ items }: { items: string[] }) {
 
 function ReceiptScanFigure() {
   return (
-    <div className="grid gap-3 sm:gap-5 lg:grid-cols-[1fr_10rem]">
-      <div className="rounded-[0.9rem] border border-[var(--line)] bg-white p-4 shadow-[0_16px_36px_rgba(14,18,24,0.04)] sm:p-5">
+    <div className="grid gap-3 sm:gap-5 lg:min-h-[34rem] lg:grid-cols-[1fr_10rem] lg:items-stretch">
+      <div className="rounded-[0.9rem] border border-[var(--line)] bg-white p-4 shadow-[0_16px_36px_rgba(14,18,24,0.04)] sm:p-5 lg:flex lg:flex-col">
         <div className="flex items-center justify-between">
           <h3 className="text-2xl leading-none text-[var(--foreground)] sm:text-3xl">
             Receipt scan
@@ -255,8 +256,8 @@ function ReceiptScanFigure() {
           <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
         </div>
 
-        <div className="relative mt-4 h-48 overflow-hidden rounded-[0.85rem] border border-[var(--line)] bg-[#fbfbfd] px-4 py-4 sm:mt-6 sm:h-[18rem] sm:px-5 sm:py-5">
-          <div className="space-y-2 sm:space-y-3">
+        <div className="relative mt-4 h-48 overflow-hidden rounded-[0.85rem] border border-[var(--line)] bg-[#fbfbfd] px-4 py-4 sm:mt-6 sm:h-[18rem] sm:px-5 sm:py-5 lg:min-h-0 lg:flex-1">
+          <div className="space-y-2 sm:space-y-3 lg:flex lg:h-full lg:flex-col lg:justify-between lg:space-y-0">
             {Array.from({ length: 9 }).map((_, index) => (
               <div
                 key={index}
@@ -274,9 +275,12 @@ function ReceiptScanFigure() {
             ))}
           </div>
 
-          <div className="pointer-events-none absolute inset-x-8 top-16 h-7 rounded-full bg-[#efedff]/80 sm:inset-x-11 sm:top-[5.2rem] sm:h-9" />
-          <div className="pointer-events-none absolute inset-x-9 top-[6.75rem] h-8 rounded-full bg-[#dff4e8]/90 sm:inset-x-12 sm:top-[9.25rem] sm:h-10" />
-          <div className="landing-receipt-scan-line pointer-events-none absolute inset-x-4 top-4 h-1.5 transform-gpu rounded-full bg-[#050506]/80 shadow-[0_0_24px_rgba(5,5,6,0.2)] [--receipt-scan-travel:9.625rem] sm:top-5 sm:[--receipt-scan-travel:15.125rem]" />
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <ScanLine className="h-9 w-9 text-[#4053ff] sm:h-10 sm:w-10" />
+          </div>
+          <div className="landing-receipt-scan-track pointer-events-none absolute inset-x-4 top-4 h-[calc(100%_-_2.375rem)] transform-gpu sm:top-5 sm:h-[calc(100%_-_2.875rem)]">
+            <div className="h-1.5 rounded-full bg-[#050506]/80 shadow-[0_0_24px_rgba(5,5,6,0.2)]" />
+          </div>
         </div>
       </div>
 
