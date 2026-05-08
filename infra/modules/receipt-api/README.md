@@ -12,7 +12,7 @@ It packages four concerns into one deployable unit:
 
 ## How It Works
 
-1. `aws_dynamodb_table.receipts` creates a provisioned-capacity table with point-in-time recovery, server-side encryption, and one GSI for owner-based listing.
+1. `aws_dynamodb_table.receipts` creates a provisioned-capacity table with server-side encryption and one GSI for owner-based listing.
 2. `aws_appsync_graphql_api.this` creates a Cognito-authenticated GraphQL API using the schema in `graphql/schema.graphql`.
 3. `aws_appsync_datasource.receipts` points AppSync at the DynamoDB table.
 4. `aws_appsync_function.this` renders APPSYNC_JS functions from the templates declared in `locals.tf`.
@@ -167,8 +167,9 @@ pk = RECEIPT#<receipt_id>
 sk = RECEIPT
 gsi1pk = USER#<owner_user_id>
 gsi1sk = RECEIPT_DATE#<receipt_occurred_at>#RECEIPT#<receipt_id>
-stores aggregate counters
-including paid_participant_count"]
+stores item_count,
+participant_count,
+paid_participant_count"]
     RP["Participant
 pk = RECEIPT#<receipt_id>
 sk = PARTICIPANT#<participant_id>
@@ -197,6 +198,16 @@ sk = ALLOCATION#ITEM#<item_id>#PARTICIPANT#<participant_id>"]
   class RI item;
   class RA allocation;
 ```
+
+Receipt root rows store these maintained aggregate counters:
+
+| Attribute | GraphQL field | Initial value | Maintained by | Purpose |
+| --- | --- | ---: | --- | --- |
+| `item_count` | `itemCount` | `0` | `upsertReceiptItem`, `removeReceiptItem` | Tracks number of item rows under receipt. |
+| `participant_count` | `participantCount` | `0` | `addParticipant`, `removeParticipant` | Tracks number of participant rows under receipt. |
+| `paid_participant_count` | `paidParticipantCount` | `0` | `addParticipant`, `updateParticipant`, `removeParticipant` | Tracks participant rows whose payment state is paid, so archive/list reads can show payment progress without querying whole receipt partition. |
+
+`version` also lives on the receipt root and increments on receipt mutations, but it is a concurrency token rather than an aggregate counter.
 
 ## Access Patterns
 
