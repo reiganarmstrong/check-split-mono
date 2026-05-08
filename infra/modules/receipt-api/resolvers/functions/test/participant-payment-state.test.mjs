@@ -4,7 +4,7 @@ import test from 'node:test';
 import vm from 'node:vm';
 
 function loadResolver(filename, overrides = {}) {
-  const sourcePath = new URL(`./${filename}`, import.meta.url);
+  const sourcePath = new URL(`../${filename}`, import.meta.url);
   let source = fs.readFileSync(sourcePath, 'utf8');
 
   source = source.replace("import { util } from '@aws-appsync/utils';\n", '');
