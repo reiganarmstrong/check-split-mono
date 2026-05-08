@@ -267,17 +267,17 @@ export function ReceiptArchivePage() {
           className="grid gap-6"
         >
           <section className="border-b border-[var(--line)] pb-8">
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
-              <div>
-                <h1 className="max-w-3xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl">
+            <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <div className="text-center md:text-left">
+                <h1 className="mx-auto max-w-3xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl md:mx-0">
                   Your Dashboard
                 </h1>
-                <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
+                <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base md:mx-0">
                   Start a new split or edit an old one.
                 </p>
               </div>
 
-              <div className="flex xl:justify-end">
+              <div className="flex justify-center md:justify-end">
                 <CreateSplitButton />
               </div>
             </div>
