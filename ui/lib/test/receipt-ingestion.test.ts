@@ -7,7 +7,7 @@ import {
   prepareReceiptUploadWithCodec,
   ReceiptIngestionError,
   type ReceiptParseResponse,
-} from "./receipt-ingestion"
+} from "../receipt-ingestion"
 
 const MAX_UPLOAD_BYTES = 4_194_304
 

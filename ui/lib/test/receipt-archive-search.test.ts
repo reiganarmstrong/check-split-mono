@@ -4,8 +4,8 @@ import {
   getPaymentProgressLabel,
   getReceiptPaymentState,
   receiptMatchesArchiveSearch,
-} from "./receipt-archive-search"
-import type { ReceiptListItem } from "./receipt-types"
+} from "../receipt-archive-search"
+import type { ReceiptListItem } from "../receipt-types"
 
 const receipt: ReceiptListItem = {
   locationName: "Brooklyn Heights",
