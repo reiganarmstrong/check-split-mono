@@ -267,17 +267,17 @@ export function ReceiptArchivePage() {
           className="grid gap-6"
         >
           <section className="border-b border-[var(--line)] pb-8">
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
-              <div>
-                <h1 className="max-w-3xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl">
+            <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <div className="text-center md:text-left">
+                <h1 className="mx-auto max-w-3xl text-4xl leading-[0.95] text-[var(--foreground)] sm:text-6xl md:mx-0">
                   Your Dashboard
                 </h1>
-                <p className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base">
+                <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base md:mx-0">
                   Start a new split or edit an old one.
                 </p>
               </div>
 
-              <div className="flex xl:justify-end">
+              <div className="flex justify-center md:justify-end">
                 <CreateSplitButton />
               </div>
             </div>
@@ -385,10 +385,7 @@ export function ReceiptArchivePage() {
             ) : filteredReceipts.length === 0 ? (
               <div className="workspace-line mt-5 pt-5">
                 <div className="rounded-[1rem] border border-dashed border-[var(--line)] px-6 py-12 text-center">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)]">
-                    <Search className="h-5 w-5 text-[var(--foreground)]" />
-                  </div>
-                  <h3 className="mt-6 text-3xl leading-none text-[var(--foreground)]">
+                  <h3 className="text-3xl leading-none text-[var(--foreground)]">
                     No matching splits
                   </h3>
                   <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[var(--muted-foreground)]">
@@ -403,7 +400,7 @@ export function ReceiptArchivePage() {
                         setStatusFilter("all");
                         setSortOption("newest");
                       }}
-                      className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface)] px-5 text-sm font-semibold text-[var(--foreground)] hover:bg-[var(--surface-strong)]"
+                      className="h-12 rounded-[0.8rem] border border-[var(--line)] bg-white px-5 text-sm font-semibold text-[var(--foreground)] hover:bg-[color-mix(in_oklab,var(--primary)_10%,white)]"
                     >
                       Reset filters
                     </Button>

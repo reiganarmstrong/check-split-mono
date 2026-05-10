@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import type { Receipt, ReceiptEditorState } from "./receipt-types"
+import type { Receipt, ReceiptEditorState } from "../receipt-types"
 import {
   buildReceiptSavePlan,
   getGroupItemShareDetails,
@@ -10,7 +10,7 @@ import {
   isValidShareWeightInput,
   mapReceiptToEditorState,
   parseShareWeightInput,
-} from "./receipt-editor"
+} from "../receipt-editor"
 
 function createState(overrides?: Partial<ReceiptEditorState>): ReceiptEditorState {
   return {

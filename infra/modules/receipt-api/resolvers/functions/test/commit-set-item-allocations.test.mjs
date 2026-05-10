@@ -4,7 +4,7 @@ import test from 'node:test';
 import vm from 'node:vm';
 
 function loadResolver() {
-  const sourcePath = new URL('./commit-set-item-allocations.js.tftpl', import.meta.url);
+  const sourcePath = new URL('../commit-set-item-allocations.js.tftpl', import.meta.url);
   let source = fs.readFileSync(sourcePath, 'utf8');
 
   source = source.replace("import { util } from '@aws-appsync/utils';\n", '');

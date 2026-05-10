@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
   buildReceiptSummaryShareData,
   buildReceiptSummaryShareFilename,
-} from "./receipt-summary-share"
+} from "../receipt-summary-share"
 
 describe("buildReceiptSummaryShareFilename", () => {
   it("slugifies merchant name and appends receipt date", () => {
