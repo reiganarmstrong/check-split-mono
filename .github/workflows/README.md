@@ -2,7 +2,7 @@
 
 This folder contains the GitHub Actions workflows for this repository.
 
-The active automation target today is the `dev` environment.
+The active automated target today is the `dev` environment. Staging and prod deploys are manual-only.
 
 ## `pr-infra-dev.yml`
 
@@ -30,6 +30,32 @@ What it does:
 - installs Terraform plus the Lambda build toolchain
 - builds the `receipt-ingestion-api` Lambda package
 - runs `terraform apply` for `infra/environments/dev`
+
+## `deploy-staging.yml`
+
+Runs only when manually dispatched from GitHub Actions.
+
+What it does:
+
+- checks out the staging environment and shared infra modules
+- authenticates to AWS through GitHub OIDC
+- reconstructs `terraform.tfvars` and `backend.hcl`
+- installs Terraform plus the Lambda build toolchain
+- builds the `receipt-ingestion-api` Lambda package
+- runs `terraform apply` for `infra/environments/staging`
+
+## `deploy-prod.yml`
+
+Runs only when manually dispatched from GitHub Actions.
+
+What it does:
+
+- checks out the prod environment and shared infra modules
+- authenticates to AWS through GitHub OIDC
+- reconstructs `terraform.tfvars` and `backend.hcl`
+- installs Terraform plus the Lambda build toolchain
+- builds the `receipt-ingestion-api` Lambda package
+- runs `terraform apply` for `infra/environments/prod`
 
 ## `deploy-ui-dev.yml`
 
