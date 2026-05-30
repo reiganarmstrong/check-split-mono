@@ -1,14 +1,11 @@
 variable "app_subdomain" {
-  type = string
+  description = "Application domain that should be covered by the certificate."
+  type        = string
 }
 
 variable "cloudflare_zone_id" {
   type        = string
   description = "Cloudflare domain zone id."
-}
-
-variable "root_domain" {
-  type = string
 }
 
 variable "environment" {

@@ -1,0 +1,139 @@
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: What should this workflow deploy?
+        required: true
+        default: infra-and-ui
+        type: choice
+        options:
+          - infra-and-ui
+          - infra-only
+
+permissions:
+  # AWS OIDC
+  id-token: write
+  # needed since we are now defining permissions
+  contents: read
+
+jobs:
+  terraform-deploy-staging:
+    defaults:
+      run:
+        working-directory: ./infra/environments/staging
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v6
+        with:
+          # only include the necessary files
+          sparse-checkout: |
+            infra/environments/staging
+            infra/modules
+
+      - name: AWS Auth
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Create tfvars file
+        # load into env variable then make to file to prevent bash from stripping out newlines needed by terraform
+        env:
+          TFVARS_CONTENT: ${{ secrets.TFVARS }}
+        run: echo "$TFVARS_CONTENT" > terraform.tfvars
+
+      - name: Create backend.hcl file
+        env:
+          BACKEND_CONTENT: ${{ secrets.TF_S3_BACKEND }}
+        run: echo "$BACKEND_CONTENT" > backend.hcl
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.14.7"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: ^10.32.1
+
+      - name: Install correct node version
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "pnpm"
+          cache-dependency-path: infra/modules/receipt-ingestion-api/lambda/pnpm-lock.yaml
+
+      - name: Install receipt-ingestion-api Lambda dependencies
+        working-directory: ./infra/modules/receipt-ingestion-api/lambda
+        run: pnpm install --frozen-lockfile
+
+      - name: Build receipt-ingestion-api Lambda package
+        working-directory: ./infra/modules/receipt-ingestion-api/lambda
+        run: pnpm run build
+
+      - name: Terraform Init
+        run: terraform init -input=false -backend-config=backend.hcl > /dev/null 2>&1
+
+      - name: Terraform Apply
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: terraform apply -auto-approve -input=false > /dev/null 2>&1
+
+  ui-deploy-staging:
+    if: ${{ inputs.deploy_target != 'infra-only' }}
+    needs: terraform-deploy-staging
+    defaults:
+      run:
+        working-directory: ./ui
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v6
+        with:
+          # only include the necessary files
+          sparse-checkout: |
+            ui
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: ^10.32.1
+
+      - name: Install correct node version
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "pnpm"
+          cache-dependency-path: ui/pnpm-lock.yaml
+
+      - name: Create .env file
+        env:
+          NEXT_ENV_VARS: ${{ vars.NEXT_ENV_VARS }}
+        run: echo "$NEXT_ENV_VARS" > .env
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build static files
+        run: pnpm build
+
+      - name: AWS Auth
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        # --delete needed to remove files not in updated build
+        run: aws s3 sync ./out s3://${{ vars.S3_BUCKET_NAME }} --delete
+
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" --paths "/*"

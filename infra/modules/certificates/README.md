@@ -6,9 +6,8 @@ It is designed for CloudFront-backed domains, which is why the AWS provider is p
 
 ## How It Works
 
-1. `aws_acm_certificate.this` requests a certificate for `var.root_domain`.
-2. The certificate includes two SANs:
-   - `var.app_subdomain`
+1. `aws_acm_certificate.this` requests a certificate for `var.app_subdomain`.
+2. The certificate includes one SAN:
    - `*.${var.app_subdomain}`
 3. `cloudflare_dns_record.this` iterates over ACM's `domain_validation_options` and creates the required validation records in the target Cloudflare zone.
 4. `aws_acm_certificate_validation.this` waits for those records to propagate and finalizes validation.
@@ -30,7 +29,7 @@ config:
     tertiaryColor: "#FFF4CC"
 ---
 flowchart LR
-  A["Terraform apply"] --> B["ACM certificate request<br/>root + app SANs"]
+  A["Terraform apply"] --> B["ACM certificate request<br/>app + wildcard SAN"]
   B --> C["ACM domain validation options"]
   C --> D["Cloudflare DNS validation records"]
   D --> E["ACM certificate validation"]
@@ -51,7 +50,6 @@ flowchart LR
 module "certificates" {
   source             = "../../modules/certificates"
   environment        = var.environment
-  root_domain        = var.root_domain
   app_subdomain      = local.app_subdomain
   cloudflare_zone_id = var.cloudflare_zone_id
 }
@@ -63,7 +61,6 @@ module "certificates" {
 | --- | --- | --- |
 | `app_subdomain` | `string` | Application domain that should be covered by the certificate. |
 | `cloudflare_zone_id` | `string` | Cloudflare zone where DNS validation records are created. |
-| `root_domain` | `string` | Base domain passed to ACM as the primary certificate name. |
 | `environment` | `string` | Environment label used by callers for composition. This module currently does not use it internally. |
 
 ## Outputs
@@ -76,3 +73,4 @@ module "certificates" {
 
 - The module requires AWS and Cloudflare credentials at apply time.
 - Because CloudFront only accepts ACM certificates from `us-east-1`, this module declares its own AWS provider region instead of inheriting the caller's region.
+- Per-environment stacks do not request certificates for the zone apex. That avoids multiple environments trying to manage the same ACM DNS validation record in Cloudflare.
