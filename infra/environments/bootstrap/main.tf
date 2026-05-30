@@ -59,7 +59,7 @@ module "dev-github-actions-auth" {
   repo_name               = var.repo_name
   github_repo_path        = var.github_repo_path
   github_repo_environment = "dev"
-  website_s3_bucket_arn   = var.website_s3_bucket_arn
+  website_s3_bucket_arn   = var.dev_website_s3_bucket_arn
   tfstate_s3_bucket_object = {
     arn           = aws_s3_bucket.terraform_state_storage.arn,
     object_prefix = "${aws_s3_bucket.terraform_state_storage.arn}/checksplit/dev"
@@ -72,7 +72,7 @@ module "staging-github-actions-auth" {
   repo_name               = var.repo_name
   github_repo_path        = var.github_repo_path
   github_repo_environment = "staging"
-  website_s3_bucket_arn   = var.website_s3_bucket_arn
+  website_s3_bucket_arn   = var.staging_website_s3_bucket_arn
   tfstate_s3_bucket_object = {
     arn           = aws_s3_bucket.terraform_state_storage.arn,
     object_prefix = "${aws_s3_bucket.terraform_state_storage.arn}/checksplit/staging"
@@ -85,7 +85,7 @@ module "prod-github-actions-auth" {
   repo_name               = var.repo_name
   github_repo_path        = var.github_repo_path
   github_repo_environment = "prod"
-  website_s3_bucket_arn   = var.website_s3_bucket_arn
+  website_s3_bucket_arn   = var.prod_website_s3_bucket_arn
   tfstate_s3_bucket_object = {
     arn           = aws_s3_bucket.terraform_state_storage.arn,
     object_prefix = "${aws_s3_bucket.terraform_state_storage.arn}/checksplit/prod"
