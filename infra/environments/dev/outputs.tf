@@ -1,3 +1,8 @@
+output "website_cloudfront_distribution_id" {
+  description = "The CloudFront distribution ID for the dev website."
+  value       = module.static-website-hosting.cloudfront_distribution_id
+}
+
 output "website_s3_bucket_arn" {
   value = module.static-website-hosting.s3_bucket_arn
 }
