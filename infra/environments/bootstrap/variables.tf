@@ -1,7 +1,3 @@
-variable "github_repo_environment" {
-  type = string
-}
-
 variable "github_repo_path" {
   type = string
 }
