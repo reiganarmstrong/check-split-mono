@@ -1,7 +1,7 @@
 # request the ACM Certificate
 resource "aws_acm_certificate" "this" {
-  domain_name               = var.root_domain
-  subject_alternative_names = ["${var.app_subdomain}", "*.${var.app_subdomain}"]
+  domain_name               = var.app_subdomain
+  subject_alternative_names = ["*.${var.app_subdomain}"]
   validation_method         = "DNS"
 
   lifecycle {
