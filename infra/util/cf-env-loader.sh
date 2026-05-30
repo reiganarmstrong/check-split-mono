@@ -9,4 +9,4 @@ fi
 # fetch the token from Bitwarden
 echo "Fetching Cloudflare token from Bitwarden..."
 # leading space to prevent saving in shell history
- CLOUDFLARE_API_TOKEN=$(bw get item "Cloudflare Terraform Token" | jq -r '.fields[] | select(.name == "API_KEY") | .value') terraform "$@"
+ CLOUDFLARE_API_TOKEN=$(bw get item "Local Cloudflare Token" | jq -r '.fields[] | select(.name == "API_KEY") | .value') terraform "$@"
