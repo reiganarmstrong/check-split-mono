@@ -22,7 +22,7 @@ It is a direct child module of `receipt-api`, following the same shape as `stati
 | `aws_lambda_function.worker`             | SQS worker Lambda that incrementally deletes receipt data.                 |
 | `aws_lambda_event_source_mapping.worker` | Connects SQS to the worker with batch size `1`.                            |
 | `aws_iam_role.appsync_sqs`               | Lets AppSync send cleanup messages to SQS.                                 |
-| `aws_iam_role.worker`                    | Lets worker Lambda read/write DynamoDB, work SQS messages, and write logs. |
+| `aws_iam_role.worker`                    | Lets worker Lambda read/write DynamoDB and work SQS messages.              |
 
 ## Queue Settings
 
@@ -107,18 +107,14 @@ flowchart LR
   Q --> W["Worker Lambda"]
   W --> D["DynamoDB receipts table"]
   Q --> DLQ["SQS DLQ"]
-  L["CloudWatch logs"]
-  W --> L
 
   classDef appsync fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
   classDef lambda fill:#FF9900,stroke:#C77700,color:#111827,stroke-width:2px;
   classDef sqs fill:#FF4F8B,stroke:#C81E5B,color:#FFFFFF,stroke-width:2px;
   classDef dynamodb fill:#C925D1,stroke:#8E1AA1,color:#FFFFFF,stroke-width:2px;
-  classDef cloudwatch fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
 
   class A,H appsync;
   class W lambda;
   class Q,DLQ sqs;
   class D dynamodb;
-  class L cloudwatch;
 ```

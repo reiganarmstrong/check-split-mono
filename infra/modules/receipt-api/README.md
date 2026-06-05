@@ -8,7 +8,7 @@ It packages four concerns into one deployable unit:
 - the AppSync API, datasource, and pipeline resolvers
 - the account data deletion request resolver
 - the `account-data-deletion` submodule for SQS and worker Lambda cleanup processing
-- the IAM roles AppSync needs for DynamoDB access and CloudWatch logging
+- the IAM roles AppSync needs for DynamoDB and SQS access
 
 ## How It Works
 
@@ -97,21 +97,18 @@ flowchart LR
   H --> Q["SQS deletion queue"]
   Q --> WL["Account deletion worker Lambda"]
   WL --> D
-  A --> L["CloudWatch logs"]
 
   classDef cognito fill:#DD344C,stroke:#B42336,color:#FFFFFF,stroke-width:2px;
   classDef appsync fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
   classDef dynamodb fill:#C925D1,stroke:#8E1AA1,color:#FFFFFF,stroke-width:2px;
   classDef lambda fill:#FF9900,stroke:#C77700,color:#111827,stroke-width:2px;
   classDef sqs fill:#FF4F8B,stroke:#C81E5B,color:#FFFFFF,stroke-width:2px;
-  classDef cloudwatch fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
 
   class C cognito;
   class A,R,H appsync;
   class D dynamodb;
   class WL lambda;
   class Q sqs;
-  class L cloudwatch;
 ```
 
 ## Resolver Composition

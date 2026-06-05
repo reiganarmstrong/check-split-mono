@@ -30,11 +30,6 @@ data "aws_iam_policy_document" "appsync_dynamodb_access" {
 
 data "aws_region" "current" {}
 
-data "aws_iam_policy" "appsync_cloudwatch" {
-  name        = "AWSAppSyncPushToCloudWatchLogs"
-  path_prefix = "/service-role/"
-}
-
 resource "aws_dynamodb_table" "receipts" {
   billing_mode   = "PROVISIONED"
   hash_key       = "pk"
@@ -194,16 +189,6 @@ resource "aws_appautoscaling_policy" "receipts_gsi_write" {
   }
 }
 
-resource "aws_iam_role" "appsync_cloudwatch" {
-  assume_role_policy = data.aws_iam_policy_document.appsync_assume_role.json
-  name               = "${local.graphql_api_name}-logs"
-}
-
-resource "aws_iam_role_policy_attachment" "appsync_cloudwatch" {
-  policy_arn = data.aws_iam_policy.appsync_cloudwatch.arn
-  role       = aws_iam_role.appsync_cloudwatch.name
-}
-
 resource "aws_iam_role" "appsync_dynamodb" {
   assume_role_policy = data.aws_iam_policy_document.appsync_assume_role.json
   name               = "${local.graphql_api_name}-dynamodb"
@@ -221,19 +206,11 @@ resource "aws_appsync_graphql_api" "this" {
   schema              = file(local.graphql_schema_path)
   xray_enabled        = false
 
-  log_config {
-    cloudwatch_logs_role_arn = aws_iam_role.appsync_cloudwatch.arn
-    exclude_verbose_content  = true
-    field_log_level          = "ERROR"
-  }
-
   user_pool_config {
     aws_region     = data.aws_region.current.region
     default_action = "ALLOW"
     user_pool_id   = var.cognito_user_pool_id
   }
-
-  depends_on = [aws_iam_role_policy_attachment.appsync_cloudwatch]
 }
 
 resource "aws_appsync_datasource" "receipts" {

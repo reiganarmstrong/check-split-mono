@@ -19,14 +19,6 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 
 data "aws_iam_policy_document" "lambda_access" {
   statement {
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-    resources = ["${aws_cloudwatch_log_group.this.arn}:*"]
-  }
-
-  statement {
     actions = ["ssm:GetParameter"]
     resources = [
       "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/${local.ssm_parameter_path}",
@@ -91,11 +83,6 @@ resource "aws_apigatewayv2_stage" "this" {
   name        = local.stage_name
 }
 
-resource "aws_cloudwatch_log_group" "this" {
-  name              = local.log_group_name
-  retention_in_days = 7
-}
-
 resource "aws_iam_role" "this" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
   name               = local.lambda_role_name
@@ -126,8 +113,6 @@ resource "aws_lambda_function" "this" {
       RECEIPT_PARSE_ALLOWED_ORIGINS = jsonencode(var.receipt_parse_allowed_origins)
     }
   }
-
-  depends_on = [aws_cloudwatch_log_group.this]
 }
 
 resource "aws_lambda_permission" "this" {

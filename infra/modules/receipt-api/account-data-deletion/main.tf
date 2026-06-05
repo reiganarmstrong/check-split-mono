@@ -36,14 +36,6 @@ data "aws_iam_policy_document" "appsync_sqs_access" {
 data "aws_iam_policy_document" "worker_access" {
   statement {
     actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-    resources = ["${aws_cloudwatch_log_group.worker.arn}:*"]
-  }
-
-  statement {
-    actions = [
       "dynamodb:BatchWriteItem",
       "dynamodb:DeleteItem",
       "dynamodb:Query",
@@ -80,11 +72,6 @@ resource "aws_sqs_queue" "this" {
     deadLetterTargetArn = aws_sqs_queue.dlq.arn
     maxReceiveCount     = 5
   })
-}
-
-resource "aws_cloudwatch_log_group" "worker" {
-  name              = "/aws/lambda/${local.worker_lambda_function_name}"
-  retention_in_days = 7
 }
 
 resource "aws_iam_role" "appsync_sqs" {
@@ -130,7 +117,6 @@ resource "aws_lambda_function" "worker" {
   }
 
   depends_on = [
-    aws_cloudwatch_log_group.worker,
     aws_iam_role_policy.worker,
   ]
 }
