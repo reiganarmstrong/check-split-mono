@@ -515,7 +515,8 @@ data "aws_iam_policy_document" "github_actions_account_data_deletion_permissions
     ]
 
     resources = [
-      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-account-data-deletion-worker-${var.environment}"
+      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-account-data-deletion-worker-${var.environment}",
+      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-account-data-deletion-worker-${var.environment}:*"
     ]
   }
 
@@ -633,7 +634,8 @@ data "aws_iam_policy_document" "github_actions_receipt_ingestion_permissions" {
     ]
 
     resources = [
-      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-receipt-parse-${var.environment}"
+      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-receipt-parse-${var.environment}",
+      "arn:${data.aws_partition.current.partition}:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/checksplit-receipt-parse-${var.environment}:*"
     ]
   }
 }
