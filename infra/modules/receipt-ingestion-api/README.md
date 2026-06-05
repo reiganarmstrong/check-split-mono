@@ -10,7 +10,7 @@ The Gemini API key is intentionally not created here. The caller supplies only t
 2. `aws_apigatewayv2_authorizer.this` enforces Cognito JWT authentication before the Lambda runs.
 3. `aws_lambda_function.this` validates the uploaded image, reads the Gemini API key from SSM Parameter Store, calls Gemini, and normalizes the JSON response.
 4. `aws_lambda_permission.this` allows only this API Gateway to invoke the function.
-5. `aws_cloudwatch_log_group.this` retains Lambda logs for seven days to keep costs low.
+5. The Lambda execution role intentionally omits CloudWatch Logs permissions to keep idle and low-traffic environments as close to zero cost as practical.
 
 ## Architecture
 
@@ -32,7 +32,6 @@ flowchart LR
   A --> L["Receipt parsing Lambda"]
   L --> S["SSM SecureString"]
   L --> G["Gemini direct API"]
-  L --> C["CloudWatch logs"]
 
   classDef client fill:#E5E7EB,stroke:#6B7280,color:#111827,stroke-width:2px;
   classDef apiGateway fill:#8C4FFF,stroke:#6D28D9,color:#FFFFFF,stroke-width:2px;
@@ -40,7 +39,6 @@ flowchart LR
   classDef lambda fill:#ED7100,stroke:#B55400,color:#FFFFFF,stroke-width:2px;
   classDef ssm fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
   classDef gemini fill:#4285F4,stroke:#EA4335,color:#FFFFFF,stroke-width:2px;
-  classDef cloudwatch fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
 
   class U client;
   class A apiGateway;
@@ -48,7 +46,6 @@ flowchart LR
   class L lambda;
   class S ssm;
   class G gemini;
-  class C cloudwatch;
 ```
 
 ## Example
