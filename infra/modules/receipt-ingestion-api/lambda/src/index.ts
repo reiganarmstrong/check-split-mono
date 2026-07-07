@@ -326,6 +326,11 @@ export async function handler(event: ApiGatewayEvent): Promise<ApiGatewayRespons
 
     return jsonResponse(event, 200, response)
   } catch (error) {
+    console.error("Receipt parsing failed.", {
+      message: error instanceof Error ? error.message : "Unknown error.",
+      name: error instanceof Error ? error.name : "UnknownError",
+    })
+
     if (error instanceof Error) {
       if (error.message.includes("Only Cognito access tokens")) {
         return jsonResponse(event, 401, { message: error.message })
