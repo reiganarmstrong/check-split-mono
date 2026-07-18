@@ -1,6 +1,6 @@
 # CheckSplit
 
-CheckSplit is a work-in-progress receipt splitting app. The goal is to let a signed-in user scan a restaurant receipt, turn it into a structured draft, assign items across people or groups, track who has paid, and save the record for future reference/edits.
+CheckSplit is a working MVP for splitting restaurant receipts. Signed-in users can scan a receipt into a structured draft, assign items across people or groups, track payments, and save the split for later reference or edits.
 
 This repository currently has two main pieces:
 
@@ -9,12 +9,12 @@ This repository currently has two main pieces:
 
 ## Main Usage Flow
 
-The application currently is built around one main end-to-end flow:
+The MVP supports one complete end-to-end flow:
 
 1. User signs up or logs in with Cognito.
 2. User starts a new receipt and uploads a photo or enters data manually.
 3. If a photo was uploaded, the browser compresses the image to fit the ingestion API limit (4 MB).
-4. Cognito-protected HTTP API sends the image to a Lambda that calls a Gemini api and normalizes the response into the app's receipt draft shape.
+4. Cognito-protected HTTP API sends the image to a Lambda that calls the Gemini API and normalizes the response into the app's receipt draft shape.
 5. User reviews merchant details, groups, items, discounts, tax, tip, and fees in the receipt workspace.
 6. Frontend saves the receipt to a Cognito-protected AppSync GraphQL API backed by DynamoDB.
 7. User can reopen saved receipts, mark groups as paid, and generate a shareable visual summary.
@@ -77,7 +77,7 @@ flowchart TB
 
 Holds the frontend, a static-exported Next.js app. Authentication is facilitated using the Amplify js library to authenticate with Cognito. The resulting JWT is sent in the authorization header as a bearer token when communicating with backend apis.
 
-Important UI capabilities visible in code today:
+MVP UI capabilities:
 
 - landing page explaining general application workflow
 - Cognito email/password sign-up, login, and confirmation
@@ -146,12 +146,18 @@ The UI expects Cognito, region, GraphQL, and receipt parsing URLs in local env v
 
 Infra work happens from the relevant environment directory after creating `terraform.tfvars` and backend config locally or through CI secrets.
 
-## Status
+## Project Status
 
-This project is still in progress. Some signals of that in the codebase:
+CheckSplit is at the MVP stage, and the core workflow is working well end to end. Users can authenticate, create a receipt manually or from an image, review and edit the split, save it, reopen it later, track payments, and generate a shareable summary.
 
-- social auth buttons exist in the UI, but OAuth providers are not enabled in Terraform yet
-- product scope is centered on the dev environment first
-- module docs are stronger than root-level project docs, which is what this README is intended to fix
+Current MVP scope:
 
-If you want implementation detail, start at the module READMEs and the UI README. If you want product and system intent, this root README is the overview.
+- email/password authentication through Cognito
+- JPEG and PNG receipt scanning with Gemini-assisted extraction
+- manual receipt entry and correction of scanned data
+- saved receipt history and per-group payment tracking
+- AWS-hosted dev environment deployed through GitHub Actions
+
+Production hardening and broader product features remain future work. OAuth providers are not enabled yet, and a separate production Terraform environment has not been added.
+
+For implementation details, start with the module READMEs and the UI README. This root README covers the product and system overview.
