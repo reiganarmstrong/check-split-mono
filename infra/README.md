@@ -16,7 +16,7 @@ Infra is split into reusable modules under `modules/` and root level environment
 - `static-website-hosting`: wraps private S3 origin hosting and CloudFront delivery
 - `certificates`: requests and validates the ACM certificate used by CloudFront and Cognito custom domains
 - `cognito-auth`: provisions the Cognito user pool, client, and custom auth domain
-- `receipt-api`: provisions the Cognito-protected AppSync API and DynamoDB receipt table
+- `receipt-api`: provisions the Cognito-protected AppSync API and fixed-capacity DynamoDB receipt table
 - `receipt-ingestion-api`: provisions the Cognito-protected HTTP API, Lambda parser, and Gemini integration
 - `github-actions-auth`: provisions the IAM role GitHub Actions assumes through OIDC
 
@@ -72,5 +72,6 @@ The receipt ingestion Lambda is built separately before Terraform plan/apply so 
 ## Notes
 
 - CloudFront and Cognito custom domains both rely on the ACM certificate requested in `us-east-1`
+- receipt tables use fixed provisioned capacity totaling `12 RCU / 12 WCU` across dev, staging, and prod; see the receipt API module README for the per-environment allocation
 - the website deploy path is separate from Terraform and lives in `.github/workflows/deploy-ui-dev.yml`
 - most implementation detail belongs in the module READMEs rather than this folder-level overview

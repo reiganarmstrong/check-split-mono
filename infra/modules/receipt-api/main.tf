@@ -35,8 +35,8 @@ resource "aws_dynamodb_table" "receipts" {
   hash_key       = "pk"
   name           = local.table_name
   range_key      = "sk"
-  read_capacity  = local.receipt_table_min_read_capacity
-  write_capacity = local.receipt_table_min_write_capacity
+  read_capacity  = local.receipt_read_capacity
+  write_capacity = local.receipt_write_capacity
 
   attribute {
     name = "gsi1pk"
@@ -61,8 +61,8 @@ resource "aws_dynamodb_table" "receipts" {
   global_secondary_index {
     name            = local.template_vars.gsi_name
     projection_type = "INCLUDE"
-    read_capacity   = local.receipt_gsi_min_read_capacity
-    write_capacity  = local.receipt_gsi_min_write_capacity
+    read_capacity   = local.receipt_read_capacity
+    write_capacity  = local.receipt_write_capacity
     non_key_attributes = [
       "location_name",
       "merchant_name",
@@ -90,102 +90,6 @@ resource "aws_dynamodb_table" "receipts" {
 
   server_side_encryption {
     enabled = true
-  }
-}
-
-resource "aws_appautoscaling_target" "receipts_table_read" {
-  max_capacity       = local.receipt_table_max_read_capacity
-  min_capacity       = local.receipt_table_min_read_capacity
-  resource_id        = "table/${aws_dynamodb_table.receipts.name}"
-  scalable_dimension = "dynamodb:table:ReadCapacityUnits"
-  service_namespace  = "dynamodb"
-}
-
-resource "aws_appautoscaling_policy" "receipts_table_read" {
-  name               = "${local.table_name}-read"
-  policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.receipts_table_read.resource_id
-  scalable_dimension = aws_appautoscaling_target.receipts_table_read.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.receipts_table_read.service_namespace
-
-  target_tracking_scaling_policy_configuration {
-    target_value = local.receipt_table_target_utilization
-
-    predefined_metric_specification {
-      predefined_metric_type = "DynamoDBReadCapacityUtilization"
-    }
-  }
-}
-
-resource "aws_appautoscaling_target" "receipts_table_write" {
-  max_capacity       = local.receipt_table_max_write_capacity
-  min_capacity       = local.receipt_table_min_write_capacity
-  resource_id        = "table/${aws_dynamodb_table.receipts.name}"
-  scalable_dimension = "dynamodb:table:WriteCapacityUnits"
-  service_namespace  = "dynamodb"
-}
-
-resource "aws_appautoscaling_policy" "receipts_table_write" {
-  name               = "${local.table_name}-write"
-  policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.receipts_table_write.resource_id
-  scalable_dimension = aws_appautoscaling_target.receipts_table_write.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.receipts_table_write.service_namespace
-
-  target_tracking_scaling_policy_configuration {
-    target_value = local.receipt_table_target_utilization
-
-    predefined_metric_specification {
-      predefined_metric_type = "DynamoDBWriteCapacityUtilization"
-    }
-  }
-}
-
-resource "aws_appautoscaling_target" "receipts_gsi_read" {
-  max_capacity       = local.receipt_gsi_max_read_capacity
-  min_capacity       = local.receipt_gsi_min_read_capacity
-  resource_id        = "table/${aws_dynamodb_table.receipts.name}/index/${local.template_vars.gsi_name}"
-  scalable_dimension = "dynamodb:index:ReadCapacityUnits"
-  service_namespace  = "dynamodb"
-}
-
-resource "aws_appautoscaling_policy" "receipts_gsi_read" {
-  name               = "${local.table_name}-${local.template_vars.gsi_name}-read"
-  policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.receipts_gsi_read.resource_id
-  scalable_dimension = aws_appautoscaling_target.receipts_gsi_read.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.receipts_gsi_read.service_namespace
-
-  target_tracking_scaling_policy_configuration {
-    target_value = local.receipt_gsi_target_utilization
-
-    predefined_metric_specification {
-      predefined_metric_type = "DynamoDBReadCapacityUtilization"
-    }
-  }
-}
-
-resource "aws_appautoscaling_target" "receipts_gsi_write" {
-  max_capacity       = local.receipt_gsi_max_write_capacity
-  min_capacity       = local.receipt_gsi_min_write_capacity
-  resource_id        = "table/${aws_dynamodb_table.receipts.name}/index/${local.template_vars.gsi_name}"
-  scalable_dimension = "dynamodb:index:WriteCapacityUnits"
-  service_namespace  = "dynamodb"
-}
-
-resource "aws_appautoscaling_policy" "receipts_gsi_write" {
-  name               = "${local.table_name}-${local.template_vars.gsi_name}-write"
-  policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.receipts_gsi_write.resource_id
-  scalable_dimension = aws_appautoscaling_target.receipts_gsi_write.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.receipts_gsi_write.service_namespace
-
-  target_tracking_scaling_policy_configuration {
-    target_value = local.receipt_gsi_target_utilization
-
-    predefined_metric_specification {
-      predefined_metric_type = "DynamoDBWriteCapacityUtilization"
-    }
   }
 }
 
