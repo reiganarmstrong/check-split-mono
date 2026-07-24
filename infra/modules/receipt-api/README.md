@@ -47,16 +47,26 @@ That keeps the storage footprint small, limits index count to one, and makes the
 
 ## Capacity Model
 
-The receipt table uses provisioned billing so low traffic can stay inside free-tier-friendly capacity where practical.
+The receipt table and its GSI use fixed provisioned capacity. Application Auto
+Scaling is intentionally disabled so it does not create managed CloudWatch
+alarms for this low-traffic workload.
 
-| Resource | Minimum | Autoscaling maximum | Target utilization |
+| Environment | Table capacity | GSI capacity | Environment total |
 | --- | --- | --- | --- |
-| Table read capacity | `1 RCU` | `20 RCU` | `70%` |
-| Table write capacity | `1 WCU` | `20 WCU` | `70%` |
-| GSI read capacity | `1 RCU` | `5 RCU` | `70%` |
-| GSI write capacity | `1 WCU` | `5 WCU` | `70%` |
+| `dev` | `1 RCU / 1 WCU` | `1 RCU / 1 WCU` | `2 RCU / 2 WCU` |
+| `staging` | `1 RCU / 1 WCU` | `1 RCU / 1 WCU` | `2 RCU / 2 WCU` |
+| `prod` | `4 RCU / 4 WCU` | `4 RCU / 4 WCU` | `8 RCU / 8 WCU` |
 
-The combined autoscaling maximum is `25 RCU / 25 WCU` across table plus GSI.
+Together, the three environments provision `12 RCU / 12 WCU` in `us-east-1`.
+This stays below DynamoDB Standard's recurring free-tier allowance of
+`25 RCU / 25 WCU` per Region and payer account, provided no other tables consume
+that allowance.
+
+Capacity changes are made explicitly through Terraform. Before increasing a
+value, review `ConsumedReadCapacityUnits`, `ConsumedWriteCapacityUnits`, and
+throttle metrics for both the table and GSI. Reintroducing target-tracking
+scaling also reintroduces its managed CloudWatch alarms and their separate
+pricing.
 
 ## Account Data Deletion
 
