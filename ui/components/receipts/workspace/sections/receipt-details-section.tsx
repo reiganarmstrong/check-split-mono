@@ -75,7 +75,7 @@ export function ReceiptDetailsSection({
             onChange={(event) =>
               updateField("receiptOccurredAt", event.target.value)
             }
-            className="block h-12 w-full min-w-0 rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 pt-2.5 text-left text-base font-medium text-[var(--foreground)] md:pt-0 md:leading-[3rem] md:[&::-webkit-datetime-edit]:p-0 md:[&::-webkit-datetime-edit-fields-wrapper]:flex md:[&::-webkit-datetime-edit-fields-wrapper]:h-full md:[&::-webkit-datetime-edit-fields-wrapper]:items-center"
+            className="block h-12 min-h-12 w-full min-w-0 max-w-full rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-0 text-left text-base font-medium leading-normal text-[var(--foreground)] [&::-webkit-calendar-picker-indicator]:m-0 [&::-webkit-calendar-picker-indicator]:shrink-0 [&::-webkit-date-and-time-value]:m-0 [&::-webkit-date-and-time-value]:min-w-0 [&::-webkit-date-and-time-value]:text-left [&::-webkit-datetime-edit]:min-w-0 [&::-webkit-datetime-edit]:p-0 [&::-webkit-datetime-edit-fields-wrapper]:flex [&::-webkit-datetime-edit-fields-wrapper]:h-full [&::-webkit-datetime-edit-fields-wrapper]:items-center"
             style={receiptDateMissing ? requiredHighlightSoftStyle : undefined}
           />
         </div>
