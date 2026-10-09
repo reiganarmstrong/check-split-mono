@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { ReceiptEditorState } from "@/lib/receipt-types";
 
 import { requiredHighlightSoftStyle } from "../lib/constants";
+import { ReceiptDateTimePicker } from "../receipt-date-time-picker";
 import { FieldLabel, SectionShell } from "../lib/shared";
 
 type UpdateField = <K extends keyof ReceiptEditorState>(
@@ -64,19 +65,14 @@ export function ReceiptDetailsSection({
 
         <div className="w-full min-w-0 space-y-2">
           <FieldLabel
-            htmlFor="receipt-occurred-at"
+            htmlFor="receipt-occurred-date"
             label="Receipt date"
             showRequired={receiptDateMissing}
           />
-          <Input
-            id="receipt-occurred-at"
-            type="datetime-local"
+          <ReceiptDateTimePicker
             value={editorState.receiptOccurredAt}
-            onChange={(event) =>
-              updateField("receiptOccurredAt", event.target.value)
-            }
-            className="block h-12 min-h-12 w-full min-w-0 max-w-full rounded-[0.8rem] border border-[var(--line)] bg-[var(--panel-strong)] px-4 py-0 text-left text-base font-medium leading-normal text-[var(--foreground)] [&::-webkit-calendar-picker-indicator]:m-0 [&::-webkit-calendar-picker-indicator]:shrink-0 [&::-webkit-date-and-time-value]:m-0 [&::-webkit-date-and-time-value]:min-w-0 [&::-webkit-date-and-time-value]:text-left [&::-webkit-datetime-edit]:min-w-0 [&::-webkit-datetime-edit]:p-0 [&::-webkit-datetime-edit-fields-wrapper]:flex [&::-webkit-datetime-edit-fields-wrapper]:h-full [&::-webkit-datetime-edit-fields-wrapper]:items-center"
-            style={receiptDateMissing ? requiredHighlightSoftStyle : undefined}
+            invalid={receiptDateMissing}
+            onChange={(value) => updateField("receiptOccurredAt", value)}
           />
         </div>
 
