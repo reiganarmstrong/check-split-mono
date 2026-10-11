@@ -1,15 +1,21 @@
 """Public command runner. No provider calls occur during preflight or replay."""
 import argparse
+import asyncio
 import hashlib
 import json
+import os
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+import httpx
+
 from .contract import load_contract, refresh_contract
 from .json_data import loads_json
-from .reporting import print_report
+from .providers import PRICING_CHECKED_AT, PROVIDERS, TIMEOUT_MS, call_provider
+from .reporting import print_report, summarize
 from .scoring import evaluate_response, failed_evaluation
 
 DEFAULT_DIRECTORY = Path(__file__).resolve().parents[1]
@@ -102,6 +108,70 @@ def replay_run(options, manifest, snapshot, stdout):
     return int(any(not record["evaluation"]["passed"] for record in records))
 
 
+def persist_report(destination, report):
+    content = json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
+    # Completed records survive interruption, and readers observe complete JSON after each request.
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=destination.parent,
+                                         prefix=f".{destination.name}.", suffix=".tmp", delete=False) as output:
+            temporary = Path(output.name)
+            output.write(content)
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary, destination)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+async def collect_live(options, directory, manifest, snapshot, fixtures, providers, http_client, stdout, environ):
+    for provider in providers:
+        if provider not in PROVIDERS:
+            raise ValueError(f"Live provider {provider} is not installed yet; no requests sent")
+    for provider in providers:
+        key_name = PROVIDERS[provider]["keyName"]
+        if not environ.get(key_name, "").strip():
+            raise ValueError(f"Missing {key_name}; no requests sent")
+    created_at = datetime.now(timezone.utc).isoformat()
+    destination = options.out or directory / "results" / ("run-" + created_at.replace(":", "-") + ".json")
+    report = {"version": 2, "mode": "live", "createdAt": created_at, "source": manifest["source"],
+              "contract": snapshot, "contractSha256": snapshot["contractSha256"],
+              "settings": {"providers": providers, "maxOutputTokens": options.max_output_tokens,
+                           "timeoutMs": TIMEOUT_MS, "plannedRequests": len(fixtures) * len(providers),
+                           "pricingCheckedAt": PRICING_CHECKED_AT, "pricing": PROVIDERS},
+              "records": [], "summary": {}}
+    write_report(destination, report)  # Exclusive reservation precedes spending any tokens.
+    owns_client = http_client is None
+    client = http_client or httpx.AsyncClient(transport=httpx.AsyncHTTPTransport(retries=0),
+                                            follow_redirects=False, timeout=TIMEOUT_MS / 1000)
+    try:
+        for index, fixture in enumerate(fixtures):
+            image = (directory / fixture["image"]).read_bytes()
+            for provider in providers if index % 2 == 0 else list(reversed(providers)):
+                result = await call_provider(provider, image, snapshot, max_output_tokens=options.max_output_tokens,
+                                             api_key=environ[PROVIDERS[provider]["keyName"]], client=client)
+                record = score_record({"fixtureId": fixture["id"], "imageSha256": fixture["sha256"],
+                                       "provider": provider, "modelId": PROVIDERS[provider]["modelId"], **result}, manifest, snapshot)
+                report["records"].append(record)
+                report["summary"] = summarize(report["records"])
+                if result.get("error", "").startswith("Provider HTTP"):
+                    report["stoppedEarly"] = "Provider HTTP error; resolve it before generating more responses"
+                persist_report(destination, report)
+                print(f"{provider}/{fixture['id']}: {'PASS' if record['evaluation']['passed'] else 'FAIL'} "
+                      f"({record['requestLatencyMs']} ms)", file=stdout)
+                if "stoppedEarly" in report:
+                    print_report(report["records"], stdout)
+                    print(f"Saved partial report {destination}", file=stdout)
+                    return 1
+        print_report(report["records"], stdout)
+        print(f"Saved {destination}; replay is offline.", file=stdout)
+        return int(any(not record["evaluation"]["passed"] for record in report["records"]))
+    finally:
+        if owns_client:
+            await client.aclose()
+
+
 def main(args=None, *, directory=DEFAULT_DIRECTORY, http_client=None, stdout=None, environ=None, source_root=None):
     stdout = stdout or sys.stdout
     try:
@@ -124,7 +194,8 @@ def main(args=None, *, directory=DEFAULT_DIRECTORY, http_client=None, stdout=Non
         for fixture in fixtures:
             print(f"{fixture['id']}: {len(fixture['expected']['items'])} rows", file=stdout)
         if options.live:
-            raise ValueError("Live collection is not installed yet")
+            return asyncio.run(collect_live(options, Path(directory), manifest, snapshot, fixtures, providers,
+                                            http_client, stdout, os.environ if environ is None else environ))
         print("Offline preflight passed. No provider HTTP calls.", file=stdout)
         return 0
     except SystemExit as error:

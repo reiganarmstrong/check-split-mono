@@ -41,12 +41,14 @@ def evaluate_response(fixture, response, schema):
             # Math.round-compatible halves toward positive infinity; Python round uses ties-to-even.
             price = max(math.floor(Fraction(int(raw["lineSubtotalCents"]), int(raw["quantity"])) + Fraction(1, 2)), 0) \
                 if raw["lineSubtotalCents"] is not None else 0
-        items.append({"description": raw["description"], "quantity": raw["quantity"],
-                      "effectiveUnitPriceCents": price, "discountCents": raw["discountCents"],
-                      "lineSubtotalCents": max(raw["quantity"] * price - raw["discountCents"], 0)})
+        # Schema integers may arrive as whole floats. Interpret with exact integer cents.
+        price, quantity, discount = int(price), int(raw["quantity"]), int(raw["discountCents"])
+        items.append({"description": raw["description"], "quantity": quantity,
+                      "effectiveUnitPriceCents": price, "discountCents": discount,
+                      "lineSubtotalCents": max(quantity * price - discount, 0)})
     subtotal = sum(item["lineSubtotalCents"] for item in items)
-    total = subtotal + (draft["taxCents"] or 0) + (draft["tipCents"] or 0) \
-        + (draft["feeCents"] or 0) - (draft["discountCents"] or 0)
+    total = subtotal + int(draft["taxCents"] or 0) + int(draft["tipCents"] or 0) \
+        + int(draft["feeCents"] or 0) - int(draft["discountCents"] or 0)
     needs_review = response["needsReview"] or bool(response["issues"]) or any(
         item["scanConfidence"] is not None and item["scanConfidence"] < 0.8 for item in raw_items)
     checks = []
