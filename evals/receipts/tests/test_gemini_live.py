@@ -380,21 +380,6 @@ def test_output_is_reserved_and_each_completed_record_is_saved_before_next_reque
     assert list(tmp_path.glob("*.tmp")) == []
 
 
-@pytest.mark.parametrize("provider", ["luna", "both"])
-def test_interim_unsupported_live_provider_fails_before_reservation_or_calls(tmp_path, provider):
-    calls = []
-    client = httpx.AsyncClient(transport=httpx.MockTransport(lambda request: calls.append(request)))
-    destination = tmp_path / "result.json"
-    try:
-        status = main(["--live", "--provider", provider, "--out", str(destination)], http_client=client,
-                      environ={"GEMINI_API_KEY": "offline-test-key", "OPENAI_API_KEY": "offline-test-key"},
-                      stdout=io.StringIO())
-    finally:
-        asyncio.run(client.aclose())
-    assert status == 1
-    assert calls == []
-    assert not destination.exists()
-
 
 def test_integral_json_numbers_in_usage_preserve_legacy_cost_semantics(tmp_path):
     def handler(request):

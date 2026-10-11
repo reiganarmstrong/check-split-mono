@@ -11,6 +11,8 @@ from .json_data import loads_json
 PROVIDERS = {
     "gemini": {"modelId": "gemini-3.1-flash-lite", "keyName": "GEMINI_API_KEY",
                "inputRate": 0.25, "cachedRate": 0.025, "outputRate": 1.5},
+    "luna": {"modelId": "gpt-6-luna", "keyName": "OPENAI_API_KEY",
+             "inputRate": 0.1, "cachedRate": 0.01, "outputRate": 0.5},
 }
 PRICING_CHECKED_AT = "2026-10-10"
 TIMEOUT_MS = 20_000
@@ -19,6 +21,13 @@ TIMEOUT_MS = 20_000
 def build_request(provider, image, snapshot, max_output_tokens):
     model_id = PROVIDERS[provider]["modelId"]
     data = base64.b64encode(image).decode()
+    if provider == "luna":
+        return {"url": "https://api.openai.com/v1/responses", "body": {
+            "model": model_id, "store": False, "service_tier": "default", "reasoning": {"effort": "none"},
+            "max_output_tokens": max_output_tokens, "instructions": snapshot["systemPrompt"],
+            "input": [{"role": "user", "content": [{"type": "input_text", "text": snapshot["imagePrompt"]},
+                       {"type": "input_image", "image_url": f"data:image/jpeg;base64,{data}", "detail": "high"}]}],
+            "text": {"format": {"type": "json_schema", "name": "receipt_draft", "strict": True, "schema": snapshot["schema"]}}}}
     return {"url": f"https://generativelanguage.googleapis.com/v1beta/models/{model_id}:generateContent",
             "body": {"contents": [{"role": "user", "parts": [{"text": snapshot["imagePrompt"]},
                      {"inlineData": {"mimeType": "image/jpeg", "data": data}}]}],
@@ -28,13 +37,23 @@ def build_request(provider, image, snapshot, max_output_tokens):
 
 
 def extract_usage(provider, document):
-    metadata = document.get("usageMetadata")
+    metadata = document.get("usage" if provider == "luna" else "usageMetadata")
     if not isinstance(metadata, dict):
         return None
-    input_tokens = metadata.get("promptTokenCount")
-    candidates = metadata.get("candidatesTokenCount")
-    reasoning = metadata.get("thoughtsTokenCount")
-    cached = metadata.get("cachedContentTokenCount")
+    if provider == "luna":
+        input_tokens = metadata.get("input_tokens")
+        candidates = metadata.get("output_tokens")
+        input_details = metadata.get("input_tokens_details")
+        output_details = metadata.get("output_tokens_details")
+        if any(details is not None and not isinstance(details, dict) for details in (input_details, output_details)):
+            return None
+        reasoning = (output_details or {}).get("reasoning_tokens")
+        cached = (input_details or {}).get("cached_tokens")
+    else:
+        input_tokens = metadata.get("promptTokenCount")
+        candidates = metadata.get("candidatesTokenCount")
+        reasoning = metadata.get("thoughtsTokenCount")
+        cached = metadata.get("cachedContentTokenCount")
     reasoning = 0 if reasoning is None else reasoning
     cached = 0 if cached is None else cached
     values = (input_tokens, candidates, reasoning, cached)
@@ -47,7 +66,7 @@ def extract_usage(provider, document):
     input_tokens, candidates, reasoning, cached = map(int, values)
     if cached > input_tokens:
         return None
-    return {"inputTokens": input_tokens, "outputTokens": candidates + reasoning,
+    return {"inputTokens": input_tokens, "outputTokens": candidates if provider == "luna" else candidates + reasoning,
             "cachedInputTokens": cached, "reasoningTokens": reasoning}
 
 
@@ -67,6 +86,26 @@ def estimate_cost(provider, usage):
 def extract_response(provider, document):
     if not isinstance(document, dict):
         raise ValueError("Provider response is not a JSON object")
+    if provider == "luna":
+        if document.get("status") != "completed":
+            raise ValueError(f"OpenAI response status: {document.get('status') or 'missing'}")
+        output = document.get("output", [])
+        if not isinstance(output, list) or any(not isinstance(item, dict) for item in output):
+            raise ValueError("OpenAI response malformed output")
+        content = []
+        for item in output:
+            if item.get("type") != "message":
+                continue
+            parts = item.get("content", [])
+            if not isinstance(parts, list) or any(not isinstance(part, dict) for part in parts):
+                raise ValueError("OpenAI response malformed content")
+            content.extend(parts)
+        if any(item.get("type") == "refusal" for item in content):
+            raise ValueError("OpenAI refused the image")
+        text_parts = [item.get("text") for item in content if item.get("type") == "output_text"]
+        if any(not isinstance(text, str) for text in text_parts):
+            raise ValueError("OpenAI response malformed text")
+        return loads_json("".join(text_parts))
     candidates = document.get("candidates")
     candidate = candidates[0] if isinstance(candidates, list) and candidates else None
     feedback = document.get("promptFeedback")
@@ -95,6 +134,9 @@ def extract_response(provider, document):
 
 async def call_provider(provider, image, snapshot, *, max_output_tokens, api_key, client):
     request = build_request(provider, image, snapshot, max_output_tokens)
+    headers = {"content-type": "application/json"}
+    headers["authorization" if provider == "luna" else "x-goog-api-key"] = \
+        f"Bearer {api_key}" if provider == "luna" else api_key
     started = time.monotonic()
     usage = None
     response = None
@@ -102,7 +144,7 @@ async def call_provider(provider, image, snapshot, *, max_output_tokens, api_key
     try:
         # asyncio covers total wall time including response reading, unlike per-phase HTTP timeouts alone.
         result = await asyncio.wait_for(client.post(request["url"], json=request["body"],
-            headers={"content-type": "application/json", "x-goog-api-key": api_key},
+            headers=headers,
             timeout=TIMEOUT_MS / 1000, follow_redirects=False), timeout=TIMEOUT_MS / 1000)
         if not 200 <= result.status_code < 300:
             raise ValueError(f"Provider HTTP {result.status_code}")
