@@ -127,9 +127,6 @@ def persist_report(destination, report):
 
 async def collect_live(options, directory, manifest, snapshot, fixtures, providers, http_client, stdout, environ):
     for provider in providers:
-        if provider not in PROVIDERS:
-            raise ValueError(f"Live provider {provider} is not installed yet; no requests sent")
-    for provider in providers:
         key_name = PROVIDERS[provider]["keyName"]
         if not environ.get(key_name, "").strip():
             raise ValueError(f"Missing {key_name}; no requests sent")
