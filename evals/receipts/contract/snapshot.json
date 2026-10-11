@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "refreshedAt": "2026-10-11T02:16:02.942301+00:00",
+  "systemPrompt": "You extract structured receipt data from a single receipt image for a receipt-splitting application.\n\nFollow these rules exactly:\n- Return data only for fields present in the response schema.\n- Be conservative. If a value is unclear, omit it or set it to null according to the schema and add a short explanation to issues.\n- Never invent merchant names, dates, addresses, taxes, tips, totals, quantities, discounts, fees, or line items.\n- Interpret all money values as integer cents.\n- allocationPolicy must always be EVEN.\n- needsReview should be true whenever any important field is missing, uncertain, low-confidence, or inferred from partial text.\n- Exclude payment card numbers, auth codes, loyalty IDs, and other non-receipt metadata unless needed to understand the receipt.\n- Do not include summary rows such as SUBTOTAL, TAX, TIP, TOTAL, CHANGE, CASH, VISA, or MASTERCARD as receipt items.\n- Do not duplicate items that appear both as a line item and again in a summary section.\n- Keep item descriptions short and faithful to the receipt text.\n- quantity must be an integer when known. If unclear, use 1 and add an issue.\n- scanConfidence must be between 0 and 1.\n- sourceLineNumber should reflect the visible line order when possible.\n- currencyCode should be a 3-letter ISO code only when clearly supported by the receipt.\n- receiptOccurredAt and capturedAt must be RFC 3339 timestamps only when confidently visible. If only a date is visible and no reliable time is present, set the field to null and explain that in issues.\n- If the image is not a receipt, return an empty draft with needsReview=true and an issue explaining that no receipt was detected.",
+  "imagePrompt": "Extract this receipt image into the required structured response.\n\nFocus on:\n- merchant or store name\n- branch or location name if distinct\n- address if visible\n- receipt date and time if confidently visible\n- subtotal, tax, tip, fees, discounts, and total\n- line items with quantity, unit price, line subtotal, and confidence\n\nIf any important field is unclear, leave it null and explain why in issues.",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "createReceiptInputDraft": {
+        "additionalProperties": false,
+        "properties": {
+          "allocationPolicy": {
+            "description": "Always EVEN for this receipt parsing draft workflow.",
+            "enum": [
+              "EVEN"
+            ],
+            "type": "string"
+          },
+          "capturedAt": {
+            "description": "RFC 3339 timestamp when the receipt was captured, if confidently visible.",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currencyCode": {
+            "description": "Three-letter ISO currency code only when clearly supported by the receipt.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "discountCents": {
+            "description": "Receipt-level discount in integer cents.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "feeCents": {
+            "description": "Receipt-level fee in integer cents.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "locationAddress": {
+            "description": "Street address shown on the receipt, if visible.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "locationLat": {
+            "description": "Latitude if the receipt explicitly shows coordinates.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "locationLng": {
+            "description": "Longitude if the receipt explicitly shows coordinates.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "locationName": {
+            "description": "Branch or venue name if distinct from the merchant name.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "merchantName": {
+            "description": "Merchant or store name taken directly from the receipt.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "receiptOccurredAt": {
+            "description": "RFC 3339 timestamp for when the receipt transaction occurred, if confidently visible.",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subtotalCents": {
+            "description": "Subtotal in integer cents.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "taxCents": {
+            "description": "Tax total in integer cents.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "tipCents": {
+            "description": "Tip total in integer cents.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "totalCents": {
+            "description": "Grand total in integer cents.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "allocationPolicy",
+          "capturedAt",
+          "currencyCode",
+          "discountCents",
+          "feeCents",
+          "locationAddress",
+          "locationLat",
+          "locationLng",
+          "locationName",
+          "merchantName",
+          "receiptOccurredAt",
+          "subtotalCents",
+          "taxCents",
+          "tipCents",
+          "totalCents"
+        ],
+        "type": "object"
+      },
+      "issues": {
+        "description": "Short explanations of any ambiguity, missing data, or suspected OCR problems.",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "needsReview": {
+        "description": "Whether a human should review the parsed receipt before persisting it.",
+        "type": "boolean"
+      },
+      "upsertReceiptItemInputDrafts": {
+        "description": "Line-item drafts extracted from the receipt.",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "category": {
+              "description": "Optional item category when visible or strongly implied by the receipt.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "description": {
+              "description": "Short item description copied from the receipt text.",
+              "type": "string"
+            },
+            "discountCents": {
+              "description": "Line-item discount in integer cents. Use zero when no item-level discount is shown.",
+              "type": "integer"
+            },
+            "lineSubtotalCents": {
+              "description": "Item subtotal in integer cents if shown or reliably derived from the receipt line.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "quantity": {
+              "description": "Integer quantity for the line item.",
+              "minimum": 1,
+              "type": "integer"
+            },
+            "scanConfidence": {
+              "description": "Confidence score between 0 and 1 for the line extraction.",
+              "maximum": 1,
+              "minimum": 0,
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "sourceLineNumber": {
+              "description": "Visible line order on the receipt when available.",
+              "minimum": 1,
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "unitPriceCents": {
+              "description": "Unit price in integer cents if shown or confidently derived.",
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "category",
+            "description",
+            "discountCents",
+            "lineSubtotalCents",
+            "quantity",
+            "scanConfidence",
+            "sourceLineNumber",
+            "unitPriceCents"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "createReceiptInputDraft",
+      "issues",
+      "needsReview",
+      "upsertReceiptItemInputDrafts"
+    ],
+    "type": "object"
+  },
+  "systemPromptSha256": "fc916e917bd23803f95d952c98390ce751f2b3782ec2e60d9cdd3ec65c50c2b8",
+  "imagePromptSha256": "8dce55a4d36553341ee420c12b34b681a80956351cd869fb22fae636fd739ce3",
+  "schemaSha256": "5b0b4c3c298708e342bdfed0467ae07f217754e55fc4ddb861012be0aaaca952",
+  "contractSha256": "7e0411ef3d5625f7d053707aa9a444a9453bcab9ded3aa166b1e167173581945",
+  "provenance": {
+    "sourceRevision": "e6d5e48b464a2101277ea6f35910026dd9ab14a4",
+    "dirtySourcePaths": [],
+    "sourceContentSha256": {
+      "infra/modules/receipt-ingestion-api/lambda/src/prompts.ts": "a5c0f2229060bd69cb5c2bfe7a2dd56d991e460ce246e508f0c7cf64a6362ba9",
+      "infra/modules/receipt-ingestion-api/lambda/src/schema.ts": "e27ca6e9a97f4a4d937c0021bc7317baad5a52b4a7337991a9ebd9d8036d5101"
+    }
+  }
+}
