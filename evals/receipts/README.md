@@ -37,10 +37,24 @@ uv run --project evals/receipts --locked receipt-eval --provider luna --limit 1 
 
 ## Explicit bounded collection
 
-Supply shell environment credentials for the selected providers: `GEMINI_API_KEY`
-for Gemini, `OPENAI_API_KEY` for Luna, or both for a comparison. The runner does not
-load dotenv files or fetch deployment secrets. All selected keys and the output
-destination are checked before the first request.
+Supply credentials for the selected providers: `GEMINI_API_KEY` for Gemini,
+`OPENAI_API_KEY` for Luna, or both for a comparison. Set them in your shell or copy
+the local environment template:
+
+```sh
+cp evals/receipts/.env.example evals/receipts/.env
+```
+
+Fill in the keys in `evals/receipts/.env`, which Git ignores. Use uv's explicit
+`--env-file` option to load the file into the runner's environment:
+
+```sh
+uv run --project evals/receipts --locked --env-file evals/receipts/.env receipt-eval --live --provider both --limit 1
+```
+
+The evaluator itself does not automatically load dotenv files or fetch deployment
+secrets. All selected keys and the output destination are checked before the first
+request. Preflight and replay remain offline, including when using `--env-file`.
 
 Start with one receipt per provider and a distinct output path:
 
