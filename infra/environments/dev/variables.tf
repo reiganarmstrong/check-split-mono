@@ -21,16 +21,16 @@ variable "website_s3_bucket_name" {
 
 }
 
-variable "gemini_api_key_ssm_parameter_name" {
-  description = "SSM SecureString parameter name that stores the Gemini API key."
+variable "openai_api_key_ssm_parameter_name" {
+  description = "SSM SecureString parameter name that stores the OpenAI API key."
   type        = string
-  default     = "/checksplit/dev/gemini/api-key"
+  default     = "/checksplit/dev/openai/api-key"
 }
 
-variable "gemini_model_id" {
-  description = "Gemini direct API model ID used by the receipt parsing Lambda."
+variable "openai_model_id" {
+  description = "OpenAI Responses API model ID used by the receipt parsing Lambda."
   type        = string
-  default     = "gemini-3.1-flash-lite-preview"
+  default     = "gpt-6-luna"
 }
 
 variable "receipt_parse_allowed_origins" {

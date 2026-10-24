@@ -144,4 +144,4 @@ module "dev-github-actions-auth" {
 
 - This module assumes the GitHub OIDC provider already exists in the account.
 - The attached policy is broad enough to support the currently-managed infra modules, but it is still scoped by service and resource shape rather than using full admin access.
-- The module intentionally does not grant GitHub Actions write access to the Gemini API key in SSM Parameter Store. That secret is created and rotated out of band.
+- The module intentionally does not grant GitHub Actions write access to the OpenAI API key in SSM Parameter Store. That secret is created and rotated out of band.

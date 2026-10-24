@@ -8,6 +8,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && rm -rf package && mkdir -p package && cp -R dist package/dist && cp package.json pnpm-lock.yaml package/ && cd package && pnpm install --prod --config.node-linker=hoisted --ignore-workspace --frozen-lockfile",
     "clean": "rm -rf dist package",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.json && node --test test/*.test.cjs"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
   }
 }

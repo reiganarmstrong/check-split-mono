@@ -4,7 +4,10 @@ data "archive_file" "this" {
   type        = "zip"
 }
 
-data "aws_caller_identity" "current" {}
+data "aws_ssm_parameter" "api_key" {
+  name            = var.openai_api_key_ssm_parameter_name
+  with_decryption = false
+}
 
 data "aws_iam_policy_document" "lambda_assume_role" {
   statement {
@@ -31,12 +34,10 @@ data "aws_iam_policy_document" "lambda_access" {
   statement {
     actions = ["ssm:GetParameter"]
     resources = [
-      "arn:${data.aws_partition.current.partition}:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter/${local.ssm_parameter_path}",
+      data.aws_ssm_parameter.api_key.arn,
     ]
   }
 }
-
-data "aws_partition" "current" {}
 
 data "aws_region" "current" {}
 
@@ -122,8 +123,8 @@ resource "aws_lambda_function" "this" {
 
   environment {
     variables = {
-      GEMINI_API_KEY_PARAMETER_NAME = var.gemini_api_key_ssm_parameter_name
-      GEMINI_MODEL_ID               = var.gemini_model_id
+      OPENAI_API_KEY_PARAMETER_NAME = var.openai_api_key_ssm_parameter_name
+      OPENAI_MODEL_ID               = var.openai_model_id
       MAX_UPLOAD_BYTES              = tostring(var.receipt_parse_max_upload_bytes)
       RECEIPT_PARSE_ALLOWED_ORIGINS = jsonencode(var.receipt_parse_allowed_origins)
     }

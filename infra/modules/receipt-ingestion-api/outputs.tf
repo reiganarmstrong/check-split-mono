@@ -1,6 +1,6 @@
-output "gemini_model_id" {
-  description = "Gemini model ID configured for the receipt parsing Lambda."
-  value       = var.gemini_model_id
+output "openai_model_id" {
+  description = "OpenAI model ID configured for the receipt parsing Lambda."
+  value       = var.openai_model_id
 }
 
 output "lambda_function_name" {

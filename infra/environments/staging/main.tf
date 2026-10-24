@@ -40,8 +40,8 @@ module "receipt-ingestion-api" {
   cognito_user_pool_client_id       = module.cognito-auth.user_pool_client_id
   cognito_user_pool_id              = module.cognito-auth.user_pool_id
   environment                       = var.environment
-  gemini_api_key_ssm_parameter_name = var.gemini_api_key_ssm_parameter_name
-  gemini_model_id                   = var.gemini_model_id
+  openai_api_key_ssm_parameter_name = var.openai_api_key_ssm_parameter_name
+  openai_model_id                   = var.openai_model_id
   receipt_parse_allowed_origins     = var.receipt_parse_allowed_origins
   receipt_parse_max_upload_bytes    = var.receipt_parse_max_upload_bytes
 }
