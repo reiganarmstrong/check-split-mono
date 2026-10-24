@@ -5,6 +5,7 @@ import {
   createReceiptIngestionClient,
   mapReceiptParseResponseToEditorState,
   prepareReceiptUploadWithCodec,
+  receiptParseResponseSchema,
   ReceiptIngestionError,
   type ReceiptParseResponse,
 } from "../receipt-ingestion"
@@ -36,9 +37,9 @@ function createParsePayload(
     needsReview: false,
     parser: {
       inputTokens: 120,
-      modelId: "gemini-test",
+      modelId: "gpt-6-luna",
       outputTokens: 80,
-      provider: "gemini-developer-api",
+      provider: "openai-responses-api",
     },
     upsertReceiptItemInputDrafts: [
       {
@@ -391,34 +392,49 @@ describe("createReceiptIngestionClient", () => {
     })
   })
 
-  it("returns a validated parse payload on success", async () => {
-    const payload = createParsePayload({
-      issues: ["Check the tip line."],
-      needsReview: true,
-    })
-    const client = createReceiptIngestionClient({
-      fetchImpl: vi.fn().mockResolvedValue(
-        new Response(JSON.stringify(payload), { status: 200 }),
-      ),
-      getAuthToken: vi.fn().mockResolvedValue("token"),
-      parseApiUrl: "https://example.com/receipts/parse",
-      prepareReceiptUpload: vi.fn().mockResolvedValue({
-        file: new File([new Uint8Array(32)], "receipt.jpg", {
-          type: "image/jpeg",
-        }),
-        mimeType: "image/jpeg",
-      }),
-    })
-
-    const result = await client.parseReceiptImage(
-      new File([new Uint8Array(1)], "receipt.jpg", { type: "image/jpeg" }),
-    )
-
-    expect(result).toEqual(payload)
-    expect(buildReceiptParseMessage(result)).toBe(
-      "Review the parsed draft before saving.",
-    )
+  it("rejects unknown parser providers", () => {
+    const payload = createParsePayload()
+    expect(receiptParseResponseSchema.safeParse({
+      ...payload,
+      parser: { ...payload.parser, provider: "unknown-provider" },
+    }).success).toBe(false)
   })
+
+  it.each(["openai-responses-api", "gemini-developer-api"] as const)(
+    "accepts %s during rollout and maps its draft into the editor",
+    async (provider) => {
+      const payload = createParsePayload({
+        parser: { ...createParsePayload().parser, provider },
+        issues: ["Check the tip line."],
+        needsReview: true,
+      })
+      const client = createReceiptIngestionClient({
+        fetchImpl: vi.fn().mockResolvedValue(
+          new Response(JSON.stringify(payload), { status: 200 }),
+        ),
+        getAuthToken: vi.fn().mockResolvedValue("token"),
+        parseApiUrl: "https://example.com/receipts/parse",
+        prepareReceiptUpload: vi.fn().mockResolvedValue({
+          file: new File([new Uint8Array(32)], "receipt.jpg", {
+            type: "image/jpeg",
+          }),
+          mimeType: "image/jpeg",
+        }),
+      })
+
+      const result = await client.parseReceiptImage(
+        new File([new Uint8Array(1)], "receipt.jpg", { type: "image/jpeg" }),
+      )
+
+      expect(result).toEqual(payload)
+      const editor = mapReceiptParseResponseToEditorState(result)
+      expect(editor.merchantName).toBe("Bodega Club")
+      expect(editor.items[1]?.unitPrice).toBe("4.50")
+      expect(buildReceiptParseMessage(result)).toBe(
+        "Review the parsed draft before saving.",
+      )
+    },
+  )
 })
 
 describe("ReceiptIngestionError", () => {
