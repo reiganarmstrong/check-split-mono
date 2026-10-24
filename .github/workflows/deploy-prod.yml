@@ -9,6 +9,7 @@ on:
         options:
           - infra-and-ui
           - infra-only
+          - plan-only
 
 permissions:
   # AWS OIDC
@@ -77,15 +78,22 @@ jobs:
         run: pnpm run build
 
       - name: Terraform Init
-        run: terraform init -input=false -backend-config=backend.hcl > /dev/null 2>&1
+        run: terraform init -input=false -backend-config=backend.hcl
 
       - name: Terraform Apply
+        if: ${{ inputs.deploy_target != 'plan-only' }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: terraform apply -auto-approve -input=false > /dev/null 2>&1
+        run: terraform apply -auto-approve -input=false
+
+      - name: Terraform Plan
+        if: ${{ inputs.deploy_target == 'plan-only' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: terraform plan -input=false
 
   ui-deploy-prod:
-    if: ${{ inputs.deploy_target != 'infra-only' }}
+    if: ${{ inputs.deploy_target == 'infra-and-ui' }}
     needs: terraform-deploy-prod
     defaults:
       run:

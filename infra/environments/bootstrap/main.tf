@@ -68,12 +68,13 @@ module "dev-github-actions-auth" {
 }
 
 module "staging-github-actions-auth" {
-  source                  = "../../modules/github-actions-auth"
-  environment             = "staging"
-  repo_name               = var.repo_name
-  github_repo_path        = var.github_repo_path
-  github_repo_environment = "staging"
-  website_s3_bucket_arn   = var.staging_website_s3_bucket_arn
+  source                                   = "../../modules/github-actions-auth"
+  environment                              = "staging"
+  repo_name                                = var.repo_name
+  github_repo_path                         = var.github_repo_path
+  github_repo_environment                  = "staging"
+  receipt_parse_api_key_ssm_parameter_name = "/checksplit/staging/openai/api-key"
+  website_s3_bucket_arn                    = var.staging_website_s3_bucket_arn
   tfstate_s3_bucket_object = {
     arn           = aws_s3_bucket.terraform_state_storage.arn,
     object_prefix = "${aws_s3_bucket.terraform_state_storage.arn}/checksplit/staging"
@@ -81,12 +82,13 @@ module "staging-github-actions-auth" {
 }
 
 module "prod-github-actions-auth" {
-  source                  = "../../modules/github-actions-auth"
-  environment             = "prod"
-  repo_name               = var.repo_name
-  github_repo_path        = var.github_repo_path
-  github_repo_environment = "prod"
-  website_s3_bucket_arn   = var.prod_website_s3_bucket_arn
+  source                                   = "../../modules/github-actions-auth"
+  environment                              = "prod"
+  repo_name                                = var.repo_name
+  github_repo_path                         = var.github_repo_path
+  github_repo_environment                  = "prod"
+  receipt_parse_api_key_ssm_parameter_name = "/checksplit/prod/openai/api-key"
+  website_s3_bucket_arn                    = var.prod_website_s3_bucket_arn
   tfstate_s3_bucket_object = {
     arn           = aws_s3_bucket.terraform_state_storage.arn,
     object_prefix = "${aws_s3_bucket.terraform_state_storage.arn}/checksplit/prod"
