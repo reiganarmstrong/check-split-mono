@@ -69,6 +69,24 @@ The receipt ingestion Lambda is built separately before Terraform plan/apply so 
 
 `util/cf-env-loader.sh` is a local convenience wrapper that loads the Cloudflare API token from Bitwarden and then runs Terraform with that token in the environment.
 
+Before deploying receipt extraction, provision each environment's OpenAI key as a SecureString at `/checksplit/<environment>/openai/api-key` and apply bootstrap so its CI role can look up that parameter. Application deployment cannot grant this permission to its own CI role.
+
+Run the read-only readiness check with operator credentials that allow SSM reads and IAM policy simulation:
+
+```bash
+python3 infra/util/check-receipt-parser-readiness.py
+# Or check a single environment:
+python3 infra/util/check-receipt-parser-readiness.py --environment staging
+```
+
+The check requires an existing SecureString, CI read access, and an explicit denial of CI decryption. It never decrypts or prints key values. It checks the default parameter paths; check custom paths separately if overriding them. Staging and production workflows retain Terraform diagnostics in their logs so a failed deployment reports its cause.
+
+Both release workflows also accept `deploy_target=plan-only`. This builds the Lambda and runs Terraform plan with the environment's actual CI credentials and secrets, while skipping infrastructure apply and UI deployment:
+
+```bash
+gh workflow run deploy-prod.yml --ref main -f deploy_target=plan-only
+```
+
 ## Notes
 
 - CloudFront and Cognito custom domains both rely on the ACM certificate requested in `us-east-1`
