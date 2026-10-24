@@ -51,7 +51,7 @@ type ReceiptParserMetadata = {
   inputTokens: number
   modelId: string
   outputTokens: number
-  provider: "gemini-developer-api"
+  provider: "openai-responses-api" | "gemini-developer-api"
 }
 
 type ReceiptIngestionDependencies = {
@@ -98,7 +98,7 @@ export const receiptParseResponseSchema = z.object({
     inputTokens: z.number().int(),
     modelId: z.string(),
     outputTokens: z.number().int(),
-    provider: z.literal("gemini-developer-api"),
+    provider: z.enum(["openai-responses-api", "gemini-developer-api"]),
   }),
   upsertReceiptItemInputDrafts: z.array(upsertReceiptItemInputDraftSchema),
 })

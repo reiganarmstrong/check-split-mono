@@ -14,7 +14,7 @@ The MVP supports one complete end-to-end flow:
 1. User signs up or logs in with Cognito.
 2. User starts a new receipt and uploads a photo or enters data manually.
 3. If a photo was uploaded, the browser compresses the image to fit the ingestion API limit (4 MB).
-4. Cognito-protected HTTP API sends the image to a Lambda that calls the Gemini API and normalizes the response into the app's receipt draft shape.
+4. Cognito-protected HTTP API sends the image to a Lambda that calls the OpenAI API and normalizes the response into the app's receipt draft shape.
 5. User reviews merchant details, groups, items, discounts, tax, tip, and fees in the receipt workspace.
 6. Frontend saves the receipt to a Cognito-protected AppSync GraphQL API backed by DynamoDB.
 7. User can reopen saved receipts, mark groups as paid, and generate a shareable visual summary.
@@ -44,8 +44,8 @@ flowchart TB
   C -. "JWT auth" .-> G
   C -. "JWT auth" .-> H
   H --> L["Lambda parser"]
-  S["SSM Parameter Store<br/>Gemini API key"] --> L
-  L --> M["Gemini API"]
+  S["SSM Parameter Store<br/>OpenAI API key"] --> L
+  L --> M["OpenAI API"]
   G --> D["DynamoDB receipt table"]
 
   classDef client fill:#E5E7EB,stroke:#6B7280,color:#111827,stroke-width:2px;
@@ -57,7 +57,7 @@ flowchart TB
   classDef lambda fill:#ED7100,stroke:#B55400,color:#FFFFFF,stroke-width:2px;
   classDef ssm fill:#E7157B,stroke:#B10F5E,color:#FFFFFF,stroke-width:2px;
   classDef dynamodb fill:#C925D1,stroke:#8E1AA1,color:#FFFFFF,stroke-width:2px;
-  classDef gemini fill:#4285F4,stroke:#EA4335,color:#FFFFFF,stroke-width:2px;
+  classDef openai fill:#000000,stroke:#000000,color:#FFFFFF,stroke-width:2px;
 
   class U client;
   class CF cloudfront;
@@ -68,7 +68,7 @@ flowchart TB
   class L lambda;
   class S ssm;
   class D dynamodb;
-  class M gemini;
+  class M openai;
 ```
 
 ## Repo Folder Structure
@@ -97,7 +97,7 @@ This folder contains the infrastructure definitions. It is structured with reusa
 - `infra/modules/static-website-hosting`: private S3 + CloudFront + Cloudflare DNS for static deploys
 - `infra/modules/cognito-auth`: Cognito user pool, client configuration, and custom auth domain configuration
 - `infra/modules/receipt-api`: AppSync + DynamoDB receipt persistence
-- `infra/modules/receipt-ingestion-api`: Cognito-protected HTTP API + Lambda + Gemini integration
+- `infra/modules/receipt-ingestion-api`: Cognito-protected HTTP API + Lambda + OpenAI integration
 - `infra/modules/github-actions-auth`: narrow AWS role for GitHub Actions via OIDC
 
 Module READMEs go into more detail. Use them for implementation specifics, inputs, outputs, and diagrams:
@@ -153,7 +153,7 @@ CheckSplit is at the MVP stage, and the core workflow is working well end to end
 Current MVP scope:
 
 - email/password authentication through Cognito
-- JPEG and PNG receipt scanning with Gemini-assisted extraction
+- JPEG and PNG receipt scanning with GPT-6 Luna-assisted extraction
 - manual receipt entry and correction of scanned data
 - saved receipt history and per-group payment tracking
 - AWS-hosted dev environment deployed through GitHub Actions

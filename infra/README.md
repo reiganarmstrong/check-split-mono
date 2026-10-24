@@ -17,7 +17,7 @@ Infra is split into reusable modules under `modules/` and root level environment
 - `certificates`: requests and validates the ACM certificate used by CloudFront and Cognito custom domains
 - `cognito-auth`: provisions the Cognito user pool, client, and custom auth domain
 - `receipt-api`: provisions the Cognito-protected AppSync API and fixed-capacity DynamoDB receipt table
-- `receipt-ingestion-api`: provisions the Cognito-protected HTTP API, Lambda parser, and Gemini integration
+- `receipt-ingestion-api`: provisions the Cognito-protected HTTP API, Lambda parser, and OpenAI integration
 - `github-actions-auth`: provisions the IAM role GitHub Actions assumes through OIDC
 
 Each module has its own README with architecture notes, inputs, outputs, and Mermaid diagrams.

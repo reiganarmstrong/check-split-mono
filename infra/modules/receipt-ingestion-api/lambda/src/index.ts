@@ -31,31 +31,25 @@ type ApiGatewayResponse = {
   statusCode: number
 }
 
-type GeminiGenerateContentResponse = {
-  candidates?: Array<{
-    content?: {
-      parts?: Array<{
-        text?: string
-      }>
-    }
-    finishReason?: string
+type OpenAIResponse = {
+  status?: string
+  output?: Array<{
+    type: string
+    content?: Array<{ type: string; text?: string }>
   }>
-  promptFeedback?: {
-    blockReason?: string
-  }
-  usageMetadata?: {
-    candidatesTokenCount?: number
-    promptTokenCount?: number
+  usage?: {
+    input_tokens?: number
+    output_tokens?: number
   }
 }
 
-const GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
 const DEFAULT_ALLOWED_ORIGIN = "*"
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite-preview"
+const DEFAULT_MODEL_ID = "gpt-6-luna"
 const DEFAULT_MAX_UPLOAD_BYTES = 4194304
-const GEMINI_REQUEST_TIMEOUT_MS = 20000
+const OPENAI_REQUEST_TIMEOUT_MS = 20000
 
-let cachedGeminiApiKey: string | null = null
+let cachedOpenAIApiKey: string | null = null
 
 function getEnv(name: string, fallback?: string) {
   return process.env[name] ?? fallback
@@ -164,52 +158,63 @@ function assertJwtClaims(event: ApiGatewayEvent) {
   }
 }
 
-async function getGeminiApiKey() {
-  if (cachedGeminiApiKey) {
-    return cachedGeminiApiKey
+async function getOpenAIApiKey() {
+  if (cachedOpenAIApiKey) {
+    return cachedOpenAIApiKey
   }
 
-  const parameterName = getEnv("GEMINI_API_KEY_PARAMETER_NAME")
+  const parameterName = getEnv("OPENAI_API_KEY_PARAMETER_NAME")
 
   if (!parameterName) {
-    throw new Error("Missing GEMINI_API_KEY_PARAMETER_NAME environment variable.")
+    throw new Error("Missing OPENAI_API_KEY_PARAMETER_NAME environment variable.")
   }
 
-  cachedGeminiApiKey = await getSecureStringParameter(parameterName)
-  return cachedGeminiApiKey
+  cachedOpenAIApiKey = await getSecureStringParameter(parameterName)
+  return cachedOpenAIApiKey
 }
 
-function extractGeminiText(response: GeminiGenerateContentResponse) {
-  const candidate = response.candidates?.[0]
-
-  if (!candidate) {
-    throw new Error("Gemini returned no response candidates.")
+function extractOpenAIText(response: OpenAIResponse) {
+  if (response.status !== "completed") {
+    throw new Error("OpenAI did not complete the receipt extraction.")
   }
 
-  if (response.promptFeedback?.blockReason) {
-    throw new Error(`Gemini blocked the request: ${response.promptFeedback.blockReason}.`)
+  if (!Array.isArray(response.output)) {
+    throw new Error("OpenAI returned no structured response.")
   }
 
-  const text = candidate.content?.parts
-    ?.map((part) => part.text ?? "")
-    .join("")
-    .trim()
+  const textParts: string[] = []
 
+  for (const item of response.output) {
+    if (item.type !== "message") continue
+    if (!Array.isArray(item.content)) {
+      throw new Error("OpenAI returned invalid message content.")
+    }
+    for (const part of item.content) {
+      if (part.type === "refusal") {
+        throw new Error("OpenAI refused the receipt extraction.")
+      }
+      if (part.type === "output_text") {
+        if (typeof part.text !== "string") {
+          throw new Error("OpenAI returned invalid structured text.")
+        }
+        textParts.push(part.text)
+      }
+    }
+  }
+
+  const text = textParts.join("").trim()
   if (!text) {
-    throw new Error(
-      `Gemini returned an empty structured response${candidate.finishReason ? ` (${candidate.finishReason})` : ""}.`,
-    )
+    throw new Error("OpenAI returned an empty structured response.")
   }
-
   return text
 }
 
-function buildParserMetadata(modelId: string, response: GeminiGenerateContentResponse) {
+function buildParserMetadata(modelId: string, response: OpenAIResponse) {
   return {
-    inputTokens: response.usageMetadata?.promptTokenCount ?? 0,
+    inputTokens: response.usage?.input_tokens ?? 0,
     modelId,
-    outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
-    provider: "gemini-developer-api" as const,
+    outputTokens: response.usage?.output_tokens ?? 0,
+    provider: "openai-responses-api" as const,
   }
 }
 
@@ -224,68 +229,71 @@ function ensureMateriallyUsefulResponse(response: ModelReceiptParseResponse) {
     return
   }
 
-  throw new Error("Gemini returned an empty draft without any issues or extracted receipt data.")
+  throw new Error("OpenAI returned an empty draft without any issues or extracted receipt data.")
 }
 
-async function callGemini(
+async function callOpenAI(
   apiKey: string,
   mimeType: string,
   modelId: string,
   payload: BufferLike,
 ): Promise<ReceiptParseResponse> {
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), GEMINI_REQUEST_TIMEOUT_MS)
+  const timeoutId = setTimeout(() => controller.abort(), OPENAI_REQUEST_TIMEOUT_MS)
 
   try {
-    const response = await fetch(`${GEMINI_API_BASE_URL}/${modelId}:generateContent`, {
+    const response = await fetch(OPENAI_RESPONSES_URL, {
       body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: IMAGE_PROMPT,
-              },
-              {
-                inlineData: {
-                  data: payload.toString("base64"),
-                  mimeType,
-                },
-              },
-            ],
-            role: "user",
-          },
-        ],
-        generationConfig: {
-          responseJsonSchema: receiptDraftResponseJsonSchema,
-          responseMimeType: "application/json",
-        },
-        systemInstruction: {
-          parts: [
+        model: modelId,
+        store: false,
+        service_tier: "default",
+        reasoning: { effort: "none" },
+        max_output_tokens: 8192,
+        instructions: SYSTEM_PROMPT,
+        input: [{
+          role: "user",
+          content: [
+            { type: "input_text", text: IMAGE_PROMPT },
             {
-              text: SYSTEM_PROMPT,
+              type: "input_image",
+              image_url: `data:${mimeType};base64,${payload.toString("base64")}`,
+              detail: "high",
             },
           ],
+        }],
+        text: {
+          format: {
+            type: "json_schema",
+            name: "receipt_draft",
+            strict: true,
+            schema: receiptDraftResponseJsonSchema,
+          },
         },
       }),
       headers: {
         "content-type": "application/json",
-        "x-goog-api-key": apiKey,
+        authorization: `Bearer ${apiKey}`,
       },
       method: "POST",
       signal: controller.signal,
     })
 
     if (!response.ok) {
-      throw new Error(`Gemini API returned ${response.status} ${response.statusText}.`)
+      throw new Error(`OpenAI API returned ${response.status} ${response.statusText}.`)
     }
 
-    const document = (await response.json()) as GeminiGenerateContentResponse
-    const parsedText = extractGeminiText(document)
-    const parsedJson = JSON.parse(parsedText) as unknown
+    const document = (await response.json()) as OpenAIResponse
+    const parsedText = extractOpenAIText(document)
+    let parsedJson: unknown
+    try {
+      parsedJson = JSON.parse(parsedText)
+    } catch {
+      throw new Error("OpenAI returned invalid structured JSON.")
+    }
     const validation = validateModelReceiptParseResponse(parsedJson)
 
     if (!validation.value) {
-      throw new Error(validation.error ?? "Gemini returned invalid structured JSON.")
+      throw new Error("OpenAI returned invalid structured JSON.")
     }
 
     const normalizedResponse = normalizeNeedsReview(validation.value)
@@ -320,9 +328,9 @@ export async function handler(event: ApiGatewayEvent): Promise<ApiGatewayRespons
       })
     }
 
-    const apiKey = await getGeminiApiKey()
-    const modelId = getEnv("GEMINI_MODEL_ID", DEFAULT_MODEL_ID) ?? DEFAULT_MODEL_ID
-    const response = await callGemini(apiKey, mimeType, modelId, body)
+    const apiKey = await getOpenAIApiKey()
+    const modelId = getEnv("OPENAI_MODEL_ID", DEFAULT_MODEL_ID) ?? DEFAULT_MODEL_ID
+    const response = await callOpenAI(apiKey, mimeType, modelId, body)
 
     return jsonResponse(event, 200, response)
   } catch (error) {
@@ -341,14 +349,14 @@ export async function handler(event: ApiGatewayEvent): Promise<ApiGatewayRespons
       }
 
       if (error.name === "AbortError") {
-        return jsonResponse(event, 504, { message: "Gemini request timed out." })
+        return jsonResponse(event, 504, { message: "OpenAI request timed out." })
       }
 
-      if (error.message.startsWith("Gemini returned an empty draft")) {
+      if (error.message.startsWith("OpenAI returned an empty draft")) {
         return jsonResponse(event, 422, { message: error.message })
       }
 
-      if (error.message.startsWith("Gemini")) {
+      if (error.message.startsWith("OpenAI")) {
         return jsonResponse(event, 502, { message: error.message })
       }
     }

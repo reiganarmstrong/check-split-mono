@@ -1,0 +1,310 @@
+{
+  "source": "https://expressexpense.com/blog/free-receipt-images-ocr-machine-learning-dataset/",
+  "archiveUrl": "https://expressexpense.com/large-receipt-image-dataset-SRD.zip",
+  "archiveMd5": "c8eb0f2d286da5ab742e7a5b59f15147",
+  "attribution": "ExpressExpense.com",
+  "license": "MIT",
+  "retrievedAt": "2026-10-10",
+  "groundTruthMethod": "Manual visual transcription of the original images, reviewed independently. No model-generated labels. Unprinted tip/fees/discounts accept null or zero. Date/time is unscored except null where no reliable time is visible.",
+  "fixtures": [
+    {
+      "id": "1008",
+      "image": "fixtures/1008-receipt.jpg",
+      "sha256": "8f04177091a9664989f5eb7905b6c65fae34288bf4af97e0ff180105e4618030",
+      "notes": [
+        "Tip suggestions are not actual tip.",
+        "No date visible."
+      ],
+      "expected": {
+        "merchantName": "Dona Mercedes Restaurant",
+        "receipt": {
+          "subtotalCents": 2225,
+          "taxCents": 222,
+          "totalCents": 2447,
+          "tipCents": [
+            null,
+            0
+          ],
+          "feeCents": [
+            null,
+            0
+          ],
+          "discountCents": [
+            null,
+            0
+          ],
+          "receiptOccurredAt": null
+        },
+        "items": [
+          {
+            "description": "Chicharon",
+            "quantity": 1,
+            "unitPriceCents": 225,
+            "lineSubtotalCents": 225,
+            "discountCents": 0
+          },
+          {
+            "description": "Pupusa Queso",
+            "quantity": 3,
+            "unitPriceCents": 225,
+            "lineSubtotalCents": 675,
+            "discountCents": 0
+          },
+          {
+            "description": "Platanos Orden",
+            "quantity": 1,
+            "unitPriceCents": 775,
+            "lineSubtotalCents": 775,
+            "discountCents": 0
+          },
+          {
+            "description": "Diet coke",
+            "quantity": 1,
+            "unitPriceCents": 150,
+            "lineSubtotalCents": 150,
+            "discountCents": 0
+          },
+          {
+            "description": "Quesadilla salvadorena",
+            "quantity": 2,
+            "unitPriceCents": 200,
+            "lineSubtotalCents": 400,
+            "discountCents": 0
+          }
+        ],
+        "editorSubtotalCents": 2225,
+        "editorTotalCents": 2447
+      }
+    },
+    {
+      "id": "1085",
+      "image": "fixtures/1085-receipt.jpg",
+      "sha256": "0fea07d91b1b05b3a7d355e90943a9e80f08fe06e1b08a2b976dd1ae1cdb63db",
+      "notes": [
+        "Final description printed with apparent typo; allow Miscellaneous alias.",
+        "Blank tip line is unknown.",
+        "Date visible 5/4/2017 4:10 PM; no timezone printed."
+      ],
+      "expected": {
+        "merchantName": [
+          "Pita Pita - Lombard",
+          "Pita Pita"
+        ],
+        "receipt": {
+          "subtotalCents": 21300,
+          "taxCents": 1592,
+          "totalCents": 22892,
+          "tipCents": [
+            null,
+            0
+          ],
+          "feeCents": [
+            null,
+            0
+          ],
+          "discountCents": [
+            null,
+            0
+          ]
+        },
+        "items": [
+          {
+            "description": "Mixed Meat Lunch",
+            "quantity": 20,
+            "unitPriceCents": 900,
+            "lineSubtotalCents": 18000,
+            "discountCents": 0
+          },
+          {
+            "description": "Reg 12pc Falafel",
+            "quantity": 1,
+            "unitPriceCents": 650,
+            "lineSubtotalCents": 650,
+            "discountCents": 0
+          },
+          {
+            "description": "Reg 12pc Falafel",
+            "quantity": 1,
+            "unitPriceCents": 650,
+            "lineSubtotalCents": 650,
+            "discountCents": 0
+          },
+          {
+            "description": [
+              "Miscelanceous",
+              "Miscellaneous",
+              "Miscelaneous"
+            ],
+            "quantity": 1,
+            "unitPriceCents": 2000,
+            "lineSubtotalCents": 2000,
+            "discountCents": 0
+          }
+        ],
+        "editorSubtotalCents": 21300,
+        "editorTotalCents": 22892
+      }
+    },
+    {
+      "id": "1144",
+      "image": "fixtures/1144-receipt.jpg",
+      "sha256": "5772787bf3b9d80e5e40da17563d96d911983a2f9bf668c8eeda012435967a9f",
+      "notes": [
+        "Printed amount due 46.40 differs by one cent from 36.00+3.19+7.20=46.39. Preserve amount due; flag arithmetic issue.",
+        "Date visible 08/03/18; no time/timezone printed."
+      ],
+      "expected": {
+        "merchantName": "CHLOE81",
+        "receipt": {
+          "subtotalCents": 3600,
+          "taxCents": 319,
+          "totalCents": 4640,
+          "tipCents": 720,
+          "feeCents": [
+            null,
+            0
+          ],
+          "discountCents": [
+            null,
+            0
+          ],
+          "receiptOccurredAt": null
+        },
+        "items": [
+          {
+            "description": "HOUSE VODKA",
+            "quantity": 2,
+            "unitPriceCents": 1200,
+            "lineSubtotalCents": 2400,
+            "discountCents": 0
+          },
+          {
+            "description": "HOUSE TEQUILA",
+            "quantity": 1,
+            "unitPriceCents": 1200,
+            "lineSubtotalCents": 1200,
+            "discountCents": 0
+          }
+        ],
+        "editorSubtotalCents": 3600,
+        "editorTotalCents": 4639,
+        "needsReview": true
+      }
+    },
+    {
+      "id": "1113",
+      "image": "fixtures/1113-receipt.jpg",
+      "sha256": "7b80f67f02dce82cc075ac17099627fd2733d19d850bc7ce3f5f1ec830117953",
+      "notes": [
+        "Date visible 6/02/2018 04:18:31 PM; no timezone printed."
+      ],
+      "expected": {
+        "merchantName": "Golden Panda Buffet",
+        "receipt": {
+          "subtotalCents": 2736,
+          "taxCents": 260,
+          "totalCents": 2996,
+          "tipCents": [
+            null,
+            0
+          ],
+          "feeCents": [
+            null,
+            0
+          ],
+          "discountCents": [
+            null,
+            0
+          ]
+        },
+        "items": [
+          {
+            "description": "Adult Dinner",
+            "quantity": 2,
+            "unitPriceCents": 1199,
+            "lineSubtotalCents": 2398,
+            "discountCents": 0
+          },
+          {
+            "description": "Soda",
+            "quantity": 2,
+            "unitPriceCents": 169,
+            "lineSubtotalCents": 338,
+            "discountCents": 0
+          }
+        ],
+        "editorSubtotalCents": 2736,
+        "editorTotalCents": 2996
+      }
+    },
+    {
+      "id": "1001",
+      "image": "fixtures/1001-receipt.jpg",
+      "sha256": "679584af268f174b10fbea42099f08c23e86f213b04c7ab086890492dea04783",
+      "notes": [
+        "Repeated Coffee remains two rows.",
+        "Gratuity Not Included and suggested gratuities must not count as actual tip.",
+        "Multiple timestamps visible (16:43 04/25/15 and 04/25 17:42); avoid scoring transaction timestamp."
+      ],
+      "expected": {
+        "merchantName": "GRAND LUX CAFE",
+        "receipt": {
+          "subtotalCents": 6375,
+          "taxCents": 550,
+          "totalCents": 6925,
+          "tipCents": [
+            null,
+            0
+          ],
+          "feeCents": [
+            null,
+            0
+          ],
+          "discountCents": [
+            null,
+            0
+          ]
+        },
+        "items": [
+          {
+            "description": "Coffee",
+            "quantity": 1,
+            "unitPriceCents": 295,
+            "lineSubtotalCents": 295,
+            "discountCents": 0
+          },
+          {
+            "description": "Chicken Parmesan",
+            "quantity": 1,
+            "unitPriceCents": 1795,
+            "lineSubtotalCents": 1795,
+            "discountCents": 0
+          },
+          {
+            "description": "Prime Top Sirloin",
+            "quantity": 1,
+            "unitPriceCents": 2595,
+            "lineSubtotalCents": 2595,
+            "discountCents": 0
+          },
+          {
+            "description": "The Bacon-Cheese Burger",
+            "quantity": 1,
+            "unitPriceCents": 1395,
+            "lineSubtotalCents": 1395,
+            "discountCents": 0
+          },
+          {
+            "description": "Coffee",
+            "quantity": 1,
+            "unitPriceCents": 295,
+            "lineSubtotalCents": 295,
+            "discountCents": 0
+          }
+        ],
+        "editorSubtotalCents": 6375,
+        "editorTotalCents": 6925
+      }
+    }
+  ]
+}

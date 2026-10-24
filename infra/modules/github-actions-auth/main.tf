@@ -7,6 +7,13 @@ data "aws_caller_identity" "current" {}
 
 data "aws_partition" "current" {}
 
+data "aws_ssm_parameter" "this" {
+  count = var.receipt_parse_api_key_ssm_parameter_name == null ? 0 : 1
+
+  name            = var.receipt_parse_api_key_ssm_parameter_name
+  with_decryption = false
+}
+
 # create an iam role that github actions can assume for the specified repo
 resource "aws_iam_role" "github_actions_role" {
   name               = "${var.repo_name}-${var.environment}-github-actions"
@@ -530,6 +537,34 @@ data "aws_iam_policy_document" "github_actions_account_data_deletion_permissions
 }
 
 data "aws_iam_policy_document" "github_actions_receipt_ingestion_permissions" {
+  dynamic "statement" {
+    for_each = data.aws_ssm_parameter.this
+
+    content {
+      sid       = "AllowReadReceiptParsingApiKeyParameter"
+      effect    = "Allow"
+      actions   = ["ssm:GetParameter"]
+      resources = [statement.value.arn]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = data.aws_ssm_parameter.this
+
+    content {
+      sid       = "DenyDecryptReceiptParsingApiKey"
+      effect    = "Deny"
+      actions   = ["kms:Decrypt"]
+      resources = ["*"]
+
+      condition {
+        test     = "StringEquals"
+        variable = "kms:EncryptionContext:PARAMETER_ARN"
+        values   = [statement.value.arn]
+      }
+    }
+  }
+
   statement {
     sid    = "AllowManageReceiptIngestionHttpApi"
     effect = "Allow"

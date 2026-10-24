@@ -2,6 +2,12 @@ variable "environment" {
   type = string
 }
 
+variable "receipt_parse_api_key_ssm_parameter_name" {
+  description = "Optional receipt API key parameter whose ARN Terraform may look up without decryption."
+  type        = string
+  default     = null
+}
+
 variable "repo_name" {
   type = string
 }

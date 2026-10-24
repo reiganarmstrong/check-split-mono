@@ -18,15 +18,15 @@ variable "environment" {
   type        = string
 }
 
-variable "gemini_api_key_ssm_parameter_name" {
-  description = "SSM SecureString parameter name that stores the Gemini API key."
+variable "openai_api_key_ssm_parameter_name" {
+  description = "SSM SecureString parameter name that stores the OpenAI API key."
   type        = string
 }
 
-variable "gemini_model_id" {
-  description = "Gemini direct API model ID used for receipt parsing."
+variable "openai_model_id" {
+  description = "OpenAI Responses API model ID used for receipt parsing."
   type        = string
-  default     = "gemini-3.1-flash-lite-preview"
+  default     = "gpt-6-luna"
 }
 
 variable "lambda_memory_size" {

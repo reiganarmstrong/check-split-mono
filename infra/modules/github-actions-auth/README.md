@@ -131,6 +131,7 @@ module "dev-github-actions-auth" {
 | `repo_name` | `string` | Repository short name used in IAM resource naming. |
 | `github_repo_path` | `string` | GitHub repository path used in the OIDC subject condition, for example `owner/repo`. |
 | `github_repo_environment` | `string` | GitHub Actions environment name required by the trust policy. |
+| `receipt_parse_api_key_ssm_parameter_name` | `string` or `null` | Optional existing receipt API key parameter. Grants Terraform `ssm:GetParameter` for ARN lookup without decryption; defaults to `null`. |
 | `website_s3_bucket_arn` | `string` | ARN of the website bucket that workflows need to manage. |
 | `tfstate_s3_bucket_object` | `object({ arn = string, object_prefix = string })` | Terraform state bucket ARN plus the object-prefix scope for read/write object access. |
 
@@ -144,4 +145,5 @@ module "dev-github-actions-auth" {
 
 - This module assumes the GitHub OIDC provider already exists in the account.
 - The attached policy is broad enough to support the currently-managed infra modules, but it is still scoped by service and resource shape rather than using full admin access.
-- The module intentionally does not grant GitHub Actions write access to the Gemini API key in SSM Parameter Store. That secret is created and rotated out of band.
+- The module intentionally does not grant GitHub Actions write access to the OpenAI API key in SSM Parameter Store. That secret is created and rotated out of band.
+- The bootstrap Dev role enables metadata lookup for `/checksplit/dev/openai/api-key`. Provision that SecureString before applying bootstrap. Configure the optional parameter input for staging or production when migrating those environments. An explicit `kms:Decrypt` deny scoped to that parameter's encryption context prevents the role from decrypting this API key, including with the [default SSM encryption key](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-setting-up.html).

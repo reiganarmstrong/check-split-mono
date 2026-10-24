@@ -37,9 +37,9 @@ output "receipt_parse_api_url" {
   value       = module.receipt-ingestion-api.parse_api_url
 }
 
-output "receipt_parse_gemini_model_id" {
-  description = "The Gemini model configured for the receipt parsing Lambda."
-  value       = module.receipt-ingestion-api.gemini_model_id
+output "receipt_parse_openai_model_id" {
+  description = "The OpenAI model configured for the receipt parsing Lambda."
+  value       = module.receipt-ingestion-api.openai_model_id
 }
 
 output "receipt_parse_lambda_function_name" {

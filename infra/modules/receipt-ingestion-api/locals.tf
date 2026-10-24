@@ -7,5 +7,4 @@ locals {
   route_key            = "POST /receipts/parse"
   route_path           = "/receipts/parse"
   stage_name           = "$default"
-  ssm_parameter_path   = trimprefix(var.gemini_api_key_ssm_parameter_name, "/")
 }

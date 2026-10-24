@@ -41,7 +41,7 @@ export type ReceiptParseResponse = ModelReceiptParseResponse & {
     inputTokens: number
     modelId: string
     outputTokens: number
-    provider: "gemini-developer-api"
+    provider: "openai-responses-api"
   }
 }
 
